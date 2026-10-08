@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-08T17:25:20",
+  "mode": "CPU-only (baseline, not valid for the GPU targets)",
+  "model": "llama3:8b",
+  "num_ctx": 4096,
+  "runs_per_prompt": 5,
+  "results": {
+    "short": {
+      "mean_tpot_ms": 169.53,
+      "max_tpot_ms": 180.95
+    },
+    "medium": {
+      "mean_tpot_ms": 187.65,
+      "max_tpot_ms": 225.59
+    },
+    "long": {
+      "mean_tpot_ms": 229.36,
+      "max_tpot_ms": 336.03
+    }
+  },
+  "worst_mean_tpot_ms": 229.36,
+  "approx_tokens_per_second": 4.4,
+  "peak_vram_mb": 0,
+  "vram_source": "ollama ps (model only)",
+  "peak_model_size_mb": 5070,
+  "peak_ram_mb": 26,
+  "hardware": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu_threads": 16,
+    "total_ram_gb": 7.3,
+    "nvidia_gpu_found": false
+  },
+  "checks": {
+    "tpot_under_45ms": false,
+    "vram_under_6gb": null,
+    "ram_under_8gb": true
+  }
+}
