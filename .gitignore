@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# Flutter / Dart
+build/
+.dart_tool/
+
+# Environment and secrets
+.env
+.env.*
+gcp-oauth.keys.json
+token.json
+credentials.json
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+
+# Model weights
+*.gguf
+*.bin
+*.onnx
+*.pt
+
+# Audio files
+*.wav
+*.opus
+*.mp3
