@@ -1,7 +1,9 @@
 # Python
 __pycache__/
+venv/
 .venv/
 *.pyc
+.pytest_cache/
 
 # Flutter / Dart
 build/
@@ -17,6 +19,7 @@ credentials.json
 # IDE
 .idea/
 .vscode/*
+.vscode/
 !.vscode/settings.json
 
 # Model weights
