@@ -1,1 +1,8 @@
 # Python dependencies for the agentic core
+
+ollama>=0.4
+pyyaml
+psutil
+nvidia-ml-py
+pytest
+

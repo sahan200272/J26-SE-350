@@ -1,0 +1,6 @@
+model: "llama3:8b"
+host: "http://localhost:11434"
+num_ctx: 4096
+temperature: 0.0 #This is useful to claim deterministic in same input and same output
+num_predict: 512
+keep_alive: "30m"
