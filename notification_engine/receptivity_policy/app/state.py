@@ -62,10 +62,10 @@ def sent_bucket(sent_today):
 def encode_state(hour, is_weekend, priority, minutes_left, sent_today):
     """Combine the five parts of a situation into one number from 0 to 719."""
 
-    part = DAY_PARTS.index(day_part(hour))
-    weekend = 1 if is_weekend else 0
-    prio = PRIORITIES.index(priority)
-    left = time_left_bucket(minutes_left)
-    sent = sent_bucket(sent_today)
+    part = DAY_PARTS.index(day_part(hour))      # 0-5
+    weekend = 1 if is_weekend else 0            # 0-1
+    prio = PRIORITIES.index(priority)           # 0-3
+    left = time_left_bucket(minutes_left)       # 0-4
+    sent = sent_bucket(sent_today)              # 0-2
 
     return (((part * 2 + weekend) * 4 + prio) * 5 + left) * 3 + sent

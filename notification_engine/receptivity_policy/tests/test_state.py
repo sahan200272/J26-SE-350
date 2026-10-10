@@ -36,5 +36,4 @@ def test_every_situation_gets_its_own_number():
                         )
 
     assert len(numbers) == N_STATES == 720
-    assert min(numbers) == 0
-    assert max(numbers) == 719
+    assert min(numbers) == 0 and max(numbers) == 719
