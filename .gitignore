@@ -12,6 +12,7 @@ build/
 # Environment and secrets
 .env
 .env.*
+!.env.example
 gcp-oauth.keys.json
 token.json
 credentials.json
@@ -32,3 +33,5 @@ credentials.json
 *.wav
 *.opus
 *.mp3
+knowledge_graph/neo4j_data/
+.env
