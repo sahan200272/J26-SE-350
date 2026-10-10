@@ -1,0 +1,185 @@
+{
+  "source": "voice_conversation_20261010_1300",
+  "entities": [
+    {
+      "type": "Person",
+      "name": "Sarah",
+      "props": {
+        "description": "Lead project manager"
+      }
+    },
+    {
+      "type": "Organization",
+      "name": "Acme Corp",
+      "props": {
+        "description": "Engineering company"
+      }
+    },
+    {
+      "type": "Task",
+      "name": "Prepare slides",
+      "props": {
+        "status": "in_progress",
+        "priority": "high",
+        "description": "Prepare final presentation slides for marketing review"
+      }
+    },
+    {
+      "type": "Project",
+      "name": "Marketing",
+      "props": {
+        "status": "active",
+        "description": "Q4 product marketing rollout"
+      }
+    },
+    {
+      "type": "Meeting",
+      "name": "Weekly Sync",
+      "props": {
+        "date": "2026-10-10",
+        "description": "Weekly progress sync meeting"
+      }
+    },
+    {
+      "type": "Location",
+      "name": "Conference Room A",
+      "props": {
+        "description": "Building 2, 3rd Floor"
+      }
+    },
+    {
+      "type": "Deadline",
+      "name": "2026-10-12",
+      "props": {
+        "date": "2026-10-12"
+      }
+    },
+    {
+      "type": "Event",
+      "name": "Product Launch",
+      "props": {
+        "date": "2026-11-01",
+        "description": "Public product release"
+      }
+    },
+    {
+      "type": "Note",
+      "name": "Sprint 4 Retrospective",
+      "props": {
+        "description": "Action items and takeaways from Sprint 4"
+      }
+    },
+    {
+      "type": "Concept",
+      "name": "Zero-Knowledge Proofs",
+      "props": {
+        "kind": "cryptography",
+        "description": "Privacy-preserving verification protocol"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah"
+      },
+      "type": "MEMBER_OF",
+      "to": {
+        "type": "Organization",
+        "name": "Acme Corp"
+      }
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah"
+      },
+      "type": "ATTENDED",
+      "to": {
+        "type": "Meeting",
+        "name": "Weekly Sync"
+      }
+    },
+    {
+      "from": {
+        "type": "Meeting",
+        "name": "Weekly Sync"
+      },
+      "type": "LOCATED_AT",
+      "to": {
+        "type": "Location",
+        "name": "Conference Room A"
+      }
+    },
+    {
+      "from": {
+        "type": "Meeting",
+        "name": "Weekly Sync"
+      },
+      "type": "DISCUSSED",
+      "to": {
+        "type": "Task",
+        "name": "Prepare slides"
+      }
+    },
+    {
+      "from": {
+        "type": "Task",
+        "name": "Prepare slides"
+      },
+      "type": "ASSIGNED_TO",
+      "to": {
+        "type": "Person",
+        "name": "Sarah"
+      }
+    },
+    {
+      "from": {
+        "type": "Task",
+        "name": "Prepare slides"
+      },
+      "type": "PART_OF",
+      "to": {
+        "type": "Project",
+        "name": "Marketing"
+      }
+    },
+    {
+      "from": {
+        "type": "Task",
+        "name": "Prepare slides"
+      },
+      "type": "DUE_ON",
+      "to": {
+        "type": "Deadline",
+        "name": "2026-10-12"
+      }
+    },
+    {
+      "from": {
+        "type": "Note",
+        "name": "Sprint 4 Retrospective"
+      },
+      "type": "MENTIONS",
+      "to": {
+        "type": "Project",
+        "name": "Marketing"
+      }
+    },
+    {
+      "from": {
+        "type": "Event",
+        "name": "Product Launch"
+      },
+      "type": "RELATED_TO",
+      "to": {
+        "type": "Project",
+        "name": "Marketing"
+      },
+      "props": {
+        "label": "CELEBRATES"
+      }
+    }
+  ]
+}

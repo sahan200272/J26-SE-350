@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GraphPayload",
+  "description": "Payload format for entities and relationships extracted from voice conversations to update the knowledge graph.",
+  "type": "object",
+  "required": [
+    "source",
+    "entities",
+    "relationships"
+  ],
+  "properties": {
+    "source": {
+      "type": "string",
+      "description": "Source identifier, e.g. voice_conversation_20261010_1300 or transcript file."
+    },
+    "entities": {
+      "type": "array",
+      "description": "List of extracted entities to upsert into the graph.",
+      "items": {
+        "$ref": "#/$defs/Entity"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "description": "List of relationships connecting the extracted entities.",
+      "items": {
+        "$ref": "#/$defs/Relationship"
+      }
+    }
+  },
+  "$defs": {
+    "EntityRef": {
+      "type": "object",
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Entity label. Recommended standard labels: Person, Task, Project, Meeting, Deadline, Organization, Location, Event, Concept, Note. Unknown types are normalized to Concept."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name of the referenced entity (non-empty)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "Entity": {
+      "type": "object",
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Entity label. Recommended standard labels: Person, Task, Project, Meeting, Deadline, Organization, Location, Event, Concept, Note. Unknown types are normalized to Concept with props['original_type']."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Display name of the entity (non-empty)."
+        },
+        "props": {
+          "type": "object",
+          "description": "Optional whitelisted entity attributes with scalar values (str, int, float, bool).",
+          "properties": {
+            "status": {
+              "type": ["string", "number", "boolean"],
+              "description": "Status of a task or project."
+            },
+            "priority": {
+              "type": ["string", "number", "boolean"],
+              "description": "Priority level, e.g. low, medium, high."
+            },
+            "date": {
+              "type": ["string", "number", "boolean"],
+              "description": "Date or deadline string in ISO format (YYYY-MM-DD)."
+            },
+            "description": {
+              "type": ["string", "number", "boolean"],
+              "description": "Text description or notes."
+            },
+            "label": {
+              "type": ["string", "number", "boolean"],
+              "description": "Original relationship type when converted to RELATED_TO."
+            },
+            "original_type": {
+              "type": ["string", "number", "boolean"],
+              "description": "Original entity type before fallback normalization to Concept."
+            },
+            "kind": {
+              "type": ["string", "number", "boolean"],
+              "description": "Sub-category or classifier for concepts or notes."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Relationship": {
+      "type": "object",
+      "required": [
+        "from",
+        "type",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/EntityRef",
+          "description": "Source entity of the directed edge."
+        },
+        "type": {
+          "type": "string",
+          "description": "Relationship type. Recommended: ASSIGNED_TO, PART_OF, WORKS_ON, ATTENDED, DISCUSSED, DUE_ON, LOCATED_AT, MEMBER_OF, MENTIONS, RELATED_TO. Unknown types or invalid directions fallback to RELATED_TO."
+        },
+        "to": {
+          "$ref": "#/$defs/EntityRef",
+          "description": "Target entity of the directed edge."
+        },
+        "props": {
+          "type": "object",
+          "description": "Optional whitelisted relationship attributes with scalar values (str, int, float, bool).",
+          "properties": {
+            "status": {
+              "type": ["string", "number", "boolean"]
+            },
+            "priority": {
+              "type": ["string", "number", "boolean"]
+            },
+            "date": {
+              "type": ["string", "number", "boolean"]
+            },
+            "description": {
+              "type": ["string", "number", "boolean"]
+            },
+            "label": {
+              "type": ["string", "number", "boolean"],
+              "description": "Original relationship type stored when normalized to RELATED_TO."
+            },
+            "original_type": {
+              "type": ["string", "number", "boolean"]
+            },
+            "kind": {
+              "type": ["string", "number", "boolean"]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
