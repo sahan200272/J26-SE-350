@@ -2,95 +2,159 @@
 
 import logging
 import re
-from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union, get_args
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 logger = logging.getLogger(__name__)
 
-# Allowed node labels in the Knowledge Graph
+# Node labels (22)
 NodeLabel = Literal[
     "Person",
-    "Task",
-    "Project",
-    "Meeting",
-    "Deadline",
+    "Team",
     "Organization",
-    "Location",
+    "Project",
+    "Task",
+    "Goal",
+    "Meeting",
+    "Decision",
+    "Issue",
+    "Question",
+    "Idea",
+    "Document",
+    "Tool",
+    "Metric",
+    "Deadline",
     "Event",
+    "Location",
+    "Topic",
     "Concept",
+    "Preference",
     "Note",
+    "Conversation",
 ]
 
-ALLOWED_NODE_LABELS: Set[str] = {
-    "Person",
-    "Task",
-    "Project",
-    "Meeting",
-    "Deadline",
-    "Organization",
-    "Location",
-    "Event",
-    "Concept",
-    "Note",
-}
+ALLOWED_NODE_LABELS: Set[str] = set(get_args(NodeLabel))
 
-# Allowed relationship types in the Knowledge Graph
+# Relationship types (35)
 RelationshipType = Literal[
-    "ASSIGNED_TO",
-    "PART_OF",
-    "WORKS_ON",
-    "ATTENDED",
-    "DISCUSSED",
-    "DUE_ON",
-    "LOCATED_AT",
     "MEMBER_OF",
+    "LEADS",
+    "REPORTS_TO",
+    "COLLABORATES_WITH",
+    "ATTENDED",
+    "ABSENT_FROM",
+    "ASSIGNED_TO",
+    "REQUESTED_BY",
+    "WORKS_ON",
+    "PART_OF",
+    "DEPENDS_ON",
+    "BLOCKED_BY",
+    "FOLLOW_UP_OF",
+    "SUPPORTS",
+    "DUE_ON",
+    "SCHEDULED_ON",
+    "LOCATED_AT",
+    "CREATED_IN",
+    "DISCUSSED",
+    "DECIDED",
+    "RAISED",
+    "PROPOSED",
+    "HAS_ISSUE",
+    "RESOLVES",
+    "ANSWERS",
+    "SUPERSEDES",
+    "AGREES_WITH",
+    "DISAGREES_WITH",
+    "REFERENCES",
+    "USES",
+    "HAS_METRIC",
+    "ABOUT",
+    "PREFERS",
     "MENTIONS",
     "RELATED_TO",
 ]
 
-ALLOWED_RELATIONSHIP_TYPES: Set[str] = {
-    "ASSIGNED_TO",
-    "PART_OF",
-    "WORKS_ON",
-    "ATTENDED",
-    "DISCUSSED",
-    "DUE_ON",
-    "LOCATED_AT",
-    "MEMBER_OF",
-    "MENTIONS",
-    "RELATED_TO",
-}
+ALLOWED_RELATIONSHIP_TYPES: Set[str] = set(get_args(RelationshipType))
 
 # Allowed relationship directions: Type -> (FromLabel(s), ToLabel(s))
-# None indicates any allowed NodeLabel is permitted.
+# A rule can be a set of allowed NodeLabels, or "any" allowing any NodeLabel.
 ALLOWED_DIRECTIONS: Dict[
     str,
     Tuple[
-        Optional[Union[str, Tuple[str, ...]]],
-        Optional[Union[str, Tuple[str, ...]]],
+        Union[Set[str], Literal["any"]],
+        Union[Set[str], Literal["any"]],
     ],
 ] = {
-    "ASSIGNED_TO": ("Task", "Person"),
-    "PART_OF": ("Task", "Project"),
-    "WORKS_ON": ("Person", "Project"),
-    "ATTENDED": ("Person", "Meeting"),
-    "DISCUSSED": ("Meeting", ("Project", "Task")),
-    "DUE_ON": ("Task", "Deadline"),
-    "LOCATED_AT": (("Meeting", "Event", "Task"), "Location"),
-    "MEMBER_OF": ("Person", "Organization"),
-    "MENTIONS": ("Note", None),
-    "RELATED_TO": (None, None),
+    "MEMBER_OF": ({"Person"}, {"Team", "Organization"}),
+    "LEADS": ({"Person"}, {"Team", "Project", "Meeting"}),
+    "REPORTS_TO": ({"Person"}, {"Person"}),
+    "COLLABORATES_WITH": ({"Person"}, {"Person"}),
+    "ATTENDED": ({"Person"}, {"Meeting"}),
+    "ABSENT_FROM": ({"Person"}, {"Meeting"}),
+    "ASSIGNED_TO": ({"Task"}, {"Person"}),
+    "REQUESTED_BY": ({"Task"}, {"Person"}),
+    "WORKS_ON": ({"Person"}, {"Project"}),
+    "PART_OF": ({"Task", "Project"}, {"Project", "Task"}),
+    "DEPENDS_ON": ({"Task", "Project"}, {"Task", "Project"}),
+    "BLOCKED_BY": ({"Task", "Project"}, {"Issue", "Task"}),
+    "FOLLOW_UP_OF": ({"Task", "Meeting"}, {"Task", "Meeting"}),
+    "SUPPORTS": ({"Task", "Project"}, {"Goal"}),
+    "DUE_ON": ({"Task", "Project", "Goal"}, {"Deadline"}),
+    "SCHEDULED_ON": ({"Meeting", "Event"}, {"Deadline"}),
+    "LOCATED_AT": ({"Meeting", "Event", "Task"}, {"Location"}),
+    "CREATED_IN": (
+        {"Task", "Decision", "Issue", "Question", "Idea", "Note", "Document"},
+        {"Meeting", "Conversation"},
+    ),
+    "DISCUSSED": ({"Meeting"}, "any"),
+    "DECIDED": ({"Person"}, {"Decision"}),
+    "RAISED": ({"Person"}, {"Issue", "Question"}),
+    "PROPOSED": ({"Person"}, {"Idea"}),
+    "HAS_ISSUE": ({"Project", "Task"}, {"Issue"}),
+    "RESOLVES": ({"Task", "Decision"}, {"Issue"}),
+    "ANSWERS": ({"Decision", "Note"}, {"Question"}),
+    "SUPERSEDES": ({"Decision"}, {"Decision"}),
+    "AGREES_WITH": ({"Person"}, {"Idea", "Decision", "Person"}),
+    "DISAGREES_WITH": ({"Person"}, {"Idea", "Decision", "Person"}),
+    "REFERENCES": (
+        {"Meeting", "Task", "Project", "Note", "Decision"},
+        {"Document"},
+    ),
+    "USES": ({"Project", "Task", "Team"}, {"Tool"}),
+    "HAS_METRIC": (
+        {"Project", "Task", "Goal", "Meeting", "Decision"},
+        {"Metric"},
+    ),
+    "ABOUT": (
+        {"Note", "Decision", "Idea", "Meeting", "Conversation"},
+        {"Topic"},
+    ),
+    "PREFERS": ({"Person"}, {"Preference", "Concept"}),
+    "MENTIONS": ({"Note", "Conversation"}, "any"),
+    "RELATED_TO": ("any", "any"),
 }
 
 # Whitelist of allowed node and relationship property keys
 ALLOWED_PROPERTIES: Set[str] = {
     "status",
     "priority",
+    "progress",
     "date",
+    "time",
+    "duration",
+    "recurrence",
+    "value",
+    "unit",
+    "title",
+    "severity",
+    "kind",
     "description",
+    "rationale",
+    "quote",
+    "timestamp",
+    "confidence",
     "label",
     "original_type",
-    "kind",
 }
 
 
@@ -106,15 +170,17 @@ def is_valid_direction(rel_type: str, from_type: str, to_type: str) -> bool:
 
     from_rule, to_rule = ALLOWED_DIRECTIONS[rel_type]
 
-    if from_rule is not None:
-        if isinstance(from_rule, tuple):
+    # Validate from_type
+    if from_rule != "any":
+        if isinstance(from_rule, (set, tuple, list)):
             if from_type not in from_rule:
                 return False
         elif from_type != from_rule:
             return False
 
-    if to_rule is not None:
-        if isinstance(to_rule, tuple):
+    # Validate to_type
+    if to_rule != "any":
+        if isinstance(to_rule, (set, tuple, list)):
             if to_type not in to_rule:
                 return False
         elif to_type != to_rule:
@@ -151,7 +217,7 @@ class EntityRef(BaseModel):
     def validate_name(cls, v: str) -> str:
         stripped = v.strip()
         if not stripped:
-            raise ValueError("Entity name must be non-empty")
+            raise ValueError("EntityRef name must be non-empty")
         return stripped
 
     @model_validator(mode="before")
@@ -249,9 +315,7 @@ class Relationship(BaseModel):
                     else:
                         data["from_entity"] = from_data
                     from_type = "Concept"
-            elif isinstance(from_data, EntityRef):
-                from_type = from_data.type
-            elif isinstance(from_data, Entity):
+            elif isinstance(from_data, (EntityRef, Entity)):
                 from_type = from_data.type
             else:
                 from_type = None
@@ -267,9 +331,7 @@ class Relationship(BaseModel):
                     else:
                         data["to_entity"] = to_data
                     to_type = "Concept"
-            elif isinstance(to_data, EntityRef):
-                to_type = to_data.type
-            elif isinstance(to_data, Entity):
+            elif isinstance(to_data, (EntityRef, Entity)):
                 to_type = to_data.type
             else:
                 to_type = None

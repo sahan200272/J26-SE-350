@@ -1,0 +1,598 @@
+{
+  "version": "1.0.0",
+  "node_labels": {
+    "Concept": {
+      "tier": 2,
+      "definition": "A domain concept, entity, or fallback node for unrecognized entity types.",
+      "example": "Zero-Knowledge Proofs"
+    },
+    "Conversation": {
+      "tier": 2,
+      "definition": "A recorded speech interaction, dialogue, or voice session transcript.",
+      "example": "voice_convo_20261011_1430"
+    },
+    "Deadline": {
+      "tier": 1,
+      "definition": "A specific date, time, or target milestone by which something must finish.",
+      "example": "2026-10-18T18:00:00Z"
+    },
+    "Decision": {
+      "tier": 1,
+      "definition": "An agreed-upon conclusion, policy, or choice that has already been decided.",
+      "example": "Adopt Neo4j 5 as the single source of truth for graph memory"
+    },
+    "Document": {
+      "tier": 1,
+      "definition": "A written file, specification, design doc, PRD, or meeting agenda.",
+      "example": "RFC-204 Local Graph Storage Architecture"
+    },
+    "Event": {
+      "tier": 2,
+      "definition": "A calendar occurrence, public demo, release date, or milestone event.",
+      "example": "Private Beta Release Demo"
+    },
+    "Goal": {
+      "tier": 2,
+      "definition": "A high-level strategic objective or outcome that projects and tasks support.",
+      "example": "Achieve sub-500ms voice response latency"
+    },
+    "Idea": {
+      "tier": 2,
+      "definition": "A proposed suggestion or possibility put forward for consideration that is not yet decided.",
+      "example": "Cache acoustic embeddings in SQLite for instant repeat lookups"
+    },
+    "Issue": {
+      "tier": 1,
+      "definition": "A problem, bug, risk, obstacle, or blocker hindering progress that needs resolution.",
+      "example": "Whisper transcription runs out of memory on 8GB machines"
+    },
+    "Location": {
+      "tier": 1,
+      "definition": "A physical room, office, or virtual platform where an event or meeting occurs.",
+      "example": "Conference Room A / Zoom Room 4"
+    },
+    "Meeting": {
+      "tier": 1,
+      "definition": "A scheduled or ad-hoc gathering where people discuss topics and align on work.",
+      "example": "Sprint 14 Architecture Sync"
+    },
+    "Metric": {
+      "tier": 2,
+      "definition": "A quantitative benchmark, measurement, or key performance indicator.",
+      "example": "P99 Response Latency: 120ms"
+    },
+    "Note": {
+      "tier": 2,
+      "definition": "A freeform text note, memo, or excerpt.",
+      "example": "Quick takeaway notes from retrospective"
+    },
+    "Organization": {
+      "tier": 1,
+      "definition": "A company, institution, partner, or enterprise entity.",
+      "example": "InnoTech Labs"
+    },
+    "Person": {
+      "tier": 1,
+      "definition": "An individual participant, employee, or stakeholder mentioned in conversations.",
+      "example": "Sarah Chen, Staff AI Engineer"
+    },
+    "Preference": {
+      "tier": 2,
+      "definition": "A stated user preference, constraint, or work habit.",
+      "example": "Prefers asynchronous meeting updates"
+    },
+    "Project": {
+      "tier": 1,
+      "definition": "A coordinated workstream or initiative with defined deliverables.",
+      "example": "Local Voice AI Assistant"
+    },
+    "Question": {
+      "tier": 1,
+      "definition": "An open, unresolved question or inquiry raised in discussion that requires an answer.",
+      "example": "Can we offload embedding calculation to the Apple Neural Engine?"
+    },
+    "Task": {
+      "tier": 1,
+      "definition": "An actionable work item that someone must do (distinguished from an Idea or Decision).",
+      "example": "Benchmark Ollama 8B inference latency on M2 Mac"
+    },
+    "Team": {
+      "tier": 1,
+      "definition": "A formal or informal group of people working together within an organization.",
+      "example": "Core AI Pipeline Team"
+    },
+    "Tool": {
+      "tier": 2,
+      "definition": "A software tool, runtime, framework, library, or platform used by teams or projects.",
+      "example": "Neo4j 5, Docker Compose, PyTorch"
+    },
+    "Topic": {
+      "tier": 2,
+      "definition": "A subject area, domain, or theme discussed in meetings, notes, or decisions.",
+      "example": "Memory Optimization and Quantization"
+    }
+  },
+  "relationship_types": {
+    "ABOUT": {
+      "definition": "Specifies the subject matter topic of a note, decision, idea, or meeting.",
+      "example": "Architecture Sync Meeting ABOUT Memory Optimization Topic",
+      "allowed_directions": {
+        "from": [
+          "Conversation",
+          "Decision",
+          "Idea",
+          "Meeting",
+          "Note"
+        ],
+        "to": [
+          "Topic"
+        ]
+      }
+    },
+    "ABSENT_FROM": {
+      "definition": "Records that an expected person was absent from a meeting.",
+      "example": "Alex ABSENT_FROM Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Meeting"
+        ]
+      }
+    },
+    "AGREES_WITH": {
+      "definition": "Records agreement by a person with an idea, decision, or colleague.",
+      "example": "Sarah AGREES_WITH SQLite Caching Proposal",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision",
+          "Idea",
+          "Person"
+        ]
+      }
+    },
+    "ANSWERS": {
+      "definition": "Links a decision or note that answers an open question.",
+      "example": "Adopt Quantized Model Decision ANSWERS Which LLM Model Question",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Note"
+        ],
+        "to": [
+          "Question"
+        ]
+      }
+    },
+    "ASSIGNED_TO": {
+      "definition": "Assigns responsibility for completing a task to a person.",
+      "example": "Benchmark Ollama ASSIGNED_TO David",
+      "allowed_directions": {
+        "from": [
+          "Task"
+        ],
+        "to": [
+          "Person"
+        ]
+      }
+    },
+    "ATTENDED": {
+      "definition": "Records that a person was present at a meeting.",
+      "example": "Sarah ATTENDED Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Meeting"
+        ]
+      }
+    },
+    "BLOCKED_BY": {
+      "definition": "Indicates a task or project is actively blocked by an issue or task.",
+      "example": "Benchmark Ollama BLOCKED_BY OOM Crash Issue",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Issue",
+          "Task"
+        ]
+      }
+    },
+    "COLLABORATES_WITH": {
+      "definition": "Indicates direct working partnership between two people.",
+      "example": "Sarah COLLABORATES_WITH David",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      }
+    },
+    "CREATED_IN": {
+      "definition": "Records the meeting or conversation context in which an item or decision originated.",
+      "example": "Adopt Neo4j Decision CREATED_IN Architecture Sync Meeting",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Document",
+          "Idea",
+          "Issue",
+          "Note",
+          "Question",
+          "Task"
+        ],
+        "to": [
+          "Conversation",
+          "Meeting"
+        ]
+      }
+    },
+    "DECIDED": {
+      "definition": "Connects a person to a formal decision they made or championed.",
+      "example": "Sarah DECIDED Adopt Neo4j 5",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision"
+        ]
+      }
+    },
+    "DEPENDS_ON": {
+      "definition": "Indicates a task or project requires another task or project to complete first.",
+      "example": "Integration Testing DEPENDS_ON Benchmark Ollama",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Project",
+          "Task"
+        ]
+      }
+    },
+    "DISAGREES_WITH": {
+      "definition": "Records dissent or objection by a person to an idea, decision, or colleague.",
+      "example": "Sarah DISAGREES_WITH Cloud Sync Idea",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision",
+          "Idea",
+          "Person"
+        ]
+      }
+    },
+    "DISCUSSED": {
+      "definition": "Broad link from a meeting to any entity or topic brought up in conversation.",
+      "example": "Architecture Sync Meeting DISCUSSED Ollama Memory Consumption",
+      "allowed_directions": {
+        "from": [
+          "Meeting"
+        ],
+        "to": "any"
+      }
+    },
+    "DUE_ON": {
+      "definition": "Associates a task, project, or goal with its target deadline.",
+      "example": "Benchmark Ollama DUE_ON 2026-10-18",
+      "allowed_directions": {
+        "from": [
+          "Goal",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Deadline"
+        ]
+      }
+    },
+    "FOLLOW_UP_OF": {
+      "definition": "Indicates a task or meeting was created as a direct next step from a prior item.",
+      "example": "Memory Tuning Task FOLLOW_UP_OF Architecture Sync Meeting",
+      "allowed_directions": {
+        "from": [
+          "Meeting",
+          "Task"
+        ],
+        "to": [
+          "Meeting",
+          "Task"
+        ]
+      }
+    },
+    "HAS_ISSUE": {
+      "definition": "Links a project or task directly to an identified issue or blocker.",
+      "example": "Voice Assistant Project HAS_ISSUE Whisper OOM Crash",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Issue"
+        ]
+      }
+    },
+    "HAS_METRIC": {
+      "definition": "Connects an entity to an observed or target quantitative metric.",
+      "example": "Voice Assistant Project HAS_METRIC Sub-500ms Latency Metric",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Goal",
+          "Meeting",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Metric"
+        ]
+      }
+    },
+    "LEADS": {
+      "definition": "Indicates a person directs, facilitates, or leads a team, project, or meeting.",
+      "example": "Sarah LEADS Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Meeting",
+          "Project",
+          "Team"
+        ]
+      }
+    },
+    "LOCATED_AT": {
+      "definition": "Associates a meeting, event, or task with its physical or virtual location.",
+      "example": "Architecture Sync LOCATED_AT Conference Room A",
+      "allowed_directions": {
+        "from": [
+          "Event",
+          "Meeting",
+          "Task"
+        ],
+        "to": [
+          "Location"
+        ]
+      }
+    },
+    "MEMBER_OF": {
+      "definition": "Indicates a person belongs to a team or organization.",
+      "example": "Sarah MEMBER_OF Core AI Pipeline Team",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Organization",
+          "Team"
+        ]
+      }
+    },
+    "MENTIONS": {
+      "definition": "Broad link indicating a note or conversation transcript references an entity.",
+      "example": "Architecture Notes MENTIONS David",
+      "allowed_directions": {
+        "from": [
+          "Conversation",
+          "Note"
+        ],
+        "to": "any"
+      }
+    },
+    "PART_OF": {
+      "definition": "Subsumption link between tasks or projects.",
+      "example": "Benchmark Ollama PART_OF Local Voice AI Assistant",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Project",
+          "Task"
+        ]
+      }
+    },
+    "PREFERS": {
+      "definition": "Associates a person with their personal preference or favored concept.",
+      "example": "David PREFERS Fully Local Execution Concept",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Concept",
+          "Preference"
+        ]
+      }
+    },
+    "PROPOSED": {
+      "definition": "Connects a person to an idea or exploratory suggestion they submitted.",
+      "example": "David PROPOSED SQLite Caching Idea",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Idea"
+        ]
+      }
+    },
+    "RAISED": {
+      "definition": "Connects a person to an issue, blocker, or open question they voiced.",
+      "example": "David RAISED Whisper OOM Crash Issue",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Issue",
+          "Question"
+        ]
+      }
+    },
+    "REFERENCES": {
+      "definition": "Cites or refers to an external document, specification, or PRD.",
+      "example": "Adopt Neo4j Decision REFERENCES RFC-204 Document",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Meeting",
+          "Note",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Document"
+        ]
+      }
+    },
+    "RELATED_TO": {
+      "definition": "Generic associative fallback edge between any two entities.",
+      "example": "Benchmark Ollama Task RELATED_TO Whisper OOM Issue",
+      "allowed_directions": {
+        "from": "any",
+        "to": "any"
+      }
+    },
+    "REPORTS_TO": {
+      "definition": "Indicates an organizational reporting relationship between people.",
+      "example": "David REPORTS_TO Sarah",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      }
+    },
+    "REQUESTED_BY": {
+      "definition": "Identifies the person who asked for or requested a task.",
+      "example": "Benchmark Ollama REQUESTED_BY Sarah",
+      "allowed_directions": {
+        "from": [
+          "Task"
+        ],
+        "to": [
+          "Person"
+        ]
+      }
+    },
+    "RESOLVES": {
+      "definition": "Indicates that completing a task or executing a decision resolves an issue.",
+      "example": "Adopt Quantized Model Decision RESOLVES Whisper OOM Crash",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Task"
+        ],
+        "to": [
+          "Issue"
+        ]
+      }
+    },
+    "SCHEDULED_ON": {
+      "definition": "Specifies the scheduled date or deadline for a meeting or event.",
+      "example": "Architecture Sync SCHEDULED_ON 2026-10-18",
+      "allowed_directions": {
+        "from": [
+          "Event",
+          "Meeting"
+        ],
+        "to": [
+          "Deadline"
+        ]
+      }
+    },
+    "SUPERSEDES": {
+      "definition": "Indicates a new decision replaces, updates, or invalidates an earlier decision.",
+      "example": "Adopt Neo4j Decision SUPERSEDES Use Raw SQLite Decision",
+      "allowed_directions": {
+        "from": [
+          "Decision"
+        ],
+        "to": [
+          "Decision"
+        ]
+      }
+    },
+    "SUPPORTS": {
+      "definition": "Connects an actionable task or project to the strategic goal it advances.",
+      "example": "Benchmark Ollama SUPPORTS Sub-500ms Latency Goal",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Goal"
+        ]
+      }
+    },
+    "USES": {
+      "definition": "Associates a project, task, or team with a software tool or platform.",
+      "example": "Core AI Pipeline Team USES Neo4j 5",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task",
+          "Team"
+        ],
+        "to": [
+          "Tool"
+        ]
+      }
+    },
+    "WORKS_ON": {
+      "definition": "Associates a person with a project they contribute to.",
+      "example": "David WORKS_ON Local Voice AI Assistant",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Project"
+        ]
+      }
+    }
+  },
+  "properties_whitelist": [
+    "confidence",
+    "date",
+    "description",
+    "duration",
+    "kind",
+    "label",
+    "original_type",
+    "priority",
+    "progress",
+    "quote",
+    "rationale",
+    "recurrence",
+    "severity",
+    "status",
+    "time",
+    "timestamp",
+    "title",
+    "unit",
+    "value"
+  ]
+}
