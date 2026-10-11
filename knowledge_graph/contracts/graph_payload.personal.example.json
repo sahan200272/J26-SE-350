@@ -1,0 +1,215 @@
+{
+  "source": "voice_convo_20261011_1900_everyday_chat",
+  "timestamp": "2026-10-11T19:00:00Z",
+  "entities": [
+    {
+      "type": "Person",
+      "name": "Sarah Perera",
+      "op": "add",
+      "props": {
+        "aliases": [
+          "Sarah",
+          "Saza"
+        ],
+        "birthday": "1994-06-15",
+        "email": "sarah.perera@example.com",
+        "sensitivity": "private",
+        "description": "Graphic designer and podcast host"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Sarah",
+      "op": "add",
+      "props": {
+        "description": "Short form display name"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Maya Perera",
+      "op": "add",
+      "props": {
+        "birthday": "1997-09-20",
+        "sensitivity": "normal",
+        "description": "Sarah's younger sister"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Alex Johnson",
+      "op": "add",
+      "props": {
+        "phone": "+1-555-0199",
+        "description": "College friend and photographer"
+      }
+    },
+    {
+      "type": "Organization",
+      "name": "Acme Design Studio",
+      "op": "add",
+      "props": {
+        "description": "Creative agency in Manhattan"
+      }
+    },
+    {
+      "type": "Location",
+      "name": "Brooklyn",
+      "op": "add",
+      "props": {
+        "description": "Residential neighborhood in New York"
+      }
+    },
+    {
+      "type": "Item",
+      "name": "Sony Headphones",
+      "op": "add",
+      "props": {
+        "kind": "electronics",
+        "description": "Wireless noise-canceling headphones"
+      }
+    },
+    {
+      "type": "Event",
+      "name": "Maya's Birthday Dinner",
+      "op": "update",
+      "props": {
+        "date": "2026-09-20",
+        "description": "Family dinner celebration (rescheduled date)"
+      }
+    },
+    {
+      "type": "Event",
+      "name": "Weekend Camping Trip",
+      "op": "retract",
+      "props": {
+        "description": "Cancelled camping trip due to rain forecast"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah"
+      },
+      "type": "ALIAS_OF",
+      "to": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "op": "add",
+      "props": {
+        "confidence": 1.0
+      }
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "FAMILY_OF",
+      "to": {
+        "type": "Person",
+        "name": "Maya Perera"
+      },
+      "op": "add",
+      "props": {
+        "kind": "sister"
+      }
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "FRIEND_OF",
+      "to": {
+        "type": "Person",
+        "name": "Alex Johnson"
+      },
+      "op": "add"
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "WORKS_AT",
+      "to": {
+        "type": "Organization",
+        "name": "Acme Design Studio"
+      },
+      "op": "add"
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "LIVES_IN",
+      "to": {
+        "type": "Location",
+        "name": "Brooklyn"
+      },
+      "op": "add",
+      "props": {
+        "confidence": 0.95
+      }
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "LIKES",
+      "to": {
+        "type": "Item",
+        "name": "Sony Headphones"
+      },
+      "op": "add"
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "OWNS",
+      "to": {
+        "type": "Item",
+        "name": "Sony Headphones"
+      },
+      "op": "add"
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "PLANS",
+      "to": {
+        "type": "Event",
+        "name": "Maya's Birthday Dinner"
+      },
+      "op": "update",
+      "props": {
+        "confidence": 0.85
+      }
+    },
+    {
+      "from": {
+        "type": "Person",
+        "name": "Sarah Perera"
+      },
+      "type": "PLANS",
+      "to": {
+        "type": "Event",
+        "name": "Weekend Camping Trip"
+      },
+      "op": "retract",
+      "props": {
+        "confidence": 1.0
+      }
+    }
+  ]
+}

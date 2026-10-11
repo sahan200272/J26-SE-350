@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "GraphPayload",
-  "description": "Payload format for entities and relationships extracted from voice conversations to update the knowledge graph.",
+  "description": "Payload format for entities and relationships extracted from voice conversations to update the personal knowledge graph.",
   "type": "object",
   "required": [
     "source",
@@ -11,7 +11,7 @@
   "properties": {
     "source": {
       "type": "string",
-      "description": "Source identifier, e.g. voice_conversation_20261010_1300 or transcript file."
+      "description": "Identifier for the conversation transcript or speech session, e.g. voice_convo_20261011_1430."
     },
     "entities": {
       "type": "array",
@@ -38,12 +38,12 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "Entity label. Recommended standard labels: Person, Task, Project, Meeting, Deadline, Organization, Location, Event, Concept, Note. Unknown types are normalized to Concept."
+          "description": "Node label. Standard Tier 1 labels: Person, Team, Organization, Project, Task, Meeting, Decision, Issue, Question, Deadline, Location, Document. Tier 2 labels: Goal, Idea, Tool, Metric, Event, Topic, Concept, Preference, Note, Conversation. Unrecognized labels fall back to Concept."
         },
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Display name of the referenced entity (non-empty)."
+          "description": "Display name of the referenced entity (non-empty after whitespace strip)."
         }
       },
       "additionalProperties": false
@@ -57,44 +57,92 @@
       "properties": {
         "type": {
           "type": "string",
-          "description": "Entity label. Recommended standard labels: Person, Task, Project, Meeting, Deadline, Organization, Location, Event, Concept, Note. Unknown types are normalized to Concept with props['original_type']."
+          "description": "Node label. Standard Tier 1 labels: Person, Team, Organization, Project, Task, Meeting, Decision, Issue, Question, Deadline, Location, Document. Tier 2 labels: Goal, Idea, Tool, Metric, Event, Topic, Concept, Preference, Note, Conversation. Unrecognized labels fall back to Concept with props['original_type']."
         },
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Display name of the entity (non-empty)."
+          "description": "Display name of the entity (non-empty after whitespace strip)."
         },
         "props": {
           "type": "object",
-          "description": "Optional whitelisted entity attributes with scalar values (str, int, float, bool).",
+          "description": "Whitelisted entity attributes with scalar values (str, int, float, bool). Nested structures are rejected.",
           "properties": {
             "status": {
               "type": ["string", "number", "boolean"],
-              "description": "Status of a task or project."
+              "description": "Lifecycle state (e.g. open, in_progress, resolved, active)."
             },
             "priority": {
               "type": ["string", "number", "boolean"],
-              "description": "Priority level, e.g. low, medium, high."
+              "description": "Priority ranking (e.g. low, medium, high, critical)."
+            },
+            "progress": {
+              "type": ["string", "number", "boolean"],
+              "description": "Completion progress percentage or indicator."
             },
             "date": {
               "type": ["string", "number", "boolean"],
-              "description": "Date or deadline string in ISO format (YYYY-MM-DD)."
+              "description": "ISO date string (YYYY-MM-DD)."
             },
-            "description": {
+            "time": {
               "type": ["string", "number", "boolean"],
-              "description": "Text description or notes."
+              "description": "Time string (HH:MM:SS)."
             },
-            "label": {
+            "duration": {
               "type": ["string", "number", "boolean"],
-              "description": "Original relationship type when converted to RELATED_TO."
+              "description": "Duration string or minutes (e.g. 45m)."
             },
-            "original_type": {
+            "recurrence": {
               "type": ["string", "number", "boolean"],
-              "description": "Original entity type before fallback normalization to Concept."
+              "description": "Recurrence pattern (e.g. weekly, biweekly)."
+            },
+            "value": {
+              "type": ["string", "number", "boolean"],
+              "description": "Metric or parameter numerical value."
+            },
+            "unit": {
+              "type": ["string", "number", "boolean"],
+              "description": "Unit of measurement (e.g. ms, %, MB)."
+            },
+            "title": {
+              "type": ["string", "number", "boolean"],
+              "description": "Document or meeting title."
+            },
+            "severity": {
+              "type": ["string", "number", "boolean"],
+              "description": "Issue severity level (e.g. low, high, blocker)."
             },
             "kind": {
               "type": ["string", "number", "boolean"],
-              "description": "Sub-category or classifier for concepts or notes."
+              "description": "Sub-category classifier."
+            },
+            "description": {
+              "type": ["string", "number", "boolean"],
+              "description": "Detailed explanation or text content."
+            },
+            "rationale": {
+              "type": ["string", "number", "boolean"],
+              "description": "Justification behind a decision."
+            },
+            "quote": {
+              "type": ["string", "number", "boolean"],
+              "description": "Verbatim quote from spoken audio."
+            },
+            "timestamp": {
+              "type": ["string", "number", "boolean"],
+              "description": "ISO-8601 timestamp string."
+            },
+            "confidence": {
+              "type": ["string", "number", "boolean"],
+              "description": "Extraction confidence score between 0.0 and 1.0."
+            },
+            "label": {
+              "type": ["string", "number", "boolean"],
+              "description": "Original relationship type preserved when normalized to RELATED_TO."
+            },
+            "original_type": {
+              "type": ["string", "number", "boolean"],
+              "description": "Original entity type preserved when normalized to Concept."
             }
           },
           "additionalProperties": false
@@ -112,42 +160,42 @@
       "properties": {
         "from": {
           "$ref": "#/$defs/EntityRef",
-          "description": "Source entity of the directed edge."
+          "description": "Source entity of the directed relationship."
         },
         "type": {
           "type": "string",
-          "description": "Relationship type. Recommended: ASSIGNED_TO, PART_OF, WORKS_ON, ATTENDED, DISCUSSED, DUE_ON, LOCATED_AT, MEMBER_OF, MENTIONS, RELATED_TO. Unknown types or invalid directions fallback to RELATED_TO."
+          "description": "Relationship type (35 standard types). Unrecognized types or invalid directions fall back to RELATED_TO."
         },
         "to": {
           "$ref": "#/$defs/EntityRef",
-          "description": "Target entity of the directed edge."
+          "description": "Target entity of the directed relationship."
         },
         "props": {
           "type": "object",
-          "description": "Optional whitelisted relationship attributes with scalar values (str, int, float, bool).",
+          "description": "Whitelisted relationship attributes with scalar values.",
           "properties": {
-            "status": {
-              "type": ["string", "number", "boolean"]
-            },
-            "priority": {
-              "type": ["string", "number", "boolean"]
-            },
-            "date": {
-              "type": ["string", "number", "boolean"]
-            },
-            "description": {
-              "type": ["string", "number", "boolean"]
-            },
+            "status": { "type": ["string", "number", "boolean"] },
+            "priority": { "type": ["string", "number", "boolean"] },
+            "progress": { "type": ["string", "number", "boolean"] },
+            "date": { "type": ["string", "number", "boolean"] },
+            "time": { "type": ["string", "number", "boolean"] },
+            "duration": { "type": ["string", "number", "boolean"] },
+            "recurrence": { "type": ["string", "number", "boolean"] },
+            "value": { "type": ["string", "number", "boolean"] },
+            "unit": { "type": ["string", "number", "boolean"] },
+            "title": { "type": ["string", "number", "boolean"] },
+            "severity": { "type": ["string", "number", "boolean"] },
+            "kind": { "type": ["string", "number", "boolean"] },
+            "description": { "type": ["string", "number", "boolean"] },
+            "rationale": { "type": ["string", "number", "boolean"] },
+            "quote": { "type": ["string", "number", "boolean"] },
+            "timestamp": { "type": ["string", "number", "boolean"] },
+            "confidence": { "type": ["string", "number", "boolean"] },
             "label": {
               "type": ["string", "number", "boolean"],
-              "description": "Original relationship type stored when normalized to RELATED_TO."
+              "description": "Original relationship type preserved when converted to RELATED_TO."
             },
-            "original_type": {
-              "type": ["string", "number", "boolean"]
-            },
-            "kind": {
-              "type": ["string", "number", "boolean"]
-            }
+            "original_type": { "type": ["string", "number", "boolean"] }
           },
           "additionalProperties": false
         }

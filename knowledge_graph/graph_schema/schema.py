@@ -15,8 +15,10 @@ Note on future conflict resolution (RP-29):
 
 import os
 from pathlib import Path
+from typing import List, Tuple, get_args
 from dotenv import load_dotenv
 from neo4j import GraphDatabase, Driver
+from graph_schema.models import NodeLabel
 
 # Load environment variables from knowledge_graph/.env
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
@@ -36,17 +38,13 @@ def get_driver(
     return GraphDatabase.driver(uri, auth=(user, password))
 
 
-CONSTRAINTS = [
-    ("person_key", "CREATE CONSTRAINT person_key IF NOT EXISTS FOR (p:Person) REQUIRE p.key IS UNIQUE"),
-    ("task_key", "CREATE CONSTRAINT task_key IF NOT EXISTS FOR (t:Task) REQUIRE t.key IS UNIQUE"),
-    ("project_key", "CREATE CONSTRAINT project_key IF NOT EXISTS FOR (pr:Project) REQUIRE pr.key IS UNIQUE"),
-    ("meeting_key", "CREATE CONSTRAINT meeting_key IF NOT EXISTS FOR (m:Meeting) REQUIRE m.key IS UNIQUE"),
-    ("deadline_key", "CREATE CONSTRAINT deadline_key IF NOT EXISTS FOR (d:Deadline) REQUIRE d.key IS UNIQUE"),
-    ("organization_key", "CREATE CONSTRAINT organization_key IF NOT EXISTS FOR (o:Organization) REQUIRE o.key IS UNIQUE"),
-    ("location_key", "CREATE CONSTRAINT location_key IF NOT EXISTS FOR (l:Location) REQUIRE l.key IS UNIQUE"),
-    ("event_key", "CREATE CONSTRAINT event_key IF NOT EXISTS FOR (e:Event) REQUIRE e.key IS UNIQUE"),
-    ("concept_key", "CREATE CONSTRAINT concept_key IF NOT EXISTS FOR (c:Concept) REQUIRE c.key IS UNIQUE"),
-    ("note_key", "CREATE CONSTRAINT note_key IF NOT EXISTS FOR (n:Note) REQUIRE n.key IS UNIQUE"),
+# Generate constraints dynamically from NodeLabel to prevent schema drift
+CONSTRAINTS: List[Tuple[str, str]] = [
+    (
+        f"{label.lower()}_key",
+        f"CREATE CONSTRAINT {label.lower()}_key IF NOT EXISTS FOR (n:{label}) REQUIRE n.key IS UNIQUE",
+    )
+    for label in get_args(NodeLabel)
 ]
 
 
