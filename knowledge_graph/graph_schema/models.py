@@ -2,12 +2,22 @@
 
 import logging
 import re
-from typing import Any, Dict, List, Literal, Optional, Set, Tuple, Union, get_args
+from typing import (
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+    get_args,
+)
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 logger = logging.getLogger(__name__)
 
-# Node labels (22)
+# Node labels (23)
 NodeLabel = Literal[
     "Person",
     "Team",
@@ -31,12 +41,14 @@ NodeLabel = Literal[
     "Preference",
     "Note",
     "Conversation",
+    "Item",
 ]
 
 ALLOWED_NODE_LABELS: Set[str] = set(get_args(NodeLabel))
 
-# Relationship types (35)
+# Relationship types (45)
 RelationshipType = Literal[
+    # Work & Meeting Layer (35)
     "MEMBER_OF",
     "LEADS",
     "REPORTS_TO",
@@ -72,9 +84,23 @@ RelationshipType = Literal[
     "PREFERS",
     "MENTIONS",
     "RELATED_TO",
+    # Personal & Everyday Layer (10)
+    "FAMILY_OF",
+    "PARTNER_OF",
+    "FRIEND_OF",
+    "WORKS_AT",
+    "LIVES_IN",
+    "LIKES",
+    "DISLIKES",
+    "ALIAS_OF",
+    "OWNS",
+    "PLANS",
 ]
 
 ALLOWED_RELATIONSHIP_TYPES: Set[str] = set(get_args(RelationshipType))
+
+# Operation types for Layer C conversation signals
+OpType = Literal["add", "update", "retract"]
 
 # Allowed relationship directions: Type -> (FromLabel(s), ToLabel(s))
 # A rule can be a set of allowed NodeLabels, or "any" allowing any NodeLabel.
@@ -85,12 +111,13 @@ ALLOWED_DIRECTIONS: Dict[
         Union[Set[str], Literal["any"]],
     ],
 ] = {
+    # Layer A: Work & Meeting
     "MEMBER_OF": ({"Person"}, {"Team", "Organization"}),
     "LEADS": ({"Person"}, {"Team", "Project", "Meeting"}),
     "REPORTS_TO": ({"Person"}, {"Person"}),
     "COLLABORATES_WITH": ({"Person"}, {"Person"}),
-    "ATTENDED": ({"Person"}, {"Meeting"}),
-    "ABSENT_FROM": ({"Person"}, {"Meeting"}),
+    "ATTENDED": ({"Person"}, {"Meeting", "Event"}),
+    "ABSENT_FROM": ({"Person"}, {"Meeting", "Event"}),
     "ASSIGNED_TO": ({"Task"}, {"Person"}),
     "REQUESTED_BY": ({"Task"}, {"Person"}),
     "WORKS_ON": ({"Person"}, {"Project"}),
@@ -132,6 +159,17 @@ ALLOWED_DIRECTIONS: Dict[
     "PREFERS": ({"Person"}, {"Preference", "Concept"}),
     "MENTIONS": ({"Note", "Conversation"}, "any"),
     "RELATED_TO": ("any", "any"),
+    # Layer B: Personal & Social Life
+    "FAMILY_OF": ({"Person"}, {"Person"}),
+    "PARTNER_OF": ({"Person"}, {"Person"}),
+    "FRIEND_OF": ({"Person"}, {"Person"}),
+    "WORKS_AT": ({"Person"}, {"Organization"}),
+    "LIVES_IN": ({"Person"}, {"Location"}),
+    "LIKES": ({"Person"}, "any"),
+    "DISLIKES": ({"Person"}, "any"),
+    "ALIAS_OF": ("any", "any"),  # Must match same label on both ends
+    "OWNS": ({"Person", "Team", "Organization"}, {"Item", "Document", "Tool"}),
+    "PLANS": ({"Person"}, {"Event", "Task", "Meeting"}),
 }
 
 # Whitelist of allowed node and relationship property keys
@@ -155,6 +193,13 @@ ALLOWED_PROPERTIES: Set[str] = {
     "confidence",
     "label",
     "original_type",
+    "age",
+    "aliases",
+    "email",
+    "phone",
+    "birthday",
+    "sensitivity",
+    "speaker",
 }
 
 
@@ -165,6 +210,13 @@ def normalize_key(name: str) -> str:
 
 def is_valid_direction(rel_type: str, from_type: str, to_type: str) -> bool:
     """Check if the given from/to node types are valid for the relationship type."""
+    if rel_type not in ALLOWED_RELATIONSHIP_TYPES:
+        return False
+
+    if rel_type == "ALIAS_OF":
+        # ALIAS_OF requires both ends to have the exact same label
+        return from_type in ALLOWED_NODE_LABELS and from_type == to_type
+
     if rel_type not in ALLOWED_DIRECTIONS:
         return False
 
@@ -190,7 +242,7 @@ def is_valid_direction(rel_type: str, from_type: str, to_type: str) -> bool:
 
 
 def validate_props_dict(props: Dict[str, Any]) -> Dict[str, Any]:
-    """Validate property keys against whitelist and ensure values are scalar types."""
+    """Validate property keys against whitelist and ensure values meet type constraints."""
     invalid_keys = set(props.keys()) - ALLOWED_PROPERTIES
     if invalid_keys:
         raise ValueError(
@@ -198,11 +250,35 @@ def validate_props_dict(props: Dict[str, Any]) -> Dict[str, Any]:
             f"Allowed properties are: {sorted(ALLOWED_PROPERTIES)}"
         )
     for k, v in props.items():
-        if not isinstance(v, (str, int, float, bool)):
-            raise ValueError(
-                f"Invalid property value type for '{k}': {type(v).__name__}. "
-                f"Allowed value types are str, int, float, bool only."
-            )
+        if k == "aliases":
+            if not isinstance(v, list):
+                raise ValueError(
+                    "Invalid property value for 'aliases': must be a list of non-empty strings."
+                )
+            for item in v:
+                if not isinstance(item, str) or not item.strip():
+                    raise ValueError(
+                        f"Invalid alias '{item}' in 'aliases': must be a non-empty string."
+                    )
+        else:
+            if not isinstance(v, (str, int, float, bool)):
+                raise ValueError(
+                    f"Invalid property value type for '{k}': {type(v).__name__}. "
+                    f"Allowed value types are str, int, float, bool only."
+                )
+
+        if k == "sensitivity":
+            if v not in ("normal", "private"):
+                raise ValueError(
+                    f"Invalid sensitivity '{v}'. Must be 'normal' or 'private'."
+                )
+
+        if k == "confidence":
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not (0.0 <= float(v) <= 1.0):
+                raise ValueError(
+                    f"Invalid confidence '{v}'. Must be a number between 0.0 and 1.0."
+                )
+
     return props
 
 
@@ -240,6 +316,7 @@ class Entity(BaseModel):
     type: NodeLabel
     name: str
     props: Dict[str, Any] = Field(default_factory=dict)
+    op: OpType = "add"
 
     @field_validator("name")
     @classmethod
@@ -284,6 +361,7 @@ class Relationship(BaseModel):
     type: RelationshipType
     to_entity: EntityRef = Field(alias="to")
     props: Dict[str, Any] = Field(default_factory=dict)
+    op: OpType = "add"
 
     @field_validator("props")
     @classmethod
@@ -366,5 +444,6 @@ class Payload(BaseModel):
     """Input payload containing extracted entities and relationships from voice conversations."""
 
     source: str
+    timestamp: Optional[str] = None
     entities: List[Entity] = Field(default_factory=list)
     relationships: List[Relationship] = Field(default_factory=list)
