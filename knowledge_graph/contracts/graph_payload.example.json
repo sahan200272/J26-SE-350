@@ -84,7 +84,7 @@
       "type": "Decision",
       "name": "Adopt Ollama 8B with 4-bit Quantization",
       "props": {
-        "status": "decided",
+        "status": "agreed",
         "rationale": "Reduces peak resident memory to 3.8GB while maintaining accuracy",
         "description": "Agreed architecture policy for local LLM inference"
       }

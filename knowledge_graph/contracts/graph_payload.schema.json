@@ -9,6 +9,11 @@
     "relationships"
   ],
   "properties": {
+    "schema_version": {
+      "type": "string",
+      "default": "1.0",
+      "description": "Schema version of the payload contract. Defaults to '1.0'."
+    },
     "source": {
       "type": "string",
       "description": "Identifier for the conversation transcript or speech session, e.g. voice_convo_20261011_1430."
@@ -86,12 +91,30 @@
           "description": "Whitelisted entity attributes. Values must be scalar (str, int, float, bool) except 'aliases' which is a list of non-empty strings.",
           "properties": {
             "status": {
-              "type": ["string", "number", "boolean"],
-              "description": "Lifecycle state (e.g. open, in_progress, resolved, active)."
+              "type": "string",
+              "enum": [
+                "open",
+                "in progress",
+                "blocked",
+                "done",
+                "cancelled",
+                "planned",
+                "active",
+                "agreed",
+                "superseded",
+                "answered"
+              ],
+              "description": "Lifecycle state (e.g. open, in progress, blocked, done, cancelled, planned, active, agreed, superseded, answered)."
             },
             "priority": {
-              "type": ["string", "number", "boolean"],
-              "description": "Priority ranking (e.g. low, medium, high, critical)."
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "urgent"
+              ],
+              "description": "Priority ranking (low, medium, high, urgent)."
             },
             "progress": {
               "type": ["string", "number", "boolean"],
@@ -126,8 +149,14 @@
               "description": "Document or meeting title."
             },
             "severity": {
-              "type": ["string", "number", "boolean"],
-              "description": "Issue severity level (e.g. low, high, blocker)."
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ],
+              "description": "Issue severity level (low, medium, high, critical)."
             },
             "kind": {
               "type": ["string", "number", "boolean"],
@@ -232,8 +261,30 @@
           "type": "object",
           "description": "Whitelisted relationship attributes with scalar values.",
           "properties": {
-            "status": { "type": ["string", "number", "boolean"] },
-            "priority": { "type": ["string", "number", "boolean"] },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "in progress",
+                "blocked",
+                "done",
+                "cancelled",
+                "planned",
+                "active",
+                "agreed",
+                "superseded",
+                "answered"
+              ]
+            },
+            "priority": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "urgent"
+              ]
+            },
             "progress": { "type": ["string", "number", "boolean"] },
             "date": { "type": ["string", "number", "boolean"] },
             "time": { "type": ["string", "number", "boolean"] },
@@ -242,7 +293,15 @@
             "value": { "type": ["string", "number", "boolean"] },
             "unit": { "type": ["string", "number", "boolean"] },
             "title": { "type": ["string", "number", "boolean"] },
-            "severity": { "type": ["string", "number", "boolean"] },
+            "severity": {
+              "type": "string",
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ]
+            },
             "kind": { "type": ["string", "number", "boolean"] },
             "description": { "type": ["string", "number", "boolean"] },
             "rationale": { "type": ["string", "number", "boolean"] },

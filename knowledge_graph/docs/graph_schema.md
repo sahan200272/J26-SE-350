@@ -15,11 +15,19 @@ The graph runs locally on Neo4j 5.
 
 ### Core Invariants
 - **Uniqueness**: Every entity node is uniquely identified by its `key` property. Unique constraints on `key` are dynamically generated from `typing.get_args(NodeLabel)` (e.g. `person_key`, `meeting_key`, `item_key`), guaranteeing zero drift between code models and the database.
+- **Range Indexes**: Range indexes are maintained on `Task(priority)`, `Task(status)`, and `Issue(severity)` for accelerated filtering.
 - **Node Metadata**: All nodes maintain `key` (normalized identifier), `name` (display name), `created_at` (ISO timestamp), and `updated_at` (ISO timestamp).
+- **Schema Versioning**: Payloads include an optional `schema_version: str = "1.0"`. Major version mismatches log a warning without rejecting the payload.
+- **Deadline Validation**: Entities of type `Deadline` whose `name` is not an ISO date (`YYYY-MM-DD`) trigger a logged warning, but the entity is kept.
+- **Relationship Symmetry & Cardinality**:
+  - `SINGLE_VALUED_RELATIONSHIPS = {"DUE_ON", "SCHEDULED_ON", "LIVES_IN"}`
+  - `SYMMETRIC_RELATIONSHIPS = {"FRIEND_OF", "PARTNER_OF", "COLLABORATES_WITH"}`
+  - Canonical key ordering helper `canonical_pair(rel_type, key_a, key_b)` sorts symmetric relationship node keys.
 - **Audit / Conflict Tracking (RP-29 preview)**: Future property conflict tracking will record changes using a `:Change` node (`field`, `old`, `new`, `source`, `at`).
 - **Open Fallback Strategy**: Voice conversations contain open-ended language. The engine guarantees no data loss:
   - Unknown entity types are normalized to `Concept` with the raw type stored in `props["original_type"]`.
   - Unknown relationship types or invalid directions are converted to `RELATED_TO` with the raw type stored in `props["label"]`.
+  - Unknown values for `priority`, `severity`, and `status` are dropped with a logged warning while keeping the payload valid.
   - Warnings are logged on each fallback.
 
 ---
@@ -77,8 +85,8 @@ Property values must be scalar types (`str`, `int`, `float`, `bool`) with the ex
 
 | Property Key | Description | Type / Constraint |
 |:---|:---|:---|
-| `status` | Lifecycle state (e.g. `open`, `in_progress`, `decided`, `resolved`, `active`). | `str` |
-| `priority` | Priority ranking (e.g. `low`, `medium`, `high`, `critical`). | `str` |
+| `status` | Lifecycle state. Allowed: `open`, `in progress`, `blocked`, `done`, `cancelled`, `planned`, `active`, `agreed`, `superseded`, `answered`. Case-insensitive synonyms: `completed`/`complete`/`finished`/`resolved`/`closed`/`solved` -> `done`; `in-progress`/`ongoing`/`started`/`wip` -> `in progress`; `canceled`/`dropped`/`called off` -> `cancelled`; `pending`/`todo`/`to do`/`new` -> `open`; `waiting`/`stuck` -> `blocked`; `decided`/`approved`/`confirmed`/`accepted` -> `agreed`. Unknown values dropped with logged warning. | `str` |
+| `priority` | Priority ranking. Allowed: `low`, `medium`, `high`, `urgent`. Case-insensitive synonyms: `critical`/`asap`/`immediately` -> `urgent`; `important` -> `high`; `normal`/`ok`/`moderate` -> `medium`; `minor`/`whenever`/`optional` -> `low`. Unknown values dropped with logged warning. | `str` |
 | `progress` | Numerical or status completion progress indicator. | `str`, `int`, `float` |
 | `date` | ISO-formatted date string (`YYYY-MM-DD`). | `str` |
 | `time` | Time string (`HH:MM:SS`). | `str` |
@@ -87,7 +95,7 @@ Property values must be scalar types (`str`, `int`, `float`, `bool`) with the ex
 | `value` | Measured or target metric numerical value. | `int`, `float`, `str` |
 | `unit` | Unit of measurement (e.g. `ms`, `%`, `MB`). | `str` |
 | `title` | Formal title of a document, role, or meeting. | `str` |
-| `severity` | Issue severity level (e.g. `low`, `high`, `blocker`). | `str` |
+| `severity` | Issue severity level. Allowed: `low`, `medium`, `high`, `critical`. Case-insensitive synonyms: `blocker` -> `critical`; `major` -> `high`; `minor` -> `low`; `normal` -> `medium`. Unknown values dropped with logged warning. | `str` |
 | `kind` | Sub-category classifier (e.g. `sister`, `mother`, `electronics`). | `str` |
 | `description` | Text description, notes, or detailed explanation. | `str` |
 | `rationale` | Architectural or logical reason for a decision. | `str` |
@@ -177,6 +185,16 @@ Used heavily in LLM extraction prompts and core graph traversal:
 | `ALIAS_OF` | Any node label | Same node label | Alias resolution (must have matching labels) |
 | `OWNS` | `Person` \| `Team` \| `Organization` | `Item` \| `Document` \| `Tool` | Ownership of physical or digital item |
 | `PLANS` | `Person` | `Event` \| `Task` \| `Meeting` | Personal plan or intended commitment |
+
+### Relationship Categories & Helper Rules
+- **Single-Valued Relationships** (`SINGLE_VALUED_RELATIONSHIPS`):
+  `{"DUE_ON", "SCHEDULED_ON", "LIVES_IN"}`
+  An entity should only have a single active target for these types.
+- **Symmetric Relationships** (`SYMMETRIC_RELATIONSHIPS`):
+  `{"FRIEND_OF", "PARTNER_OF", "COLLABORATES_WITH"}`
+  Bi-directional social or collaborative links.
+- **Canonical Ordering**:
+  Helper function `canonical_pair(rel_type, key_a, key_b)` returns `tuple(sorted((key_a, key_b)))` for symmetric relationship types, preserving stable deduplication during ingestion.
 
 ---
 
