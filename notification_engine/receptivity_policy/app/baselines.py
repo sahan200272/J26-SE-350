@@ -1,4 +1,4 @@
-"""Simpler ways of choosing when to send, to compare your learner against.""" 
+"""Simpler ways of choosing when to send, to compare Q-learner against.""" 
 import random 
  
 from app.environment import SEND_NOW, WAIT_30 

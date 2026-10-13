@@ -1,0 +1,106 @@
+user,seed,method,average points,response rate,missed deadlines,rule breaks
+morning_person,1,Send when due,0.12305000000004393,0.3418,0.0,0.0
+morning_person,1,Random timing,0.1898800000000385,0.3722,0.0,0.0
+morning_person,1,Mornings only,0.3659000000001569,0.5966,0.0,0.0
+morning_person,1,"Learner, no planning",0.19212200000009666,0.4412,0.0,0.0
+morning_person,1,Q-learner,0.5087679999997781,0.6094,0.0,0.0
+morning_person,2,Send when due,0.08551600000004009,0.3262,0.0,0.0
+morning_person,2,Random timing,0.1394960000000342,0.347,0.0,0.0
+morning_person,2,Mornings only,0.34072000000015523,0.5774,0.0,0.0
+morning_person,2,"Learner, no planning",0.1606400000000937,0.4146,0.0,0.0
+morning_person,2,Q-learner,0.48682999999981913,0.5904,0.0,0.0
+morning_person,3,Send when due,0.11278000000004482,0.3466,0.0,0.0
+morning_person,3,Random timing,0.1528260000000389,0.3636,0.0,0.0
+morning_person,3,Mornings only,0.3671840000001583,0.6044,0.0,0.0
+morning_person,3,"Learner, no planning",0.19414200000010795,0.4448,0.0,0.0
+morning_person,3,Q-learner,0.4946959999997933,0.605,0.0,0.0
+evening_person,1,Send when due,-0.006849999999999983,0.257,0.0,0.0
+evening_person,1,Random timing,0.05488000000000852,0.2866,0.0,0.0
+evening_person,1,Mornings only,-0.15179999999986077,0.2362,0.0,0.0
+evening_person,1,"Learner, no planning",0.1924200000000956,0.4346,0.0,0.0
+evening_person,1,Q-learner,0.5155299999997653,0.6108,0.0,0.0
+evening_person,2,Send when due,-0.006983999999997539,0.2522,0.0,0.0
+evening_person,2,Random timing,0.0390960000000084,0.269,0.0,0.0
+evening_person,2,Mornings only,-0.19487999999984762,0.2114,0.0,0.0
+evening_person,2,"Learner, no planning",0.17607200000009357,0.4214,0.0,0.0
+evening_person,2,Q-learner,0.4958119999997779,0.6006,0.0,0.0
+evening_person,3,Send when due,-0.0012200000000016818,0.2574,0.0,0.0
+evening_person,3,Random timing,0.05672600000002592,0.2876,0.0,0.0
+evening_person,3,Mornings only,-0.16301599999985714,0.2278,0.0,0.0
+evening_person,3,"Learner, no planning",0.17677400000008875,0.418,0.0,0.0
+evening_person,3,Q-learner,0.5068579999997413,0.6098,0.0,0.0
+lunch_break_person,1,Send when due,-0.09844999999995399,0.182,0.0,0.0
+lunch_break_person,1,Random timing,-0.024919999999999616,0.222,0.0,0.0
+lunch_break_person,1,Mornings only,-0.15269999999985792,0.2352,0.0,0.0
+lunch_break_person,1,"Learner, no planning",0.29208000000014434,0.5246,0.0,0.0
+lunch_break_person,1,Q-learner,0.5466639999996878,0.628,0.0,0.0
+lunch_break_person,2,Send when due,-0.1305839999999475,0.1732,0.0,0.0
+lunch_break_person,2,Random timing,-0.07190399999996853,0.207,0.0,0.0
+lunch_break_person,2,Mornings only,-0.20137999999984976,0.2076,0.0,0.0
+lunch_break_person,2,"Learner, no planning",0.30257000000014034,0.537,0.0,0.0
+lunch_break_person,2,Q-learner,0.538111999999682,0.6304,0.0,0.0
+lunch_break_person,3,Send when due,-0.10501999999995337,0.1816,0.0,0.0
+lunch_break_person,3,Random timing,-0.029573999999990826,0.2234,0.0,0.0
+lunch_break_person,3,Mornings only,-0.17231599999985797,0.2242,0.0,0.0
+lunch_break_person,3,"Learner, no planning",0.3032880000001378,0.5492,0.0,0.0
+lunch_break_person,3,Q-learner,0.5386019999996672,0.6322,0.0,0.0
+nine_to_five,1,Send when due,-0.023250000000011213,0.2436,0.0,0.0
+nine_to_five,1,Random timing,0.04328000000001316,0.2794,0.0,0.0
+nine_to_five,1,Mornings only,0.052900000000066096,0.3874,0.0,0.0
+nine_to_five,1,"Learner, no planning",0.03371400000002205,0.3888,0.0,0.0
+nine_to_five,1,Q-learner,0.19482200000006847,0.4136,0.0,0.0
+nine_to_five,2,Send when due,-0.05418399999996002,0.2244,0.0,0.0
+nine_to_five,2,Random timing,0.01109599999999993,0.257,0.0,0.0
+nine_to_five,2,Mornings only,0.033319999999962775,0.3646,0.0,0.0
+nine_to_five,2,"Learner, no planning",-0.023690000000028515,0.3384,0.0,0.0
+nine_to_five,2,Q-learner,0.17678000000006813,0.3896,0.0,0.0
+nine_to_five,3,Send when due,-0.0274199999999988,0.24,0.0,0.0
+nine_to_five,3,Random timing,0.03072600000000253,0.2686,0.0,0.0
+nine_to_five,3,Mornings only,0.058584000000054606,0.3834,0.0,0.0
+nine_to_five,3,"Learner, no planning",0.053930000000078006,0.3948,0.0,0.0
+nine_to_five,3,Q-learner,0.1994520000000646,0.4082,0.0,0.0
+night_owl_student,1,Send when due,-0.020750000000026435,0.2454,0.0,0.0
+night_owl_student,1,Random timing,0.04748000000000519,0.284,0.0,0.0
+night_owl_student,1,Mornings only,-0.19069999999985762,0.2122,0.0,0.0
+night_owl_student,1,"Learner, no planning",0.15833800000007736,0.4084,0.0,0.0
+night_owl_student,1,Q-learner,0.4067280000000633,0.5484,0.0,0.0
+night_owl_student,2,Send when due,-0.011984000000003346,0.2456,0.0,0.0
+night_owl_student,2,Random timing,0.04849600000001899,0.2778,0.0,0.0
+night_owl_student,2,Mornings only,-0.21487999999984653,0.1972,0.0,0.0
+night_owl_student,2,"Learner, no planning",0.16445200000009208,0.4088,0.0,0.0
+night_owl_student,2,Q-learner,0.4114320000000468,0.5416,0.0,0.0
+night_owl_student,3,Send when due,-0.0022200000000003896,0.2536,0.0,0.0
+night_owl_student,3,Random timing,0.06902600000002986,0.2898,0.0,0.0
+night_owl_student,3,Mornings only,-0.19961599999985485,0.203,0.0,0.0
+night_owl_student,3,"Learner, no planning",0.1641340000000916,0.4128,0.0,0.0
+night_owl_student,3,Q-learner,0.40567400000005777,0.549,0.0,0.0
+busy_person,1,Send when due,-0.1911499999999478,0.1248,0.0,0.0
+busy_person,1,Random timing,-0.16401999999996253,0.1298,0.0,0.0
+busy_person,1,Mornings only,-0.2639999999998521,0.157,0.0,0.0
+busy_person,1,"Learner, no planning",-0.5295140000018356,0.1302,0.0,0.0
+busy_person,1,Q-learner,-0.22898399999989275,0.1466,0.0,0.0
+busy_person,2,Send when due,-0.22038399999994207,0.1098,0.0,0.0
+busy_person,2,Random timing,-0.19450399999995788,0.114,0.0,0.0
+busy_person,2,Mornings only,-0.2941799999998408,0.1416,0.0,0.0
+busy_person,2,"Learner, no planning",-0.5977680000028789,0.1064,0.0,0.0
+busy_person,2,Q-learner,-0.3230879999998397,0.119,0.0,0.0
+busy_person,3,Send when due,-0.2112199999999458,0.113,0.0,0.0
+busy_person,3,Random timing,-0.18647399999996042,0.1188,0.0,0.0
+busy_person,3,Mornings only,-0.281115999999849,0.1462,0.0,0.0
+busy_person,3,"Learner, no planning",-0.5600680000024214,0.1172,0.0,0.0
+busy_person,3,Q-learner,-0.2737739999998763,0.129,0.0,0.0
+no_pattern,1,Send when due,0.07385000000003217,0.3102,0.0,0.0
+no_pattern,1,Random timing,0.10068000000003027,0.3156,0.0,0.0
+no_pattern,1,Mornings only,-0.022400000000024588,0.3296,0.0,0.0
+no_pattern,1,"Learner, no planning",0.026571999999982096,0.3342,0.0,0.0
+no_pattern,1,Q-learner,0.08732600000005342,0.3388,0.0,0.0
+no_pattern,2,Send when due,0.031215999999991906,0.288,0.0,0.0
+no_pattern,2,Random timing,0.05549600000001849,0.2914,0.0,0.0
+no_pattern,2,Mornings only,-0.059979999999874134,0.3046,0.0,0.0
+no_pattern,2,"Learner, no planning",-0.036521999999972125,0.3132,0.0,0.0
+no_pattern,2,Q-learner,0.03766999999999335,0.3182,0.0,0.0
+no_pattern,3,Send when due,0.05778000000002637,0.3052,0.0,0.0
+no_pattern,3,Random timing,0.08162600000003221,0.3098,0.0,0.0
+no_pattern,3,Mornings only,-0.035915999999934244,0.3214,0.0,0.0
+no_pattern,3,"Learner, no planning",0.00520199999999598,0.3308,0.0,0.0
+no_pattern,3,Q-learner,0.07225800000005124,0.3316,0.0,0.0
