@@ -8,6 +8,15 @@ from graph_schema.models import (
     ALLOWED_NODE_LABELS,
     ALLOWED_PROPERTIES,
     ALLOWED_RELATIONSHIP_TYPES,
+    ALLOWED_PRIORITIES,
+    ALLOWED_SEVERITIES,
+    ALLOWED_STATUSES,
+    PRIORITY_SYNONYMS,
+    SEVERITY_SYNONYMS,
+    STATUS_SYNONYMS,
+    SINGLE_VALUED_RELATIONSHIPS,
+    SYMMETRIC_RELATIONSHIPS,
+    SUPPORTED_SCHEMA_VERSION,
 )
 
 TIER_1_LABELS = {
@@ -392,8 +401,18 @@ RELATIONSHIP_DEFINITIONS: Dict[str, Dict[str, Any]] = {
 }
 
 PROPERTY_DOCUMENTATION: Dict[str, Dict[str, Any]] = {
-    "status": {"type": "scalar", "description": "Lifecycle state (e.g. open, in_progress, resolved)."},
-    "priority": {"type": "scalar", "description": "Priority ranking (low, medium, high, critical)."},
+    "status": {
+        "type": "str (scalar)",
+        "allowed_values": sorted(list(ALLOWED_STATUSES)),
+        "synonyms": STATUS_SYNONYMS,
+        "description": "Lifecycle state (e.g. open, in progress, blocked, done, cancelled, planned, active, agreed, superseded, answered). Unknown values are dropped with a logged warning.",
+    },
+    "priority": {
+        "type": "str (scalar)",
+        "allowed_values": sorted(list(ALLOWED_PRIORITIES)),
+        "synonyms": PRIORITY_SYNONYMS,
+        "description": "Priority ranking (low, medium, high, urgent). Unknown values are dropped with a logged warning.",
+    },
     "progress": {"type": "scalar", "description": "Completion indicator or percentage."},
     "date": {"type": "scalar", "description": "ISO date string (YYYY-MM-DD)."},
     "time": {"type": "scalar", "description": "Time string (HH:MM:SS)."},
@@ -402,7 +421,12 @@ PROPERTY_DOCUMENTATION: Dict[str, Dict[str, Any]] = {
     "value": {"type": "scalar", "description": "Numeric parameter or score."},
     "unit": {"type": "scalar", "description": "Measurement unit string."},
     "title": {"type": "scalar", "description": "Formal document or role title."},
-    "severity": {"type": "scalar", "description": "Severity assessment (e.g. blocker)."},
+    "severity": {
+        "type": "str (scalar)",
+        "allowed_values": sorted(list(ALLOWED_SEVERITIES)),
+        "synonyms": SEVERITY_SYNONYMS,
+        "description": "Severity assessment (low, medium, high, critical). Unknown values are dropped with a logged warning.",
+    },
     "kind": {"type": "scalar", "description": "Kinship or sub-category classifier (e.g. 'sister', 'mother')."},
     "description": {"type": "scalar", "description": "Detailed explanation or text description."},
     "rationale": {"type": "scalar", "description": "Reasoning behind a decision."},
@@ -465,12 +489,21 @@ def serialize_type_definitions() -> Dict[str, Any]:
                 "from": list(sorted(from_rule)) if isinstance(from_rule, (set, tuple, list)) else from_rule,
                 "to": list(sorted(to_rule)) if isinstance(to_rule, (set, tuple, list)) else to_rule,
             },
+            "is_single_valued": rel_type in SINGLE_VALUED_RELATIONSHIPS,
+            "is_symmetric": rel_type in SYMMETRIC_RELATIONSHIPS,
         }
 
     return {
         "version": "1.1.0",
+        "schema_version": {
+            "default": SUPPORTED_SCHEMA_VERSION,
+            "supported_major": SUPPORTED_SCHEMA_VERSION.split(".")[0],
+            "description": "Schema version of the payload contract. Major version mismatch triggers a warning.",
+        },
         "node_labels": node_labels,
         "relationship_types": rel_types,
+        "single_valued_relationships": sorted(list(SINGLE_VALUED_RELATIONSHIPS)),
+        "symmetric_relationships": sorted(list(SYMMETRIC_RELATIONSHIPS)),
         "properties": PROPERTY_DOCUMENTATION,
         "layer_c_signals": LAYER_C_SIGNALS,
     }

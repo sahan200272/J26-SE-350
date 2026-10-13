@@ -1,5 +1,10 @@
 {
   "version": "1.1.0",
+  "schema_version": {
+    "default": "1.0",
+    "supported_major": "1",
+    "description": "Schema version of the payload contract. Major version mismatch triggers a warning."
+  },
   "node_labels": {
     "Concept": {
       "tier": 2,
@@ -133,7 +138,9 @@
         "to": [
           "Topic"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "ABSENT_FROM": {
       "tier": 1,
@@ -147,7 +154,9 @@
           "Event",
           "Meeting"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "AGREES_WITH": {
       "tier": 2,
@@ -162,7 +171,9 @@
           "Idea",
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "ALIAS_OF": {
       "tier": 2,
@@ -171,7 +182,9 @@
       "allowed_directions": {
         "from": "any",
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "ANSWERS": {
       "tier": 2,
@@ -185,7 +198,9 @@
         "to": [
           "Question"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "ASSIGNED_TO": {
       "tier": 1,
@@ -198,7 +213,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "ATTENDED": {
       "tier": 1,
@@ -212,7 +229,9 @@
           "Event",
           "Meeting"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "BLOCKED_BY": {
       "tier": 1,
@@ -227,7 +246,9 @@
           "Issue",
           "Task"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "COLLABORATES_WITH": {
       "tier": 2,
@@ -240,7 +261,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
     },
     "CREATED_IN": {
       "tier": 2,
@@ -260,7 +283,9 @@
           "Conversation",
           "Meeting"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DECIDED": {
       "tier": 1,
@@ -273,7 +298,9 @@
         "to": [
           "Decision"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DEPENDS_ON": {
       "tier": 2,
@@ -288,7 +315,9 @@
           "Project",
           "Task"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DISAGREES_WITH": {
       "tier": 2,
@@ -303,7 +332,9 @@
           "Idea",
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DISCUSSED": {
       "tier": 1,
@@ -314,7 +345,9 @@
           "Meeting"
         ],
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DISLIKES": {
       "tier": 2,
@@ -325,7 +358,9 @@
           "Person"
         ],
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "DUE_ON": {
       "tier": 1,
@@ -340,7 +375,9 @@
         "to": [
           "Deadline"
         ]
-      }
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
     },
     "FAMILY_OF": {
       "tier": 1,
@@ -353,7 +390,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "FOLLOW_UP_OF": {
       "tier": 2,
@@ -368,7 +407,9 @@
           "Meeting",
           "Task"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "FRIEND_OF": {
       "tier": 1,
@@ -381,7 +422,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
     },
     "HAS_ISSUE": {
       "tier": 2,
@@ -395,7 +438,9 @@
         "to": [
           "Issue"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "HAS_METRIC": {
       "tier": 2,
@@ -412,7 +457,9 @@
         "to": [
           "Metric"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "LEADS": {
       "tier": 2,
@@ -427,7 +474,9 @@
           "Project",
           "Team"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "LIKES": {
       "tier": 2,
@@ -438,7 +487,9 @@
           "Person"
         ],
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "LIVES_IN": {
       "tier": 2,
@@ -451,7 +502,9 @@
         "to": [
           "Location"
         ]
-      }
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
     },
     "LOCATED_AT": {
       "tier": 1,
@@ -466,7 +519,9 @@
         "to": [
           "Location"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "MEMBER_OF": {
       "tier": 1,
@@ -480,7 +535,9 @@
           "Organization",
           "Team"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "MENTIONS": {
       "tier": 2,
@@ -492,7 +549,9 @@
           "Note"
         ],
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "OWNS": {
       "tier": 2,
@@ -509,7 +568,9 @@
           "Item",
           "Tool"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "PARTNER_OF": {
       "tier": 2,
@@ -522,7 +583,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
     },
     "PART_OF": {
       "tier": 1,
@@ -537,7 +600,9 @@
           "Project",
           "Task"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "PLANS": {
       "tier": 2,
@@ -552,7 +617,9 @@
           "Meeting",
           "Task"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "PREFERS": {
       "tier": 2,
@@ -566,7 +633,9 @@
           "Concept",
           "Preference"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "PROPOSED": {
       "tier": 2,
@@ -579,7 +648,9 @@
         "to": [
           "Idea"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "RAISED": {
       "tier": 1,
@@ -593,7 +664,9 @@
           "Issue",
           "Question"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "REFERENCES": {
       "tier": 2,
@@ -610,7 +683,9 @@
         "to": [
           "Document"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "RELATED_TO": {
       "tier": 2,
@@ -619,7 +694,9 @@
       "allowed_directions": {
         "from": "any",
         "to": "any"
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "REPORTS_TO": {
       "tier": 2,
@@ -632,7 +709,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "REQUESTED_BY": {
       "tier": 1,
@@ -645,7 +724,9 @@
         "to": [
           "Person"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "RESOLVES": {
       "tier": 2,
@@ -659,7 +740,9 @@
         "to": [
           "Issue"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "SCHEDULED_ON": {
       "tier": 2,
@@ -673,7 +756,9 @@
         "to": [
           "Deadline"
         ]
-      }
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
     },
     "SUPERSEDES": {
       "tier": 2,
@@ -686,7 +771,9 @@
         "to": [
           "Decision"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "SUPPORTS": {
       "tier": 2,
@@ -700,7 +787,9 @@
         "to": [
           "Goal"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "USES": {
       "tier": 2,
@@ -715,7 +804,9 @@
         "to": [
           "Tool"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "WORKS_AT": {
       "tier": 2,
@@ -728,7 +819,9 @@
         "to": [
           "Organization"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     },
     "WORKS_ON": {
       "tier": 1,
@@ -741,17 +834,78 @@
         "to": [
           "Project"
         ]
-      }
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
     }
   },
+  "single_valued_relationships": [
+    "DUE_ON",
+    "LIVES_IN",
+    "SCHEDULED_ON"
+  ],
+  "symmetric_relationships": [
+    "COLLABORATES_WITH",
+    "FRIEND_OF",
+    "PARTNER_OF"
+  ],
   "properties": {
     "status": {
-      "type": "scalar",
-      "description": "Lifecycle state (e.g. open, in_progress, resolved)."
+      "type": "str (scalar)",
+      "allowed_values": [
+        "active",
+        "agreed",
+        "answered",
+        "blocked",
+        "cancelled",
+        "done",
+        "in progress",
+        "open",
+        "planned",
+        "superseded"
+      ],
+      "synonyms": {
+        "completed": "done",
+        "complete": "done",
+        "finished": "done",
+        "in-progress": "in progress",
+        "in_progress": "in progress",
+        "ongoing": "in progress",
+        "started": "in progress",
+        "wip": "in progress",
+        "canceled": "cancelled",
+        "dropped": "cancelled",
+        "called off": "cancelled",
+        "pending": "open",
+        "todo": "open",
+        "to do": "open",
+        "new": "open",
+        "waiting": "blocked",
+        "stuck": "blocked"
+      },
+      "description": "Lifecycle state (e.g. open, in progress, blocked, done, cancelled, planned, active, agreed, superseded, answered). Unknown values are dropped with a logged warning."
     },
     "priority": {
-      "type": "scalar",
-      "description": "Priority ranking (low, medium, high, critical)."
+      "type": "str (scalar)",
+      "allowed_values": [
+        "high",
+        "low",
+        "medium",
+        "urgent"
+      ],
+      "synonyms": {
+        "critical": "urgent",
+        "asap": "urgent",
+        "immediately": "urgent",
+        "important": "high",
+        "normal": "medium",
+        "ok": "medium",
+        "moderate": "medium",
+        "minor": "low",
+        "whenever": "low",
+        "optional": "low"
+      },
+      "description": "Priority ranking (low, medium, high, urgent). Unknown values are dropped with a logged warning."
     },
     "progress": {
       "type": "scalar",
@@ -786,8 +940,20 @@
       "description": "Formal document or role title."
     },
     "severity": {
-      "type": "scalar",
-      "description": "Severity assessment (e.g. blocker)."
+      "type": "str (scalar)",
+      "allowed_values": [
+        "critical",
+        "high",
+        "low",
+        "medium"
+      ],
+      "synonyms": {
+        "blocker": "critical",
+        "major": "high",
+        "minor": "low",
+        "normal": "medium"
+      },
+      "description": "Severity assessment (low, medium, high, critical). Unknown values are dropped with a logged warning."
     },
     "kind": {
       "type": "scalar",

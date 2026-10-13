@@ -202,6 +202,89 @@ ALLOWED_PROPERTIES: Set[str] = {
     "speaker",
 }
 
+# Property value constraints & case-insensitive synonyms (RP-25)
+ALLOWED_PRIORITIES: Set[str] = {"low", "medium", "high", "urgent"}
+PRIORITY_SYNONYMS: Dict[str, str] = {
+    "critical": "urgent",
+    "asap": "urgent",
+    "immediately": "urgent",
+    "important": "high",
+    "normal": "medium",
+    "ok": "medium",
+    "moderate": "medium",
+    "minor": "low",
+    "whenever": "low",
+    "optional": "low",
+}
+
+ALLOWED_SEVERITIES: Set[str] = {"low", "medium", "high", "critical"}
+SEVERITY_SYNONYMS: Dict[str, str] = {
+    "blocker": "critical",
+    "major": "high",
+    "minor": "low",
+    "normal": "medium",
+}
+
+ALLOWED_STATUSES: Set[str] = {
+    "open",
+    "in progress",
+    "blocked",
+    "done",
+    "cancelled",
+    "planned",
+    "active",
+    "agreed",
+    "superseded",
+    "answered",
+}
+STATUS_SYNONYMS: Dict[str, str] = {
+    "completed": "done",
+    "complete": "done",
+    "finished": "done",
+    "in-progress": "in progress",
+    "in_progress": "in progress",
+    "ongoing": "in progress",
+    "started": "in progress",
+    "wip": "in progress",
+    "canceled": "cancelled",
+    "dropped": "cancelled",
+    "called off": "cancelled",
+    "pending": "open",
+    "todo": "open",
+    "to do": "open",
+    "new": "open",
+    "waiting": "blocked",
+    "stuck": "blocked",
+}
+
+# Relationship cardinality & symmetry constants (RP-25)
+SINGLE_VALUED_RELATIONSHIPS: Set[str] = {"DUE_ON", "SCHEDULED_ON", "LIVES_IN"}
+SYMMETRIC_RELATIONSHIPS: Set[str] = {"FRIEND_OF", "PARTNER_OF", "COLLABORATES_WITH"}
+
+SUPPORTED_SCHEMA_VERSION: str = "1.0"
+
+
+def canonical_pair(rel_type: str, key_a: str, key_b: str) -> Tuple[str, str]:
+    """Return keys in sorted order for symmetric relationship types, unchanged otherwise."""
+    if rel_type in SYMMETRIC_RELATIONSHIPS:
+        return tuple(sorted((key_a, key_b)))
+    return (key_a, key_b)
+
+
+def is_iso_date(value: str) -> bool:
+    """Check if value is an ISO date formatted as YYYY-MM-DD."""
+    if not isinstance(value, str):
+        return False
+    stripped = value.strip()
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", stripped):
+        return False
+    try:
+        from datetime import date
+        date.fromisoformat(stripped)
+        return True
+    except ValueError:
+        return False
+
 
 def normalize_key(name: str) -> str:
     """Normalize an entity name into a unique key: strip, lowercase, collapse whitespace."""
@@ -243,12 +326,44 @@ def is_valid_direction(rel_type: str, from_type: str, to_type: str) -> bool:
 
 def validate_props_dict(props: Dict[str, Any]) -> Dict[str, Any]:
     """Validate property keys against whitelist and ensure values meet type constraints."""
+    props = dict(props)
     invalid_keys = set(props.keys()) - ALLOWED_PROPERTIES
     if invalid_keys:
         raise ValueError(
             f"Invalid property keys: {sorted(invalid_keys)}. "
             f"Allowed properties are: {sorted(ALLOWED_PROPERTIES)}"
         )
+
+    # Normalize or drop priority, severity, status
+    property_mappings = [
+        ("priority", ALLOWED_PRIORITIES, PRIORITY_SYNONYMS),
+        ("severity", ALLOWED_SEVERITIES, SEVERITY_SYNONYMS),
+        ("status", ALLOWED_STATUSES, STATUS_SYNONYMS),
+    ]
+    for prop_key, allowed_vals, synonyms in property_mappings:
+        if prop_key in props:
+            val = props[prop_key]
+            if isinstance(val, str):
+                normalized = val.strip().lower()
+                if normalized in allowed_vals:
+                    props[prop_key] = normalized
+                elif normalized in synonyms:
+                    props[prop_key] = synonyms[normalized]
+                else:
+                    logger.warning(
+                        "Unknown %s '%s' dropped.",
+                        prop_key,
+                        val,
+                    )
+                    props.pop(prop_key)
+            else:
+                logger.warning(
+                    "Unknown %s '%s' dropped.",
+                    prop_key,
+                    val,
+                )
+                props.pop(prop_key)
+
     for k, v in props.items():
         if k == "aliases":
             if not isinstance(v, list):
@@ -351,6 +466,15 @@ class Entity(BaseModel):
                 data["props"] = props
         return data
 
+    @model_validator(mode="after")
+    def validate_deadline_entity(self) -> "Entity":
+        if self.type == "Deadline" and not is_iso_date(self.name):
+            logger.warning(
+                "Deadline entity name '%s' is not an ISO date (YYYY-MM-DD).",
+                self.name,
+            )
+        return self
+
 
 class Relationship(BaseModel):
     """A directed edge between two entities with open fallback normalization."""
@@ -444,6 +568,24 @@ class Payload(BaseModel):
     """Input payload containing extracted entities and relationships from voice conversations."""
 
     source: str
+    schema_version: Optional[str] = "1.0"
     timestamp: Optional[str] = None
     entities: List[Entity] = Field(default_factory=list)
     relationships: List[Relationship] = Field(default_factory=list)
+
+    @field_validator("schema_version")
+    @classmethod
+    def validate_schema_version(cls, v: Optional[str]) -> str:
+        if v is None:
+            return "1.0"
+        v_str = str(v).strip()
+        major = v_str.split(".")[0]
+        supported_major = SUPPORTED_SCHEMA_VERSION.split(".")[0]
+        if major != supported_major:
+            logger.warning(
+                "Payload schema_version '%s' has major version '%s' differing from supported version '%s'.",
+                v_str,
+                major,
+                SUPPORTED_SCHEMA_VERSION,
+            )
+        return v_str

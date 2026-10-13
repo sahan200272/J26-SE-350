@@ -7,16 +7,25 @@ import pytest
 from pydantic import ValidationError
 from graph_schema.models import (
     ALLOWED_NODE_LABELS,
+    ALLOWED_PRIORITIES,
     ALLOWED_RELATIONSHIP_TYPES,
+    ALLOWED_SEVERITIES,
+    ALLOWED_STATUSES,
+    PRIORITY_SYNONYMS,
+    SEVERITY_SYNONYMS,
+    SINGLE_VALUED_RELATIONSHIPS,
+    STATUS_SYNONYMS,
+    SYMMETRIC_RELATIONSHIPS,
     Entity,
     EntityRef,
     NodeLabel,
     Payload,
     Relationship,
     RelationshipType,
+    canonical_pair,
     normalize_key,
 )
-from graph_schema.schema import CONSTRAINTS
+from graph_schema.schema import CONSTRAINTS, INDEXES
 
 # Direction test cases covering all 45 relationship types:
 # (rel_type, valid_from, valid_to, invalid_from, invalid_to)
@@ -408,3 +417,323 @@ def test_populate_by_name_and_alias():
     dumped = rel.model_dump(by_alias=True)
     assert "from" in dumped
     assert dumped["from"]["name"] == "Slides"
+
+
+@pytest.mark.parametrize(
+    "raw_val,expected",
+    [
+        ("critical", "urgent"),
+        ("asap", "urgent"),
+        ("immediately", "urgent"),
+        ("important", "high"),
+        ("normal", "medium"),
+        ("ok", "medium"),
+        ("moderate", "medium"),
+        ("minor", "low"),
+        ("whenever", "low"),
+        ("optional", "low"),
+        ("low", "low"),
+        ("medium", "medium"),
+        ("high", "high"),
+        ("urgent", "urgent"),
+    ],
+)
+def test_priority_synonyms_mapping(raw_val, expected):
+    """Verify all priority synonyms map to their canonical target values."""
+    entity = Entity.model_validate({
+        "type": "Task",
+        "name": "Test Priority",
+        "props": {"priority": raw_val},
+    })
+    assert entity.props["priority"] == expected
+
+    rel = Relationship.model_validate({
+        "from": {"type": "Task", "name": "TaskA"},
+        "type": "ASSIGNED_TO",
+        "to": {"type": "Person", "name": "Sarah"},
+        "props": {"priority": raw_val},
+    })
+    assert rel.props["priority"] == expected
+
+
+@pytest.mark.parametrize(
+    "raw_val,expected",
+    [
+        ("blocker", "critical"),
+        ("major", "high"),
+        ("minor", "low"),
+        ("normal", "medium"),
+        ("low", "low"),
+        ("medium", "medium"),
+        ("high", "high"),
+        ("critical", "critical"),
+    ],
+)
+def test_severity_synonyms_mapping(raw_val, expected):
+    """Verify all severity synonyms map to their canonical target values."""
+    entity = Entity.model_validate({
+        "type": "Issue",
+        "name": "Test Severity",
+        "props": {"severity": raw_val},
+    })
+    assert entity.props["severity"] == expected
+
+    rel = Relationship.model_validate({
+        "from": {"type": "Task", "name": "TaskA"},
+        "type": "BLOCKED_BY",
+        "to": {"type": "Issue", "name": "IssueB"},
+        "props": {"severity": raw_val},
+    })
+    assert rel.props["severity"] == expected
+
+
+@pytest.mark.parametrize(
+    "raw_val,expected",
+    [
+        ("completed", "done"),
+        ("complete", "done"),
+        ("finished", "done"),
+        ("in-progress", "in progress"),
+        ("in_progress", "in progress"),
+        ("ongoing", "in progress"),
+        ("started", "in progress"),
+        ("wip", "in progress"),
+        ("canceled", "cancelled"),
+        ("dropped", "cancelled"),
+        ("called off", "cancelled"),
+        ("pending", "open"),
+        ("todo", "open"),
+        ("to do", "open"),
+        ("new", "open"),
+        ("waiting", "blocked"),
+        ("stuck", "blocked"),
+        ("open", "open"),
+        ("in progress", "in progress"),
+        ("blocked", "blocked"),
+        ("done", "done"),
+        ("cancelled", "cancelled"),
+        ("planned", "planned"),
+        ("active", "active"),
+        ("agreed", "agreed"),
+        ("superseded", "superseded"),
+        ("answered", "answered"),
+    ],
+)
+def test_status_synonyms_mapping(raw_val, expected):
+    """Verify all status synonyms map to their canonical target values."""
+    entity = Entity.model_validate({
+        "type": "Task",
+        "name": "Test Status",
+        "props": {"status": raw_val},
+    })
+    assert entity.props["status"] == expected
+
+    rel = Relationship.model_validate({
+        "from": {"type": "Task", "name": "TaskA"},
+        "type": "ASSIGNED_TO",
+        "to": {"type": "Person", "name": "Sarah"},
+        "props": {"status": raw_val},
+    })
+    assert rel.props["status"] == expected
+
+
+def test_prop_synonyms_case_insensitivity_and_whitespace():
+    """Verify case-insensitivity and surrounding whitespace normalization for priority, severity, and status."""
+    e = Entity.model_validate({
+        "type": "Task",
+        "name": "Test Case Insensitivity",
+        "props": {
+            "priority": "  CRITICAL  ",
+            "severity": "Blocker",
+            "status": "In-Progress",
+        },
+    })
+    assert e.props["priority"] == "urgent"
+    assert e.props["severity"] == "critical"
+    assert e.props["status"] == "in progress"
+
+    e2 = Entity.model_validate({
+        "type": "Task",
+        "name": "Test More Casing",
+        "props": {
+            "priority": "IMPORTANT",
+            "severity": "MAJOR",
+            "status": "TO DO",
+        },
+    })
+    assert e2.props["priority"] == "high"
+    assert e2.props["severity"] == "high"
+    assert e2.props["status"] == "open"
+
+
+def test_unknown_prop_value_dropped_with_warning(caplog):
+    """Verify unknown priority, severity, or status values are dropped with a warning, keeping the payload valid."""
+    import logging
+
+    with caplog.at_level(logging.WARNING):
+        # 1. Entity with unknown values
+        entity = Entity.model_validate({
+            "type": "Task",
+            "name": "Deploy Service",
+            "props": {
+                "priority": "unrecognized_priority",
+                "severity": "extreme_severity",
+                "status": "in_limbo",
+                "title": "Keep Valid Title",
+            },
+        })
+        # Unknown values should be dropped
+        assert "priority" not in entity.props
+        assert "severity" not in entity.props
+        assert "status" not in entity.props
+        # Valid property retained
+        assert entity.props["title"] == "Keep Valid Title"
+
+        # 2. Non-string unknown values dropped without raising exception
+        entity_non_str = Entity.model_validate({
+            "type": "Task",
+            "name": "Non String Prop",
+            "props": {
+                "priority": 9999,
+                "status": True,
+            },
+        })
+        assert "priority" not in entity_non_str.props
+        assert "status" not in entity_non_str.props
+
+        # 3. Relationship with unknown values dropped
+        rel = Relationship.model_validate({
+            "from": {"type": "Task", "name": "TaskA"},
+            "type": "ASSIGNED_TO",
+            "to": {"type": "Person", "name": "Sarah"},
+            "props": {
+                "priority": "bad_priority",
+                "status": "bad_status",
+            },
+        })
+        assert "priority" not in rel.props
+        assert "status" not in rel.props
+
+        # 4. Full payload containing unknown values stays valid
+        payload = Payload.model_validate({
+            "source": "test_voice_session",
+            "entities": [
+                {
+                    "type": "Task",
+                    "name": "Task in Payload",
+                    "props": {"priority": "invalid_val", "status": "wip"},
+                }
+            ],
+            "relationships": [
+                {
+                    "from": {"type": "Task", "name": "Task in Payload"},
+                    "type": "ASSIGNED_TO",
+                    "to": {"type": "Person", "name": "Sarah"},
+                    "props": {"severity": "unknown_sev"},
+                }
+            ],
+        })
+        assert len(payload.entities) == 1
+        assert "priority" not in payload.entities[0].props
+        assert payload.entities[0].props["status"] == "in progress"
+        assert len(payload.relationships) == 1
+        assert "severity" not in payload.relationships[0].props
+
+    # Verify warnings were recorded in log
+    assert any("Unknown priority" in record.message for record in caplog.records)
+    assert any("Unknown severity" in record.message for record in caplog.records)
+    assert any("Unknown status" in record.message for record in caplog.records)
+
+
+def test_canonical_pair():
+    """Verify canonical_pair sorts keys for symmetric relationships and leaves non-symmetric types unchanged."""
+    assert SINGLE_VALUED_RELATIONSHIPS == {"DUE_ON", "SCHEDULED_ON", "LIVES_IN"}
+    assert SYMMETRIC_RELATIONSHIPS == {"FRIEND_OF", "PARTNER_OF", "COLLABORATES_WITH"}
+
+    # Symmetric relationships return keys in sorted order
+    assert canonical_pair("FRIEND_OF", "bob", "alice") == ("alice", "bob")
+    assert canonical_pair("FRIEND_OF", "alice", "bob") == ("alice", "bob")
+    assert canonical_pair("PARTNER_OF", "zara", "alex") == ("alex", "zara")
+    assert canonical_pair("COLLABORATES_WITH", "sarah", "david") == ("david", "sarah")
+
+    # Non-symmetric relationships return unchanged keys
+    assert canonical_pair("ASSIGNED_TO", "task_key", "person_key") == ("task_key", "person_key")
+    assert canonical_pair("ASSIGNED_TO", "person_key", "task_key") == ("person_key", "task_key")
+    assert canonical_pair("DUE_ON", "task_1", "deadline_1") == ("task_1", "deadline_1")
+    assert canonical_pair("REPORTS_TO", "david", "sarah") == ("david", "sarah")
+    assert canonical_pair("LIVES_IN", "sarah", "brooklyn") == ("sarah", "brooklyn")
+
+
+def test_schema_version_default_and_mismatch_warning(caplog):
+    """Verify schema_version defaults to 1.0, and logs warning on major version mismatch."""
+    import logging
+
+    # 1. Default schema_version when omitted
+    p_default = Payload.model_validate({"source": "voice_1"})
+    assert p_default.schema_version == "1.0"
+
+    # 2. Matching schema_version 1.0 or minor bump 1.1 produces no warning
+    with caplog.at_level(logging.WARNING):
+        caplog.clear()
+        p_10 = Payload.model_validate({"source": "voice_1", "schema_version": "1.0"})
+        assert p_10.schema_version == "1.0"
+        p_11 = Payload.model_validate({"source": "voice_1", "schema_version": "1.1"})
+        assert p_11.schema_version == "1.1"
+        assert not any("schema_version" in r.message for r in caplog.records)
+
+    # 3. Differing major version logs a warning but payload is kept
+    with caplog.at_level(logging.WARNING):
+        caplog.clear()
+        p_mismatch = Payload.model_validate({"source": "voice_1", "schema_version": "2.0"})
+        assert p_mismatch.schema_version == "2.0"
+        assert any("schema_version '2.0' has major version '2'" in r.message for r in caplog.records)
+
+
+def test_deadline_name_warning(caplog):
+    """Verify Deadline entities whose name is not YYYY-MM-DD log a warning but are kept."""
+    import logging
+
+    with caplog.at_level(logging.WARNING):
+        caplog.clear()
+        # Valid ISO date produces no warning
+        d_valid = Entity.model_validate({"type": "Deadline", "name": "2026-10-18"})
+        assert d_valid.type == "Deadline"
+        assert d_valid.name == "2026-10-18"
+        assert not any("Deadline" in r.message for r in caplog.records)
+
+        # Non-ISO date name logs a warning but entity is kept
+        d_invalid = Entity.model_validate({"type": "Deadline", "name": "End of Sprint 14"})
+        assert d_invalid.type == "Deadline"
+        assert d_invalid.name == "End of Sprint 14"
+        assert any(
+            "Deadline entity name 'End of Sprint 14' is not an ISO date" in r.message
+            for r in caplog.records
+        )
+
+        caplog.clear()
+        # Invalid date like 2026-02-31 logs a warning
+        d_bad_date = Entity.model_validate({"type": "Deadline", "name": "2026-02-31"})
+        assert d_bad_date.name == "2026-02-31"
+        assert any("Deadline entity name '2026-02-31' is not an ISO date" in r.message for r in caplog.records)
+
+        caplog.clear()
+        # Non-Deadline entity does not trigger deadline warning
+        p = Entity.model_validate({"type": "Person", "name": "End of Sprint 14"})
+        assert not any("Deadline" in r.message for r in caplog.records)
+
+
+def test_schema_range_indexes():
+    """Verify range indexes on Task(priority), Task(status), Issue(severity) exist in schema."""
+    assert len(INDEXES) == 3
+    index_names = [idx[0] for idx in INDEXES]
+    assert "task_priority" in index_names
+    assert "task_status" in index_names
+    assert "issue_severity" in index_names
+
+    queries = {name: q for name, q in INDEXES}
+    assert "FOR (n:Task) ON (n.priority)" in queries["task_priority"]
+    assert "FOR (n:Task) ON (n.status)" in queries["task_status"]
+    assert "FOR (n:Issue) ON (n.severity)" in queries["issue_severity"]
+    for q in queries.values():
+        assert "CREATE INDEX" in q
+        assert "IF NOT EXISTS" in q
