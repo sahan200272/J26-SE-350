@@ -517,6 +517,13 @@ def test_severity_synonyms_mapping(raw_val, expected):
         ("agreed", "agreed"),
         ("superseded", "superseded"),
         ("answered", "answered"),
+        ("decided", "agreed"),
+        ("approved", "agreed"),
+        ("confirmed", "agreed"),
+        ("accepted", "agreed"),
+        ("resolved", "done"),
+        ("closed", "done"),
+        ("solved", "done"),
     ],
 )
 def test_status_synonyms_mapping(raw_val, expected):
@@ -737,3 +744,27 @@ def test_schema_range_indexes():
     for q in queries.values():
         assert "CREATE INDEX" in q
         assert "IF NOT EXISTS" in q
+
+
+def test_all_contract_examples_parse_with_no_warnings(caplog):
+    """Verify that every contract example matching contracts/*example*.json parses with zero warnings."""
+    import logging
+
+    contracts_dir = Path(__file__).resolve().parent.parent / "contracts"
+    example_files = list(contracts_dir.glob("*example*.json"))
+    assert len(example_files) >= 2, f"Expected at least 2 example files, found: {example_files}"
+
+    with caplog.at_level(logging.WARNING):
+        caplog.clear()
+        for example_path in example_files:
+            with open(example_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            payload = Payload.model_validate(data)
+            assert payload.source
+            assert len(payload.entities) > 0
+            assert len(payload.relationships) > 0
+
+        assert len(caplog.records) == 0, (
+            f"Expected zero warnings when parsing contract examples, got: "
+            f"{[r.message for r in caplog.records]}"
+        )

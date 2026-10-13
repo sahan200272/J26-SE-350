@@ -255,6 +255,13 @@ STATUS_SYNONYMS: Dict[str, str] = {
     "new": "open",
     "waiting": "blocked",
     "stuck": "blocked",
+    "decided": "agreed",
+    "approved": "agreed",
+    "confirmed": "agreed",
+    "accepted": "agreed",
+    "resolved": "done",
+    "closed": "done",
+    "solved": "done",
 }
 
 # Relationship cardinality & symmetry constants (RP-25)

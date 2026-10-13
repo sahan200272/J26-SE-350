@@ -85,7 +85,7 @@ Property values must be scalar types (`str`, `int`, `float`, `bool`) with the ex
 
 | Property Key | Description | Type / Constraint |
 |:---|:---|:---|
-| `status` | Lifecycle state. Allowed: `open`, `in progress`, `blocked`, `done`, `cancelled`, `planned`, `active`, `agreed`, `superseded`, `answered`. Case-insensitive synonyms: `completed`/`complete`/`finished` -> `done`; `in-progress`/`ongoing`/`started`/`wip` -> `in progress`; `canceled`/`dropped`/`called off` -> `cancelled`; `pending`/`todo`/`to do`/`new` -> `open`; `waiting`/`stuck` -> `blocked`. Unknown values dropped with logged warning. | `str` |
+| `status` | Lifecycle state. Allowed: `open`, `in progress`, `blocked`, `done`, `cancelled`, `planned`, `active`, `agreed`, `superseded`, `answered`. Case-insensitive synonyms: `completed`/`complete`/`finished`/`resolved`/`closed`/`solved` -> `done`; `in-progress`/`ongoing`/`started`/`wip` -> `in progress`; `canceled`/`dropped`/`called off` -> `cancelled`; `pending`/`todo`/`to do`/`new` -> `open`; `waiting`/`stuck` -> `blocked`; `decided`/`approved`/`confirmed`/`accepted` -> `agreed`. Unknown values dropped with logged warning. | `str` |
 | `priority` | Priority ranking. Allowed: `low`, `medium`, `high`, `urgent`. Case-insensitive synonyms: `critical`/`asap`/`immediately` -> `urgent`; `important` -> `high`; `normal`/`ok`/`moderate` -> `medium`; `minor`/`whenever`/`optional` -> `low`. Unknown values dropped with logged warning. | `str` |
 | `progress` | Numerical or status completion progress indicator. | `str`, `int`, `float` |
 | `date` | ISO-formatted date string (`YYYY-MM-DD`). | `str` |

@@ -881,7 +881,14 @@
         "to do": "open",
         "new": "open",
         "waiting": "blocked",
-        "stuck": "blocked"
+        "stuck": "blocked",
+        "decided": "agreed",
+        "approved": "agreed",
+        "confirmed": "agreed",
+        "accepted": "agreed",
+        "resolved": "done",
+        "closed": "done",
+        "solved": "done"
       },
       "description": "Lifecycle state (e.g. open, in progress, blocked, done, cancelled, planned, active, agreed, superseded, answered). Unknown values are dropped with a logged warning."
     },
