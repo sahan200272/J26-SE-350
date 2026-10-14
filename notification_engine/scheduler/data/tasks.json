@@ -1412,5 +1412,12 @@
     "deadline": "2026-10-14T13:25:53.819448+05:30",
     "priority": "low",
     "status": "pending"
+  },
+  {
+    "id": "T203",
+    "title": "Test normal task 23 hours away",
+    "deadline": "2026-10-15T11:42:29.254604+05:30",
+    "priority": "normal",
+    "status": "pending"
   }
 ]
