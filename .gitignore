@@ -44,3 +44,5 @@ knowledge_graph/neo4j_data/
 *.safetensors
 test_output/
 data/
+
+**/data/notifications.db
