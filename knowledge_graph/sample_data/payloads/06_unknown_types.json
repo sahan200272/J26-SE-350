@@ -13,8 +13,8 @@
       "name": "Prune roses in garden",
       "op": "add",
       "props": {
-        "priority": "asap",
-        "status": "wip"
+        "priority": "urgent",
+        "status": "in progress"
       }
     },
     {
