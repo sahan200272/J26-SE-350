@@ -24,9 +24,9 @@ from graph_schema.models import NodeLabel
 ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
 
-NEO4J_URI = os.getenv("NEO4J_URI") or "bolt://localhost:7687"
-NEO4J_USER = os.getenv("NEO4J_USER") or "neo4j"
-NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD") or "changeme123"
+NEO4J_URI = os.getenv("NEO4J_URI")
+NEO4J_USER = os.getenv("NEO4J_USER")
+NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD")
 
 
 def get_driver(
@@ -35,9 +35,9 @@ def get_driver(
     password: str = None,
 ) -> Driver:
     """Create and return a Neo4j driver instance."""
-    resolved_uri = uri or os.getenv("NEO4J_URI") or "bolt://localhost:7687"
-    resolved_user = user or os.getenv("NEO4J_USER") or "neo4j"
-    resolved_password = password or os.getenv("NEO4J_PASSWORD") or "changeme123"
+    resolved_uri = uri or os.getenv("NEO4J_URI")
+    resolved_user = user or os.getenv("NEO4J_USER")
+    resolved_password = password or os.getenv("NEO4J_PASSWORD")
     return GraphDatabase.driver(resolved_uri, auth=(resolved_user, resolved_password))
 
 

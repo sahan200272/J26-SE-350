@@ -1,0 +1,137 @@
+{
+  "source": "office_sync_20261014",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-14T10:00:00Z",
+  "entities": [
+    {
+      "type": "Meeting",
+      "name": "Sprint 15 Architecture Sync",
+      "op": "add",
+      "props": {
+        "date": "2026-10-14",
+        "duration": "45m"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Sarah Chen",
+      "op": "add",
+      "props": {
+        "title": "Staff AI Engineer"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "David Miller",
+      "op": "add",
+      "props": {
+        "title": "Senior Backend Engineer"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Elena Rostova",
+      "op": "add",
+      "props": {
+        "title": "DevOps Engineer"
+      }
+    },
+    {
+      "type": "Task",
+      "name": "Benchmark Ollama 8B latency",
+      "op": "add",
+      "props": {
+        "priority": "high",
+        "status": "in progress"
+      }
+    },
+    {
+      "type": "Deadline",
+      "name": "2026-10-21",
+      "op": "add",
+      "props": {
+        "date": "2026-10-21"
+      }
+    },
+    {
+      "type": "Issue",
+      "name": "Whisper memory limit exceeded",
+      "op": "add",
+      "props": {
+        "severity": "high",
+        "status": "open"
+      }
+    },
+    {
+      "type": "Decision",
+      "name": "Adopt Neo4j 5 for memory",
+      "op": "add",
+      "props": {
+        "status": "agreed"
+      }
+    },
+    {
+      "type": "Question",
+      "name": "Can embeddings run on Neural Engine?",
+      "op": "add",
+      "props": {
+        "status": "open"
+      }
+    },
+    {
+      "type": "Tool",
+      "name": "Docker Desktop",
+      "op": "add",
+      "props": {
+        "kind": "runtime"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "ATTENDED",
+      "to": { "type": "Meeting", "name": "Sprint 15 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "ATTENDED",
+      "to": { "type": "Meeting", "name": "Sprint 15 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Person", "name": "Elena Rostova" },
+      "type": "ABSENT_FROM",
+      "to": { "type": "Meeting", "name": "Sprint 15 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B latency" },
+      "type": "ASSIGNED_TO",
+      "to": { "type": "Person", "name": "David Miller" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B latency" },
+      "type": "DUE_ON",
+      "to": { "type": "Deadline", "name": "2026-10-21" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B latency" },
+      "type": "HAS_ISSUE",
+      "to": { "type": "Issue", "name": "Whisper memory limit exceeded" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "DECIDED",
+      "to": { "type": "Decision", "name": "Adopt Neo4j 5 for memory" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "RAISED",
+      "to": { "type": "Question", "name": "Can embeddings run on Neural Engine?" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B latency" },
+      "type": "USES",
+      "to": { "type": "Tool", "name": "Docker Desktop" }
+    }
+  ]
+}

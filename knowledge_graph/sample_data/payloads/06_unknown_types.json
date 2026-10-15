@@ -1,0 +1,38 @@
+{
+  "source": "unknown_types_test_20261017",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-17T16:00:00Z",
+  "entities": [
+    {
+      "type": "Hobby",
+      "name": "Gardening",
+      "op": "add"
+    },
+    {
+      "type": "Task",
+      "name": "Prune roses in garden",
+      "op": "add",
+      "props": {
+        "priority": "asap",
+        "status": "wip"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Alice Walker",
+      "op": "add"
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Person", "name": "Alice Walker" },
+      "type": "CUSTOM_UNKNOWN_RELATION",
+      "to": { "type": "Hobby", "name": "Gardening" }
+    },
+    {
+      "from": { "type": "Person", "name": "Alice Walker" },
+      "type": "ASSIGNED_TO",
+      "to": { "type": "Task", "name": "Prune roses in garden" }
+    }
+  ]
+}
