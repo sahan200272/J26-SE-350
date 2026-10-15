@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone 
  
-from reminder_app.rules import reminder_due, time_left_text 
-from reminder_app.tasks import Task 
+from app.rules import reminder_due, time_left_text 
+from app.tasks import Task 
  
 NOW = datetime(2026, 10, 15, 9, 0, tzinfo=timezone.utc)      # a fixed "now" for every test 
+ 
  
 def task(priority="high", minutes_left=60, status="pending"): 
     return Task(id="T001", title="Submit report", priority=priority, status=status, 
@@ -39,7 +40,7 @@ def test_when_two_are_due_only_the_most_urgent_is_sent():
 def test_time_left_in_friendly_words(): 
     assert time_left_text(task(minutes_left=3 * 24 * 60), NOW) == "3 days"
     assert time_left_text(task(minutes_left=5 * 60 + 10), NOW) == "5 hours" 
-    assert time_left_text(task(minutes_left=45), NOW) == "45 minutes"
+    assert time_left_text(task(minutes_left=45), NOW) == "45 minutes" 
 
 
 def test_critical_task_23_hours_away_gets_24_hour_reminder():

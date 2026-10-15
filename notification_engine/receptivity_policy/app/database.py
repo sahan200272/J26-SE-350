@@ -23,18 +23,19 @@ class Database:
  
     def already_sent(self, reminder_key): 
         row = self.conn.execute( 
-            "SELECT 1 FROM notifications WHERE reminder_key = ?",
-            (reminder_key,)).fetchone() 
+            "SELECT 1 FROM notifications WHERE reminder_key = ?", (reminder_key,)).fetchone() 
         return row is not None 
  
     def save_notification(self, task_id, reminder_key, message, sent_at): 
-        cursor = self.conn.execute("INSERT INTO notifications (task_id, reminder_key, message, sent_at) VALUES (?, ?, ?, ?)", 
+        cursor = self.conn.execute( 
+            "INSERT INTO notifications (task_id, reminder_key, message, sent_at) VALUES (?, ?, ?, ?)", 
             (task_id, reminder_key, message, sent_at.isoformat())) 
         self.conn.commit() 
         return cursor.lastrowid 
  
     def record_response(self, notification_id, response, at): 
-        self.conn.execute("INSERT OR REPLACE INTO responses (notification_id, response, response_at) VALUES (?, ?, ?)", 
+        self.conn.execute( 
+            "INSERT OR REPLACE INTO responses (notification_id, response, response_at) VALUES (?, ?, ?)", 
             (notification_id, response, at.isoformat())) 
         self.conn.commit() 
  

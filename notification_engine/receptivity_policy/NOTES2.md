@@ -15,21 +15,20 @@ The engine reads tasks from a JSON file, checks whether reminders are due, recor
 
 | File                       | Responsibility                                                              |
 |----------------------------|-----------------------------------------------------------------------------|
-| `reminder_app/tasks.py`    | Defines the `Task` model and `FakeTaskRepository`.                          |
-| `reminder_app/config.py`   | Stores reminder rules, scheduler interval, timeout, and file paths.         |
-| `reminder_app/rules.py`    | Determines whether a reminder is due and formats the time remaining.        |
-| `reminder_app/database.py` | Stores notifications and responses in SQLite.                               |
-| `reminder_app/engine.py`   | Checks tasks, records reminders, and marks unanswered reminders as ignored. |
-| `reminder_app/respond.py`  | Records a simulated user response.                                          |
-| `reminder_app/history.py`  | Displays notification history and responses.                                |
-| `reminder_app/add_task.py` | Adds a new task through the terminal.                                       |
+| `app/tasks.py`             | Defines the `Task` model and `FakeTaskRepository`.                          |
+| `app/config.py`            | Stores reminder rules, scheduler interval, timeout, and file paths.         |
+| `app/rules.py`             | Determines whether a reminder is due and formats the time remaining.        |
+| `app/database.py`          | Stores notifications and responses in SQLite.                               |
+| `app/engine.py`            | Checks tasks, records reminders, and marks unanswered reminders as ignored. |
+| `app/respond.py`           | Records a simulated user response.                                          |
+| `app/history.py`           | Displays notification history and responses.                                |
+| `app/add_task.py`          | Adds a new task through the terminal.                                       |
 | `data/make_tasks.py`       | Generates 200 sample tasks with different deadlines and priorities.         |
 | `main.py`                  | Starts the background scheduler and runs periodic checks.                   |
 | `tests/test_tasks.py`      | Tests task retrieval and pending-task filtering.                            |
 | `tests/test_rules.py`      | Tests reminder timing and deadline rules.                                   |
 | `tests/test_engine.py`     | Tests duplicate prevention, ignored reminders, and response handling.       |
 
-**Note:** My implementation uses the `reminder_app` package name inside `scheduler/`. The imports and commands must consistently use `reminder_app`.
 
 ## 4. Task Model and Repository Pattern
 
@@ -39,7 +38,7 @@ The task generator creates 200 sample tasks with time-zone-aware deadlines, diff
 
 ## 5. Reminder Rules
 
-The reminder rules are stored in `reminder_app/config.py`, rather than being hard-coded throughout the engine.
+The reminder rules are stored in `app/config.py`, rather than being hard-coded throughout the engine.
 The original reminder settings are:
 | Priority | Reminder time before deadline |
 |----------|-------------------------------|
@@ -90,7 +89,7 @@ The interval is set to one minute for testing. It can be changed to 15 minutes f
 
 ## 9. Testing and Running the Engine
 
-I used the following commands from the `notification_engine/scheduler/` directory with the project's virtual environment activated.
+I used the following commands from the `notification_engine/receptivity_policy/` directory with the project's virtual environment activated.
 Generate sample tasks:
 ```powershell
 python data/make_tasks.py

@@ -1,9 +1,9 @@
 """The reminder engine: check every task, send what's due, never send the same one 
-twice.""" 
+twice."""
 from datetime import timedelta 
  
-from reminder_app.config import IGNORE_AFTER_MINUTES 
-from reminder_app.rules import reminder_due, time_left_text 
+from app.config import IGNORE_AFTER_MINUTES 
+from app.rules import reminder_due, time_left_text 
  
  
 def check_tasks(repo, db, now): 
@@ -25,4 +25,4 @@ def mark_ignored(db, now):
     ids = db.unanswered_sent_before(cutoff) 
     for notification_id in ids: 
         db.record_response(notification_id, "ignored", now) 
-    return ids
+    return ids 

@@ -1,9 +1,10 @@
 """The deadline rules: when does a task need a reminder?""" 
-from reminder_app.config import REMINDER_RULES 
+from app.config import REMINDER_RULES 
  
  
 def reminder_due(task, now): 
-    """Return the key of the reminder that is due right now (e.g. 'T001:60m'), or None.""" 
+    """Return the key of the reminder that is due right now (e.g. 'T001:60m'), or 
+None.""" 
     if task.status != "pending" or now >= task.deadline: 
         return None 
     minutes_left = (task.deadline - now).total_seconds() / 60 

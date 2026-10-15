@@ -1,12 +1,12 @@
 """Pretend to tap a button on a reminder, until the web page exists (Hands-on 5). 
  
-Usage:  python -m reminder_app.respond 3 done 
+Usage:  python -m app.respond 3 done 
 """ 
 import sys 
 from datetime import datetime 
  
-from reminder_app.config import DATABASE_FILE 
-from reminder_app.database import Database 
+from app.config import DATABASE_FILE 
+from app.database import Database 
  
 ALLOWED = {"opened", "done", "snoozed", "dismissed"} 
  
@@ -15,4 +15,4 @@ if response not in ALLOWED:
     sys.exit(f"Response must be one of: {', '.join(sorted(ALLOWED))}") 
 Database(DATABASE_FILE).record_response(notification_id, response, 
 datetime.now().astimezone()) 
-print(f"Saved: reminder {notification_id} -> {response}")
+print(f"Saved: reminder {notification_id} -> {response}") 

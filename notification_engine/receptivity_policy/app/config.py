@@ -11,4 +11,4 @@ CHECK_EVERY_MINUTES = 1            # 1 while testing; 15 for real use
 IGNORE_AFTER_MINUTES = 30          # no response after this long counts as "ignored" 
  
 TASKS_FILE = "data/tasks.json" 
-DATABASE_FILE = "data/notifications.db"
+DATABASE_FILE = "data/notifications.db" 

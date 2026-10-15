@@ -28,7 +28,8 @@ for i in range(1, 201):
     tasks.append({ 
         "id": f"T{i:03d}", 
         "title": random.choice(TITLES), 
-        "deadline": (now + timedelta(minutes=minutes_ahead)).isoformat(timespec="minutes"), 
+        "deadline": (now + 
+timedelta(minutes=minutes_ahead)).isoformat(timespec="minutes"), 
         "priority": random.choices(PRIORITIES, WEIGHTS)[0], 
         "status": "done" if random.random() < 0.1 else "pending", 
     }) 

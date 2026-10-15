@@ -43,6 +43,6 @@ knowledge_graph/neo4j_data/
 *.mp4
 *.safetensors
 test_output/
-data/
+
 
 **/data/notifications.db
