@@ -41,3 +41,9 @@ def test_time_left_in_friendly_words():
     assert time_left_text(task(minutes_left=3 * 24 * 60), NOW) == "3 days"
     assert time_left_text(task(minutes_left=5 * 60 + 10), NOW) == "5 hours" 
     assert time_left_text(task(minutes_left=45), NOW) == "45 minutes" 
+
+
+def test_critical_task_23_hours_away_gets_24_hour_reminder():
+    critical_task = task(priority="critical", minutes_left=23 * 60)
+    result = reminder_due(critical_task, NOW)
+    assert result == "T001:1440m"
