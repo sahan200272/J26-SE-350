@@ -27,3 +27,13 @@ graph."""
  
     def get_pending_tasks(self): 
         return [task for task in self.get_all_tasks() if task.status == "pending"]
+
+    def mark_done(self, task_id): 
+        """Mark one task as done and save the file.""" 
+        with open(self.path, encoding="utf-8") as f: 
+            items = json.load(f) 
+        for item in items: 
+            if item["id"] == task_id: 
+                item["status"] = "done" 
+        with open(self.path, "w", encoding="utf-8") as f: 
+            json.dump(items, f, indent=2) 

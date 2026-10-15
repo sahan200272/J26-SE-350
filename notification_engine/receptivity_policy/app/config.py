@@ -12,3 +12,8 @@ IGNORE_AFTER_MINUTES = 30          # no response after this long counts as "igno
  
 TASKS_FILE = "data/tasks.json" 
 DATABASE_FILE = "data/notifications.db" 
+
+# --- Hands-on 5: smart timing --- 
+MODE = "smart"                     # "smart" = learner + safety net decide; "rules" = send as soon as due 
+START_Q_TABLE = "experiments/results/q_table_everyone.npy"   # the head start from before
+LIVE_Q_TABLE = "data/q_table_live.npy"                         # keeps learning from real taps

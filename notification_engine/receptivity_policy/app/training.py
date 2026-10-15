@@ -65,5 +65,5 @@ def evaluate(env, choose, episodes=5000, use_shield=False):
  
  
 def always_send_now(state, allowed=ALL_MOVES): 
-    """Baseline: send as soon as it's allowed (your original rule-based system).""" 
+    """Baseline: send as soon as it's allowed (original rule-based system).""" 
     return SEND_NOW if SEND_NOW in allowed else WAIT_30
