@@ -24,7 +24,12 @@ class LLMClient:
             return False
         return self.config.model in names
 
-    def chat(self, user_prompt: str, system_prompt: str | None = None) -> LLMResult:
+    def chat(
+        self,
+        user_prompt: str,
+        system_prompt: str | None = None,
+        response_format: dict | None = None,
+    ) -> LLMResult:
         messages = []
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
@@ -33,6 +38,7 @@ class LLMClient:
         response = self._client.chat(
             model=self.config.model,
             messages=messages,
+            format=response_format,
             options={
                 "num_ctx": self.config.num_ctx,
                 "temperature": self.config.temperature,
@@ -44,7 +50,7 @@ class LLMClient:
         tokens = response.eval_count or 0
         eval_ns = response.eval_duration or 0
         tpot = (eval_ns / 1e6 / tokens) if tokens else 0.0
-        
+
         return LLMResult(
             text=response.message.content,
             tokens_out=tokens,
