@@ -1,0 +1,54 @@
+{
+  "source": "alias_duplicates_test_20261017",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-17T14:00:00Z",
+  "entities": [
+    {
+      "type": "Person",
+      "name": "Sarah",
+      "op": "add"
+    },
+    {
+      "type": "Person",
+      "name": "Sarah Perera",
+      "op": "add"
+    },
+    {
+      "type": "Person",
+      "name": "Ruwan Silva",
+      "op": "add"
+    },
+    {
+      "type": "Person",
+      "name": "Kamal Perera",
+      "op": "add"
+    },
+    {
+      "type": "Task",
+      "name": "Deploy notification service",
+      "op": "add"
+    },
+    {
+      "type": "Task",
+      "name": "Deploy notification serivce",
+      "op": "add"
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Person", "name": "Sarah" },
+      "type": "ALIAS_OF",
+      "to": { "type": "Person", "name": "Sarah Perera" }
+    },
+    {
+      "from": { "type": "Person", "name": "Ruwan Silva" },
+      "type": "FRIEND_OF",
+      "to": { "type": "Person", "name": "Kamal Perera" }
+    },
+    {
+      "from": { "type": "Person", "name": "Kamal Perera" },
+      "type": "FRIEND_OF",
+      "to": { "type": "Person", "name": "Ruwan Silva" }
+    }
+  ]
+}

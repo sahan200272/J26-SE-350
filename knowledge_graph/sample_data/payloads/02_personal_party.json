@@ -1,0 +1,138 @@
+{
+  "source": "personal_party_prep_20261014",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-14T19:00:00Z",
+  "entities": [
+    {
+      "type": "Person",
+      "name": "Sarah Perera",
+      "op": "add",
+      "props": {
+        "aliases": ["Sarah"]
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Maya Perera",
+      "op": "add",
+      "props": {
+        "birthday": "1997-09-20"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Alex Johnson",
+      "op": "add"
+    },
+    {
+      "type": "Location",
+      "name": "Brooklyn",
+      "op": "add"
+    },
+    {
+      "type": "Organization",
+      "name": "Acme Design Studio",
+      "op": "add"
+    },
+    {
+      "type": "Event",
+      "name": "Maya Birthday Celebration",
+      "op": "add",
+      "props": {
+        "date": "2026-10-24"
+      }
+    },
+    {
+      "type": "Task",
+      "name": "Order birthday cake",
+      "op": "add",
+      "props": {
+        "priority": "high",
+        "status": "open"
+      }
+    },
+    {
+      "type": "Deadline",
+      "name": "2026-10-22",
+      "op": "add",
+      "props": {
+        "date": "2026-10-22"
+      }
+    },
+    {
+      "type": "Item",
+      "name": "Chocolate Fudge Cake",
+      "op": "add"
+    },
+    {
+      "type": "Concept",
+      "name": "Italian Cuisine",
+      "op": "add"
+    },
+    {
+      "type": "Concept",
+      "name": "Loud Noise",
+      "op": "add"
+    },
+    {
+      "type": "Event",
+      "name": "Weekend Camping Trip",
+      "op": "add"
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "FAMILY_OF",
+      "to": { "type": "Person", "name": "Maya Perera" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "FRIEND_OF",
+      "to": { "type": "Person", "name": "Alex Johnson" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "LIVES_IN",
+      "to": { "type": "Location", "name": "Brooklyn" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "WORKS_AT",
+      "to": { "type": "Organization", "name": "Acme Design Studio" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "PLANS",
+      "to": { "type": "Event", "name": "Maya Birthday Celebration" }
+    },
+    {
+      "from": { "type": "Task", "name": "Order birthday cake" },
+      "type": "DUE_ON",
+      "to": { "type": "Deadline", "name": "2026-10-22" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "OWNS",
+      "to": { "type": "Item", "name": "Chocolate Fudge Cake" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Perera" },
+      "type": "LIKES",
+      "to": { "type": "Concept", "name": "Italian Cuisine" }
+    },
+    {
+      "from": { "type": "Person", "name": "Maya Perera" },
+      "type": "DISLIKES",
+      "to": { "type": "Concept", "name": "Loud Noise" }
+    },
+    {
+      "from": { "type": "Person", "name": "Alex Johnson" },
+      "type": "PLANS",
+      "to": { "type": "Event", "name": "Weekend Camping Trip" },
+      "props": {
+        "confidence": 0.5
+      }
+    }
+  ]
+}
