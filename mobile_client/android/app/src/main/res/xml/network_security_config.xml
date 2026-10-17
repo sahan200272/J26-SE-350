@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A5: the app talks to the embedded Syncthing's REST API on http://127.0.0.1:<port> (loopback,
+     never leaves the phone). Android blocks cleartext HTTP to every host by default, including
+     127.0.0.1, so it is allowed for exactly that address. Every other host keeps the default
+     (cleartext blocked); the app makes no other connections. -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
