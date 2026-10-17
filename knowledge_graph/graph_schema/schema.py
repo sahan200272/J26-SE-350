@@ -47,9 +47,25 @@ CONSTRAINTS: List[Tuple[str, str]] = [
     for label in get_args(NodeLabel)
 ]
 
+# Range indexes on frequently filtered properties (RP-25)
+INDEXES: List[Tuple[str, str]] = [
+    (
+        "task_priority",
+        "CREATE INDEX task_priority IF NOT EXISTS FOR (n:Task) ON (n.priority)",
+    ),
+    (
+        "task_status",
+        "CREATE INDEX task_status IF NOT EXISTS FOR (n:Task) ON (n.status)",
+    ),
+    (
+        "issue_severity",
+        "CREATE INDEX issue_severity IF NOT EXISTS FOR (n:Issue) ON (n.severity)",
+    ),
+]
+
 
 def create_schema(driver: Driver = None) -> None:
-    """Ensure all required uniqueness constraints exist in Neo4j."""
+    """Ensure all required uniqueness constraints and range indexes exist in Neo4j."""
     close_driver = False
     if driver is None:
         driver = get_driver()
@@ -60,10 +76,20 @@ def create_schema(driver: Driver = None) -> None:
             for name, query in CONSTRAINTS:
                 session.run(query)
                 print(f"Verified constraint: {name}")
+            for name, query in INDEXES:
+                session.run(query)
+                print(f"Verified index: {name}")
     finally:
         if close_driver:
             driver.close()
 
 
 if __name__ == "__main__":
-    create_schema()
+    from neo4j.exceptions import ServiceUnavailable
+
+    try:
+        create_schema()
+    except ServiceUnavailable as exc:
+        print(f"ServiceUnavailable: Could not connect to Neo4j at {NEO4J_URI} ({exc}).")
+        print(f"Defined constraints ({len(CONSTRAINTS)}): {[name for name, _ in CONSTRAINTS]}")
+        print(f"Defined indexes ({len(INDEXES)}): {[name for name, _ in INDEXES]}")

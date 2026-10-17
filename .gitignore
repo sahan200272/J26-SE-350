@@ -35,5 +35,16 @@ credentials.json
 *.mp3
 knowledge_graph/neo4j_data/
 .env
+*.m4a
+*.aac
+*.flac
+*.ogg
+*.amr
+*.mp4
+*.safetensors
+test_output/
+
+
+**/data/notifications.db
 
 agentic_core/datasets/segmentation/ami/

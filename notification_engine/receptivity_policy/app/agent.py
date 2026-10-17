@@ -15,20 +15,27 @@ class QAgent:
         self.epsilon = epsilon    # how often to try a random choice 
         self.rng = random.Random(seed) 
  
-    def choose(self, state): 
-        """Usually pick the best-scoring choice; sometimes explore.""" 
+    def choose(self, state, allowed=None): 
+        """Usually pick the best-scoring allowed choice; sometimes explore.""" 
+        if allowed is None: 
+            allowed = list(range(self.n_actions)) 
         if self.rng.random() < self.epsilon: 
-            return self.rng.randrange(self.n_actions) 
-        return int(np.argmax(self.Q[state])) 
+            return self.rng.choice(allowed) 
+        return max(allowed, key=lambda action: self.Q[state, action]) 
  
-    def learn(self, state, action, reward, next_state, finished): 
+    def learn(self, state, action, reward, next_state, finished, next_allowed=None): 
         """Nudge one score towards what actually happened.""" 
-        future = 0.0 if finished else np.max(self.Q[next_state]) 
+        if finished: 
+            future = 0.0 
+        else: 
+            if next_allowed is None: 
+                next_allowed = range(self.n_actions) 
+            future = max(self.Q[next_state, a] for a in next_allowed) 
         target = reward + self.gamma * future 
-        self.Q[state, action] += self.alpha * (target - self.Q[state, action]) 
- 
+        self.Q[state, action] += self.alpha * (target - self.Q[state, action])
+
     def save(self, path): 
         np.save(path, self.Q) 
  
     def load(self, path): 
-        self.Q = np.load(path) 
+        self.Q = np.load(path)
