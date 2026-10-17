@@ -6,3 +6,5 @@ psutil
 nvidia-ml-py
 pytest
 
+
+pydantic>=2.5
