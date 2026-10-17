@@ -12,6 +12,7 @@ import '../permissions/microphone_permission.dart';
 import '../platform/app_channel.dart';
 import '../segmentation/segment.dart';
 import '../segmentation/segmenter.dart';
+import '../transfer/chunk_pipeline.dart';
 import '../session/clock.dart';
 import '../session/recording_session.dart';
 import '../session/session_id.dart';
@@ -29,6 +30,9 @@ typedef SegmentSinkFactory = void Function(Segment segment) Function(
 
 /// Creates the live segmenter of a session.
 typedef SegmenterFactory = Segmenter Function(RecordingSession session);
+
+/// Creates the session's chunk pipeline (Opus + sidecar + manifest, A4).
+typedef ChunkPipelineFactory = ChunkPipeline Function(RecordingSession session);
 
 /// Default live segmentation (A3): [VadSegmenter] with [EnergyVad], default
 /// parameters.
@@ -67,6 +71,7 @@ class RecordingController extends ChangeNotifier {
     this.debugFrameSinkFactory,
     this.debugSegmentSinkFactory,
     this.segmenterFactory = defaultSegmenter,
+    this.chunkPipelineFactory,
     this.log,
     this.tickInterval = const Duration(milliseconds: 100),
   }) : _clock = clock ?? StopwatchClock() {
@@ -88,6 +93,10 @@ class RecordingController extends ChangeNotifier {
   final SegmentSinkFactory? debugSegmentSinkFactory;
 
   final SegmenterFactory segmenterFactory;
+
+  /// Encodes every segment into the outbox; null: segments are not encoded
+  /// (tests).
+  final ChunkPipelineFactory? chunkPipelineFactory;
 
   /// Debug log; null in release.
   final void Function(String message)? log;
@@ -161,6 +170,9 @@ class RecordingController extends ChangeNotifier {
 
   /// The current (or last) session's segmenter, for its counters.
   Segmenter? get segmenter => _current?.segmenter;
+
+  /// The current (or last) session's chunk pipeline, if any.
+  ChunkPipeline? get chunkPipeline => _current?.pipeline;
 
   /// Every segment of every session, in order (sync broadcast).
   Stream<Segment> get segments => _segments.stream;
@@ -252,6 +264,7 @@ class RecordingController extends ChangeNotifier {
       debugFrameSinkFactory?.call(id),
       segmenterFactory(session),
       debugSegmentSinkFactory?.call(id),
+      chunkPipelineFactory?.call(session),
     );
     _level.reset();
     _levelDbfs = null;
@@ -409,6 +422,7 @@ class RecordingController extends ChangeNotifier {
       '${segment.forcedSplit ? ', forced split' : ''}',
     );
     run.segmentSink?.call(segment);
+    run.pipeline?.add(segment, run.session.runs[segment.run]);
     _segments.add(segment);
   }
 
@@ -513,6 +527,12 @@ class RecordingController extends ChangeNotifier {
       'runs=[${s.runs.map(_describeRun).join(', ')}], '
       'segmenter=${run.segmenter.stats.toJson()}',
     );
+    // Every segment has been queued by now (the segmenter's run ended at
+    // Stop): the manifest is written after the last chunk.
+    // The pipeline logs a failure itself.
+    run.pipeline
+        ?.finish(session: s, segmenter: run.segmenter, framer: f)
+        .ignore();
     final sink = run.sink;
     if (sink != null) unawaited(sink.close());
   }
@@ -575,6 +595,7 @@ class _SessionRun {
     this.sink,
     this.segmenter,
     this.segmentSink,
+    this.pipeline,
   );
 
   final RecordingSession session;
@@ -582,6 +603,7 @@ class _SessionRun {
   final FrameSink? sink;
   final Segmenter segmenter;
   final void Function(Segment segment)? segmentSink;
+  final ChunkPipeline? pipeline;
 
   /// AudioCapture.start was issued for this session.
   bool captureStarted = false;
