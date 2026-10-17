@@ -28,7 +28,7 @@ void main() {
     );
   });
 
-  for (final dir in ['lib/vad', 'lib/segmentation']) {
+  for (final dir in ['lib/vad', 'lib/segmentation', 'lib/transfer']) {
     test('$dir has no Flutter imports', () {
       expectNoFlutterImports(
         Directory(dir)
@@ -38,6 +38,18 @@ void main() {
       );
     });
   }
+
+  test('the Opus encoder interface has no Flutter imports', () {
+    expectNoFlutterImports([File('lib/encoding/opus_encoder.dart')]);
+  });
+
+  test('sync input checks and status model have no Flutter imports', () {
+    // syncthing_client.dart is the MethodChannel adapter and may use Flutter.
+    expectNoFlutterImports([
+      File('lib/sync/peer_input.dart'),
+      File('lib/sync/syncthing_status.dart'),
+    ]);
+  });
 
   test('pure lib/capture files have no Flutter imports', () {
     // record_audio_capture.dart is the plugin adapter and may use Flutter.

@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 /// - `setKeepScreenOn(bool)` → toggles `FLAG_KEEP_SCREEN_ON`
 /// - `getFilesDir` → app-private `files/` directory (absolute path)
 /// - `listOpusEncoders` → Opus encoders in `MediaCodecList(REGULAR_CODECS)`
+/// - `encodeOpus` → Ogg Opus file (see `MethodChannelOpusEncoder`)
+/// - `getAppVersion` → `versionName+versionCode`, e.g. `1.0.0+1`
 ///
 /// The name dates from A1, when it only handled the permission.
 const appChannel = MethodChannel('lk.sliit.j26se350.echo_vault/permissions');
@@ -43,4 +45,14 @@ Future<List<Map<String, Object?>>> listOpusEncoders() async {
     for (final item in list ?? const <Object?>[])
       Map<String, Object?>.from(item! as Map),
   ];
+}
+
+/// The app's version as `versionName+versionCode` (from the installed
+/// package), for chunk sidecars and the session manifest.
+Future<String> appVersion() async {
+  final version = await appChannel.invokeMethod<String>('getAppVersion');
+  if (version == null || version.isEmpty) {
+    throw PlatformException(code: 'NO_VERSION', message: 'getAppVersion');
+  }
+  return version;
 }

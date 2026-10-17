@@ -7,10 +7,12 @@ import '../permissions/microphone_permission.dart';
 import '../platform/app_channel.dart';
 import '../session/clock.dart';
 import '../session/recording_session.dart';
+import '../sync/syncthing_client.dart';
 import 'elapsed_format.dart';
 import 'input_level_meter.dart';
 import 'lifecycle_source.dart';
 import 'recording_controller.dart';
+import 'settings_screen.dart';
 
 /// Main screen: status (idle / recording indicator with input level /
 /// paused / stopped), messages and the Start, Pause/Resume and Stop buttons.
@@ -24,10 +26,19 @@ class RecordingScreen extends StatefulWidget {
     this.clock,
     this.wallClock,
     this.random,
+    this.chunkPipelineFactory,
     this.debugFrameSinkFactory,
     this.debugSegmentSinkFactory,
+    this.syncthing,
+    this.appVersion,
     this.log,
   });
+
+  /// Opens the sync settings from the app bar; no button when null.
+  final SyncthingClient? syncthing;
+  final Future<String>? appVersion;
+
+  static const settingsKey = Key('sync-settings-button');
 
   final MicrophonePermission permission;
   final AudioCapture capture;
@@ -36,6 +47,7 @@ class RecordingScreen extends StatefulWidget {
   final Clock? clock;
   final DateTime Function()? wallClock;
   final Random? random;
+  final ChunkPipelineFactory? chunkPipelineFactory;
   final FrameSinkFactory? debugFrameSinkFactory;
   final SegmentSinkFactory? debugSegmentSinkFactory;
   final void Function(String message)? log;
@@ -53,6 +65,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
     clock: widget.clock,
     wallClock: widget.wallClock,
     random: widget.random,
+    chunkPipelineFactory: widget.chunkPipelineFactory,
     debugFrameSinkFactory: widget.debugFrameSinkFactory,
     debugSegmentSinkFactory: widget.debugSegmentSinkFactory,
     log: widget.log,
@@ -67,7 +80,34 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Echo Vault')),
+      appBar: AppBar(
+        title: const Text('Echo Vault'),
+        actions: [
+          if (widget.syncthing case final syncthing?)
+            ListenableBuilder(
+              listenable: _controller,
+              // Only between sessions: the recording indicator (FR1) must
+              // stay on screen while a session is open.
+              builder: (context, _) => IconButton(
+                key: RecordingScreen.settingsKey,
+                tooltip: 'Sync settings',
+                icon: const Icon(Icons.sync),
+                onPressed: switch (_controller.state) {
+                  SessionState.idle ||
+                  SessionState.stopped => () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => SettingsScreen(
+                        syncthing: syncthing,
+                        appVersion: widget.appVersion,
+                      ),
+                    ),
+                  ),
+                  _ => null,
+                },
+              ),
+            ),
+        ],
+      ),
       body: SafeArea(
         child: ListenableBuilder(
           listenable: _controller,

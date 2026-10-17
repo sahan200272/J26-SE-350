@@ -12,3 +12,7 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Syncthing executable installed by tool/fetch_syncthing.ps1 (A5). Downloaded and
+# verified locally; never committed.
+/app/src/main/jniLibs/arm64-v8a/libsyncthing.so

@@ -62,4 +62,15 @@ void main() {
     answer((_) => null);
     expect(await listOpusEncoders(), isEmpty);
   });
+
+  test(
+    'getAppVersion returns versionName+versionCode; empty is an error',
+    () async {
+      answer((_) => '1.0.0+1');
+      expect(await appVersion(), '1.0.0+1');
+      expect(calls.single.method, 'getAppVersion');
+      answer((_) => null);
+      await expectLater(appVersion(), throwsA(isA<PlatformException>()));
+    },
+  );
 }

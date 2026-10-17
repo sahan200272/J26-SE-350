@@ -1,12 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Microphone access for user-initiated recording (FR1). Requested at runtime when
-         Start is pressed. INTERNET is intentionally NOT declared in this main manifest
-         (FR5/NFR4: no cloud services); the debug/profile manifests keep it for Flutter tooling. -->
+         Start is pressed. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Sockets of any kind need INTERNET, even on 127.0.0.1. Its only user is the embedded
+         Syncthing (A5, approved), which the app configures LAN-only: no global discovery,
+         relays, NAT traversal, STUN, upgrades, usage or crash reporting; GUI/REST on
+         127.0.0.1 only (FR5/NFR4). The app itself talks only to that local REST API. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="Echo Vault"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".MainActivity"
             android:exported="true"
