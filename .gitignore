@@ -46,3 +46,5 @@ test_output/
 
 
 **/data/notifications.db
+
+agentic_core/datasets/segmentation/ami/

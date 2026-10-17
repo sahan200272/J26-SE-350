@@ -1,0 +1,4 @@
+# Untuned starting guesses. We tune them later on AMI. Do not quote them as results.
+long_pause_s: 120.0       # a silence this long always starts a new segment
+cue_pause_s: 15.0         # a cue phrase ("Next", "By the way") plus this silence starts a new segment
+max_segment_tokens: 1500  # keeps each segment small inside the 4096-token window (num_ctx)

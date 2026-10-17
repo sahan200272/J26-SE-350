@@ -9,6 +9,7 @@ from pathlib import Path
 
 import psutil
 
+#if NVIDIA's tool is missing, the program carries on instead of breaking.
 try:
     import pynvml
 except Exception:
@@ -25,13 +26,13 @@ SAMPLE = (
 )
 PROMPTS = {
     "short": "Summarize in one sentence: we should meet on Friday to review the budget.",
-    "medium": "Summarize this meeting in 3 bullet points:\n" + SAMPLE * 8,
-    "long": "Summarize this meeting in 3 bullet points:\n" + SAMPLE * 40,
+    "medium": "Summarize this meeting in 3 bullet points:\n" + SAMPLE * 8, #repeat SAMPLE string 8 times
+    "long": "Summarize this meeting in 3 bullet points:\n" + SAMPLE * 40, ##repeat SAMPLE string 40 times
 }
 
-VRAM_LIMIT_MB = 6 * 1024
-RAM_LIMIT_MB = 8 * 1024
-TPOT_LIMIT_MS = 45
+VRAM_LIMIT_MB = 6 * 1024 #6 GB
+RAM_LIMIT_MB = 8 * 1024 #8 GB
+TPOT_LIMIT_MS = 45 #45 ms
 
 
 class ResourceMonitor:

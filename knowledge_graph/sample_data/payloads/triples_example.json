@@ -1,0 +1,11 @@
+{
+  "source": "untyped_extractor_demo",
+  "timestamp": "2026-10-18T15:30:00Z",
+  "triples": [
+    ["Review architectural blueprint", "ASSIGNED_TO", "Sarah Chen"],
+    ["Sarah Chen", "FRIEND_OF", "David Miller"],
+    ["Review architectural blueprint", "DUE_ON", "2026-10-30"],
+    ["David Miller", "WORKS_AT", "InnoTech Labs"],
+    ["Database performance degraded", "UNKNOWN_RELATION", "Query Optimizer"]
+  ]
+}

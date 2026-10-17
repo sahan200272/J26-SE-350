@@ -1,0 +1,38 @@
+{
+  "source": "personal_party_correction_20261015",
+  "schema_version": "1.0",
+  "timestamp": "2026-10-15T09:00:00Z",
+  "entities": [
+    {
+      "type": "Event",
+      "name": "Maya Birthday Celebration",
+      "op": "update",
+      "props": {
+        "date": "2026-10-25"
+      }
+    },
+    {
+      "type": "Task",
+      "name": "Order birthday cake",
+      "op": "update",
+      "props": {
+        "priority": "urgent"
+      }
+    },
+    {
+      "type": "Deadline",
+      "name": "2026-10-23",
+      "op": "add",
+      "props": {
+        "date": "2026-10-23"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Task", "name": "Order birthday cake" },
+      "type": "DUE_ON",
+      "to": { "type": "Deadline", "name": "2026-10-23" }
+    }
+  ]
+}
