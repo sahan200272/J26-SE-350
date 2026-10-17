@@ -6,10 +6,16 @@ import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.media.MediaFormat
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
+import java.util.concurrent.Executors
 
 /**
  * Hosts the Flutter UI and answers platform requests from Dart over one MethodChannel,
@@ -20,9 +26,41 @@ import io.flutter.plugin.common.MethodChannel
  * - `setKeepScreenOn(Boolean)` -> null; sets or clears FLAG_KEEP_SCREEN_ON on this window
  * - `getFilesDir` -> absolute path of the app-private files directory
  * - `listOpusEncoders` -> list of maps describing audio/opus encoders (informational)
+ * - `encodeOpus`({pcm, sampleRate, channels, bitrate, outputPath}) -> {encoder, bitrate,
+ *   inputSamples, packets, outputBytes}: Ogg Opus via [OpusOggEncoder], one at a time on a
+ *   background thread
+ * - `getAppVersion` -> "versionName+versionCode", e.g. "1.0.0+1"
+ *
+ * Embedded Syncthing (A5, see [SyncthingController]): started when the activity is created,
+ * stopped when it finishes. Each call runs on the controller's one background thread, in order:
+ * - `syncthingVersion` -> output of `libsyncthing.so --version`
+ * - `syncthingStart` -> status map (idempotent; restarts a stopped instance)
+ * - `syncthingStop` -> null
+ * - `syncthingStatus` -> status map: running, version, deviceId, lanOnly + lanOnlyVerified,
+ *   listeners, discovery, folder*, pc* (device ID, address, connection), pendingChunks, error
+ * - `syncthingSetPeer`({deviceId, address}) -> status map; error "BAD_PEER" if invalid
+ * - `syncthingScan`({sub}) -> Boolean; scans that path of the outbox now
+ * - `syncthingQr` -> PNG bytes of this device ID's QR code
+ * - `syncthingLog` -> recent Syncthing output lines
  */
 class MainActivity : FlutterActivity() {
     private var pendingResult: MethodChannel.Result? = null
+
+    // Encodes run here, in submission order, never on the main thread.
+    private val encodeExecutor = Executors.newSingleThreadExecutor()
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val syncthing by lazy { SyncthingController.shared(this) }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        SyncthingController.executor.execute { syncthing.start() }
+    }
+
+    override fun onDestroy() {
+        // Finishing the activity stops Syncthing; a process kill ends it with the app.
+        if (isFinishing) SyncthingController.executor.execute { syncthing.stop() }
+        super.onDestroy()
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -33,6 +71,23 @@ class MainActivity : FlutterActivity() {
                     "setKeepScreenOn" -> setKeepScreenOn(call.arguments as? Boolean, result)
                     "getFilesDir" -> result.success(filesDir.absolutePath)
                     "listOpusEncoders" -> result.success(listOpusEncoders())
+                    "encodeOpus" -> encodeOpus(call, result)
+                    "getAppVersion" -> result.success(appVersion())
+                    "syncthingVersion" -> onSyncThread(result) { syncthing.version() }
+                    "syncthingStart" -> onSyncThread(result) { syncthing.start() }
+                    "syncthingStop" -> onSyncThread(result) { syncthing.stop(); null }
+                    "syncthingStatus" -> onSyncThread(result) { syncthing.status() }
+                    "syncthingSetPeer" -> onSyncThread(result) {
+                        syncthing.setPeer(
+                            call.argument<String>("deviceId").orEmpty(),
+                            call.argument<String>("address").orEmpty(),
+                        )
+                    }
+                    "syncthingScan" -> onSyncThread(result) {
+                        syncthing.scan(call.argument<String>("sub"))
+                    }
+                    "syncthingQr" -> onSyncThread(result) { syncthing.qrPng() }
+                    "syncthingLog" -> onSyncThread(result) { syncthing.recentLog() }
                     else -> result.notImplemented()
                 }
             }
@@ -87,6 +142,47 @@ class MainActivity : FlutterActivity() {
         result.success(null)
     }
 
+    private fun encodeOpus(call: MethodCall, result: MethodChannel.Result) {
+        val pcm = call.argument<ByteArray>("pcm")
+        val sampleRate = call.argument<Int>("sampleRate")
+        val channels = call.argument<Int>("channels")
+        val bitrate = call.argument<Int>("bitrate")
+        val outputPath = call.argument<String>("outputPath")
+        if (pcm == null || sampleRate == null || channels == null || bitrate == null ||
+            outputPath == null
+        ) {
+            result.error("BAD_ARGS", "encodeOpus needs pcm, sampleRate, channels, bitrate, outputPath.", null)
+            return
+        }
+        encodeExecutor.execute {
+            try {
+                val encoded = OpusOggEncoder.encode(pcm, sampleRate, channels, bitrate, File(outputPath))
+                mainHandler.post { result.success(encoded.toMap()) }
+            } catch (e: Exception) {
+                mainHandler.post { result.error("ENCODE_FAILED", e.message ?: e.toString(), e.javaClass.name) }
+            }
+        }
+    }
+
+    /** Runs [block] on the Syncthing thread and replies on the main thread. */
+    private fun onSyncThread(result: MethodChannel.Result, block: () -> Any?) {
+        SyncthingController.executor.execute {
+            try {
+                val value = block()
+                mainHandler.post { result.success(value) }
+            } catch (e: IllegalArgumentException) {
+                mainHandler.post { result.error("BAD_PEER", e.message, null) }
+            } catch (e: Exception) {
+                mainHandler.post { result.error("SYNCTHING", e.message ?: e.toString(), e.javaClass.name) }
+            }
+        }
+    }
+
+    private fun appVersion(): String {
+        val info = packageManager.getPackageInfo(packageName, 0)
+        return "${info.versionName}+${info.longVersionCode}"
+    }
+
     /** Encoders in MediaCodecList(REGULAR_CODECS) that accept audio/opus. Not used for encoding. */
     private fun listOpusEncoders(): List<Map<String, Any?>> =
         MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
@@ -109,13 +205,12 @@ class MainActivity : FlutterActivity() {
             "maxInputChannelCount" to audio?.maxInputChannelCount,
             "bitrateRange" to audio?.bitrateRange?.let { listOf(it.lower, it.upper) },
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            map["canonicalName"] = info.canonicalName
-            map["isAlias"] = info.isAlias
-            map["hardwareAccelerated"] = info.isHardwareAccelerated
-            map["softwareOnly"] = info.isSoftwareOnly
-            map["vendor"] = info.isVendor
-        }
+        // API 29 fields: always available since minSdk is 29.
+        map["canonicalName"] = info.canonicalName
+        map["isAlias"] = info.isAlias
+        map["hardwareAccelerated"] = info.isHardwareAccelerated
+        map["softwareOnly"] = info.isSoftwareOnly
+        map["vendor"] = info.isVendor
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             map["minInputChannelCount"] = audio?.minInputChannelCount
         }
