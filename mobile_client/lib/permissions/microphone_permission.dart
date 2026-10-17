@@ -1,5 +1,7 @@
 import 'package:flutter/services.dart';
 
+import '../platform/app_channel.dart';
+
 /// Outcome of asking the user for microphone access.
 enum MicPermissionStatus {
   granted,
@@ -20,9 +22,7 @@ abstract interface class MicrophonePermission {
 class MethodChannelMicrophonePermission implements MicrophonePermission {
   const MethodChannelMicrophonePermission();
 
-  static const channel = MethodChannel(
-    'lk.sliit.j26se350.echo_vault/permissions',
-  );
+  static const MethodChannel channel = appChannel;
 
   @override
   Future<MicPermissionStatus> request() async {
