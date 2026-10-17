@@ -1,36 +1,104 @@
-﻿"""Plan schema: the exact shape of what the LLM is allowed to write (RP-14)."""
+﻿"""Plan schemas (RP-14, section 5).
+
+Two layers:
+  PlannedNote, DraftEvent, DraftPlan
+      What the LLM is allowed to write. Small and flat. Ollama's grammar
+      enforces this shape.
+  PlannedEvent, ActionPlan
+      What the rest of the system receives. Our code builds it from the
+      draft (see resolver.py), so dates are real dates and nothing is guessed.
+"""
+
+import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-MAX_ACTIONS = 5        # untuned guess
-MAX_TITLE_CHARS = 80   # untuned guess
+MAX_NOTES = 5  # untuned guess
+MAX_EVENTS = 5  # untuned guess
+MAX_TITLE_CHARS = 80  # untuned guess
+
+DayWord = Literal[
+    "today", "tomorrow",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+]
+Folder = Literal["Inbox", "Meetings", "Ideas"]
+
+_TIME_PATTERN = re.compile(r"(?:[01]\d|2[0-3]):[0-5]\d")
 
 
-class PlannedAction(BaseModel):
+def _not_blank(value: str) -> str:
+    if not value.strip():
+        raise ValueError("must not be blank")
+    return value
+
+
+class PlannedNote(BaseModel):
+    """A note to save. The same shape is used in the draft and in the final plan."""
+
     model_config = ConfigDict(extra="forbid")
 
-    method: Literal["create_note", "create_calendar_event"]
     title: str = Field(min_length=1, max_length=MAX_TITLE_CHARS)
-    folder: Literal["Inbox", "Meetings", "Ideas"] = "Inbox"
-    body: str = ""
-    start: str = ""
+    body: str = Field(min_length=1)
+    folder: Folder = "Inbox"
+
+    @field_validator("title", "body")
+    @classmethod
+    def check_not_blank(cls, value: str) -> str:
+        return _not_blank(value)
+
+
+class DraftEvent(BaseModel):
+    """An event as the LLM writes it: a day word and a time, but no real date."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=1, max_length=MAX_TITLE_CHARS)
+    day: DayWord
+    time: str  # 24-hour HH:MM. Checked here in Python, not by the grammar.
     attendees: list[str] = Field(default_factory=list)
 
-    @model_validator(mode="after")
-    def check_required_fields(self):
-        if self.method == "create_note" and not self.body.strip():
-            raise ValueError("create_note needs a non-empty body")
-        if self.method == "create_calendar_event":
-            try:
-                datetime.fromisoformat(self.start)
-            except ValueError:
-                raise ValueError("create_calendar_event needs start as an ISO 8601 time")
-        return self
+    @field_validator("title")
+    @classmethod
+    def check_title_not_blank(cls, value: str) -> str:
+        return _not_blank(value)
+
+    @field_validator("time")
+    @classmethod
+    def check_time_format(cls, value: str) -> str:
+        if not _TIME_PATTERN.fullmatch(value):
+            raise ValueError("time must look like HH:MM (24-hour)")
+        return value
+
+
+class PlannedEvent(BaseModel):
+    """An event in the final plan: a real start time (local, no time zone yet)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=1, max_length=MAX_TITLE_CHARS)
+    start: datetime
+    attendees: list[str] = Field(default_factory=list)
+
+
+class DraftPlan(BaseModel):
+    """The only shape the LLM may produce. This is the schema sent to Ollama."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    notes: list[PlannedNote] = Field(max_length=MAX_NOTES)
+    events: list[DraftEvent] = Field(max_length=MAX_EVENTS)
 
 
 class ActionPlan(BaseModel):
+    """The final plan. Two empty lists mean: nothing to do."""
+
     model_config = ConfigDict(extra="forbid")
 
-    actions: list[PlannedAction] = Field(max_length=MAX_ACTIONS)
+    notes: list[PlannedNote]
+    events: list[PlannedEvent]
+
+    @property
+    def is_empty(self) -> bool:
+        return not self.notes and not self.events
