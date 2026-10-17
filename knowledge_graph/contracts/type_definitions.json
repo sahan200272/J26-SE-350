@@ -1,0 +1,1050 @@
+{
+  "version": "1.1.0",
+  "schema_version": {
+    "default": "1.0",
+    "supported_major": "1",
+    "description": "Schema version of the payload contract. Major version mismatch triggers a warning."
+  },
+  "node_labels": {
+    "Concept": {
+      "tier": 2,
+      "definition": "A domain concept, entity, or fallback node for unrecognized entity types.",
+      "example": "Zero-Knowledge Proofs"
+    },
+    "Conversation": {
+      "tier": 2,
+      "definition": "A recorded speech interaction, dialogue, or voice session transcript.",
+      "example": "voice_convo_20261011_1430"
+    },
+    "Deadline": {
+      "tier": 1,
+      "definition": "A specific date, time, or target milestone by which something must finish.",
+      "example": "2026-10-18T18:00:00Z"
+    },
+    "Decision": {
+      "tier": 1,
+      "definition": "An agreed-upon conclusion, policy, or choice that has already been decided.",
+      "example": "Adopt Neo4j 5 as the single source of truth for graph memory"
+    },
+    "Document": {
+      "tier": 1,
+      "definition": "A written file, specification, design doc, PRD, or meeting agenda.",
+      "example": "RFC-204 Local Graph Storage Architecture"
+    },
+    "Event": {
+      "tier": 2,
+      "definition": "A calendar occurrence, party, public demo, release date, or personal milestone event.",
+      "example": "Birthday Party / Private Beta Release Demo"
+    },
+    "Goal": {
+      "tier": 2,
+      "definition": "A high-level strategic objective or outcome that projects and tasks support.",
+      "example": "Achieve sub-500ms voice response latency"
+    },
+    "Idea": {
+      "tier": 2,
+      "definition": "A proposed suggestion or possibility put forward for consideration that is not yet decided.",
+      "example": "Cache acoustic embeddings in SQLite for instant repeat lookups"
+    },
+    "Issue": {
+      "tier": 1,
+      "definition": "A problem, bug, risk, obstacle, or blocker hindering progress that needs resolution.",
+      "example": "Whisper transcription runs out of memory on 8GB machines"
+    },
+    "Item": {
+      "tier": 2,
+      "definition": "A physical product, grocery, purchased good, device, or tangible physical object.",
+      "example": "Oat milk / MacBook Pro / Sony WH-1000XM5 headphones"
+    },
+    "Location": {
+      "tier": 1,
+      "definition": "A physical room, office, city, or virtual platform where an event or person resides.",
+      "example": "Conference Room A / Brooklyn, NY"
+    },
+    "Meeting": {
+      "tier": 1,
+      "definition": "A scheduled or ad-hoc gathering where people discuss topics and align on work.",
+      "example": "Sprint 14 Architecture Sync"
+    },
+    "Metric": {
+      "tier": 2,
+      "definition": "A quantitative benchmark, measurement, or key performance indicator.",
+      "example": "P99 Response Latency: 120ms"
+    },
+    "Note": {
+      "tier": 2,
+      "definition": "A freeform text note, memo, or excerpt.",
+      "example": "Quick takeaway notes from retrospective"
+    },
+    "Organization": {
+      "tier": 1,
+      "definition": "A company, institution, partner, or enterprise entity.",
+      "example": "InnoTech Labs"
+    },
+    "Person": {
+      "tier": 1,
+      "definition": "An individual participant, employee, or stakeholder mentioned in conversations.",
+      "example": "Sarah Chen, Staff AI Engineer"
+    },
+    "Preference": {
+      "tier": 2,
+      "definition": "A stated user preference, constraint, or work habit.",
+      "example": "Prefers asynchronous meeting updates"
+    },
+    "Project": {
+      "tier": 1,
+      "definition": "A coordinated workstream or initiative with defined deliverables.",
+      "example": "Local Voice AI Assistant"
+    },
+    "Question": {
+      "tier": 1,
+      "definition": "An open, unresolved question or inquiry raised in discussion that requires an answer.",
+      "example": "Can we offload embedding calculation to the Apple Neural Engine?"
+    },
+    "Task": {
+      "tier": 1,
+      "definition": "An actionable work item that someone must do (distinguished from an Idea or Decision).",
+      "example": "Benchmark Ollama 8B inference latency on M2 Mac"
+    },
+    "Team": {
+      "tier": 1,
+      "definition": "A formal or informal group of people working together within an organization.",
+      "example": "Core AI Pipeline Team"
+    },
+    "Tool": {
+      "tier": 2,
+      "definition": "A software tool, runtime, framework, library, or platform used by teams or projects.",
+      "example": "Neo4j 5, Docker Compose, PyTorch"
+    },
+    "Topic": {
+      "tier": 2,
+      "definition": "A subject area, domain, or theme discussed in meetings, notes, or decisions.",
+      "example": "Memory Optimization and Quantization"
+    }
+  },
+  "relationship_types": {
+    "ABOUT": {
+      "tier": 2,
+      "definition": "Specifies the subject matter topic of a note, decision, idea, or meeting.",
+      "example": "Architecture Sync Meeting ABOUT Memory Optimization Topic",
+      "allowed_directions": {
+        "from": [
+          "Conversation",
+          "Decision",
+          "Idea",
+          "Meeting",
+          "Note"
+        ],
+        "to": [
+          "Topic"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "ABSENT_FROM": {
+      "tier": 1,
+      "definition": "Records that an expected person was absent from a meeting or event.",
+      "example": "Alex ABSENT_FROM Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Event",
+          "Meeting"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "AGREES_WITH": {
+      "tier": 2,
+      "definition": "Records agreement by a person with an idea, decision, or colleague.",
+      "example": "Sarah AGREES_WITH SQLite Caching Proposal",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision",
+          "Idea",
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "ALIAS_OF": {
+      "tier": 2,
+      "definition": "Links an entity variant or nickname to its canonical entity of the SAME label.",
+      "example": "Sarah ALIAS_OF Sarah Perera",
+      "allowed_directions": {
+        "from": "any",
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "ANSWERS": {
+      "tier": 2,
+      "definition": "Links a decision or note that answers an open question.",
+      "example": "Adopt Quantized Model Decision ANSWERS Which LLM Model Question",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Note"
+        ],
+        "to": [
+          "Question"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "ASSIGNED_TO": {
+      "tier": 1,
+      "definition": "Assigns responsibility for completing a task to a person.",
+      "example": "Benchmark Ollama ASSIGNED_TO David",
+      "allowed_directions": {
+        "from": [
+          "Task"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "ATTENDED": {
+      "tier": 1,
+      "definition": "Records that a person was present at a meeting or event.",
+      "example": "Sarah ATTENDED Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Event",
+          "Meeting"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "BLOCKED_BY": {
+      "tier": 1,
+      "definition": "Indicates a task or project is actively blocked by an issue or task.",
+      "example": "Benchmark Ollama BLOCKED_BY OOM Crash Issue",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Issue",
+          "Task"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "COLLABORATES_WITH": {
+      "tier": 2,
+      "definition": "Indicates direct working partnership between two people.",
+      "example": "Sarah COLLABORATES_WITH David",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
+    },
+    "CREATED_IN": {
+      "tier": 2,
+      "definition": "Records the meeting or conversation context in which an item or decision originated.",
+      "example": "Adopt Neo4j Decision CREATED_IN Architecture Sync Meeting",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Document",
+          "Idea",
+          "Issue",
+          "Note",
+          "Question",
+          "Task"
+        ],
+        "to": [
+          "Conversation",
+          "Meeting"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DECIDED": {
+      "tier": 1,
+      "definition": "Connects a person to a formal decision they made or championed.",
+      "example": "Sarah DECIDED Adopt Neo4j 5",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DEPENDS_ON": {
+      "tier": 2,
+      "definition": "Indicates a task or project requires another task or project to complete first.",
+      "example": "Integration Testing DEPENDS_ON Benchmark Ollama",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Project",
+          "Task"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DISAGREES_WITH": {
+      "tier": 2,
+      "definition": "Records dissent or objection by a person to an idea, decision, or colleague.",
+      "example": "Sarah DISAGREES_WITH Cloud Sync Idea",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Decision",
+          "Idea",
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DISCUSSED": {
+      "tier": 1,
+      "definition": "Broad link from a meeting to any entity or topic brought up in conversation.",
+      "example": "Architecture Sync Meeting DISCUSSED Ollama Memory Consumption",
+      "allowed_directions": {
+        "from": [
+          "Meeting"
+        ],
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DISLIKES": {
+      "tier": 2,
+      "definition": "Expresses a negative opinion, aversion, or disinterest of a person toward any entity.",
+      "example": "David DISLIKES Loud Offices",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "DUE_ON": {
+      "tier": 1,
+      "definition": "Associates a task, project, or goal with its target deadline.",
+      "example": "Benchmark Ollama DUE_ON 2026-10-18",
+      "allowed_directions": {
+        "from": [
+          "Goal",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Deadline"
+        ]
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
+    },
+    "FAMILY_OF": {
+      "tier": 1,
+      "definition": "Indicates familial kinship relationship between two people (e.g. parent, sibling).",
+      "example": "Sarah FAMILY_OF Maya (kind='sister')",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "FOLLOW_UP_OF": {
+      "tier": 2,
+      "definition": "Indicates a task or meeting was created as a direct next step from a prior item.",
+      "example": "Memory Tuning Task FOLLOW_UP_OF Architecture Sync Meeting",
+      "allowed_directions": {
+        "from": [
+          "Meeting",
+          "Task"
+        ],
+        "to": [
+          "Meeting",
+          "Task"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "FRIEND_OF": {
+      "tier": 1,
+      "definition": "Indicates interpersonal friendship between two people.",
+      "example": "David FRIEND_OF Alex",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
+    },
+    "HAS_ISSUE": {
+      "tier": 2,
+      "definition": "Links a project or task directly to an identified issue or blocker.",
+      "example": "Voice Assistant Project HAS_ISSUE Whisper OOM Crash",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Issue"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "HAS_METRIC": {
+      "tier": 2,
+      "definition": "Connects an entity to an observed or target quantitative metric.",
+      "example": "Voice Assistant Project HAS_METRIC Sub-500ms Latency Metric",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Goal",
+          "Meeting",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Metric"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "LEADS": {
+      "tier": 2,
+      "definition": "Indicates a person directs, facilitates, or leads a team, project, or meeting.",
+      "example": "Sarah LEADS Sprint 14 Architecture Sync",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Meeting",
+          "Project",
+          "Team"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "LIKES": {
+      "tier": 2,
+      "definition": "Expresses a positive opinion, affinity, or interest of a person toward any entity.",
+      "example": "Sarah LIKES Sony Headphones",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "LIVES_IN": {
+      "tier": 2,
+      "definition": "Indicates the home city, neighborhood, or residential location of a person.",
+      "example": "Sarah LIVES_IN Brooklyn",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Location"
+        ]
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
+    },
+    "LOCATED_AT": {
+      "tier": 1,
+      "definition": "Associates a meeting, event, or task with its physical or virtual location.",
+      "example": "Architecture Sync LOCATED_AT Conference Room A",
+      "allowed_directions": {
+        "from": [
+          "Event",
+          "Meeting",
+          "Task"
+        ],
+        "to": [
+          "Location"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "MEMBER_OF": {
+      "tier": 1,
+      "definition": "Indicates a person belongs to a team or organization.",
+      "example": "Sarah MEMBER_OF Core AI Pipeline Team",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Organization",
+          "Team"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "MENTIONS": {
+      "tier": 2,
+      "definition": "Broad link indicating a note or conversation transcript references an entity.",
+      "example": "Architecture Notes MENTIONS David",
+      "allowed_directions": {
+        "from": [
+          "Conversation",
+          "Note"
+        ],
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "OWNS": {
+      "tier": 2,
+      "definition": "Indicates ownership or possession of an item, document, or tool.",
+      "example": "David OWNS MacBook Pro (Item)",
+      "allowed_directions": {
+        "from": [
+          "Organization",
+          "Person",
+          "Team"
+        ],
+        "to": [
+          "Document",
+          "Item",
+          "Tool"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "PARTNER_OF": {
+      "tier": 2,
+      "definition": "Indicates a romantic, marital, or domestic partnership between two people.",
+      "example": "Sarah PARTNER_OF John",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": true
+    },
+    "PART_OF": {
+      "tier": 1,
+      "definition": "Subsumption link between tasks or projects.",
+      "example": "Benchmark Ollama PART_OF Local Voice AI Assistant",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Project",
+          "Task"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "PLANS": {
+      "tier": 2,
+      "definition": "Indicates an intended future commitment, activity, or personal schedule of a person.",
+      "example": "Sarah PLANS Birthday Party (Event)",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Event",
+          "Meeting",
+          "Task"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "PREFERS": {
+      "tier": 2,
+      "definition": "Associates a person with their personal preference or favored concept.",
+      "example": "David PREFERS Fully Local Execution Concept",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Concept",
+          "Preference"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "PROPOSED": {
+      "tier": 2,
+      "definition": "Connects a person to an idea or exploratory suggestion they submitted.",
+      "example": "David PROPOSED SQLite Caching Idea",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Idea"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "RAISED": {
+      "tier": 1,
+      "definition": "Connects a person to an issue, blocker, or open question they voiced.",
+      "example": "David RAISED Whisper OOM Crash Issue",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Issue",
+          "Question"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "REFERENCES": {
+      "tier": 2,
+      "definition": "Cites or refers to an external document, specification, or PRD.",
+      "example": "Adopt Neo4j Decision REFERENCES RFC-204 Document",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Meeting",
+          "Note",
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Document"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "RELATED_TO": {
+      "tier": 2,
+      "definition": "Generic associative fallback edge between any two entities.",
+      "example": "Benchmark Ollama Task RELATED_TO Whisper OOM Issue",
+      "allowed_directions": {
+        "from": "any",
+        "to": "any"
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "REPORTS_TO": {
+      "tier": 2,
+      "definition": "Indicates an organizational reporting relationship between people.",
+      "example": "David REPORTS_TO Sarah",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "REQUESTED_BY": {
+      "tier": 1,
+      "definition": "Identifies the person who asked for or requested a task.",
+      "example": "Benchmark Ollama REQUESTED_BY Sarah",
+      "allowed_directions": {
+        "from": [
+          "Task"
+        ],
+        "to": [
+          "Person"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "RESOLVES": {
+      "tier": 2,
+      "definition": "Indicates that completing a task or executing a decision resolves an issue.",
+      "example": "Adopt Quantized Model Decision RESOLVES Whisper OOM Crash",
+      "allowed_directions": {
+        "from": [
+          "Decision",
+          "Task"
+        ],
+        "to": [
+          "Issue"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "SCHEDULED_ON": {
+      "tier": 2,
+      "definition": "Specifies the scheduled date or deadline for a meeting or event.",
+      "example": "Architecture Sync SCHEDULED_ON 2026-10-18",
+      "allowed_directions": {
+        "from": [
+          "Event",
+          "Meeting"
+        ],
+        "to": [
+          "Deadline"
+        ]
+      },
+      "is_single_valued": true,
+      "is_symmetric": false
+    },
+    "SUPERSEDES": {
+      "tier": 2,
+      "definition": "Indicates a new decision replaces, updates, or invalidates an earlier decision.",
+      "example": "Adopt Neo4j Decision SUPERSEDES Use Raw SQLite Decision",
+      "allowed_directions": {
+        "from": [
+          "Decision"
+        ],
+        "to": [
+          "Decision"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "SUPPORTS": {
+      "tier": 2,
+      "definition": "Connects an actionable task or project to the strategic goal it advances.",
+      "example": "Benchmark Ollama SUPPORTS Sub-500ms Latency Goal",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task"
+        ],
+        "to": [
+          "Goal"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "USES": {
+      "tier": 2,
+      "definition": "Associates a project, task, or team with a software tool or platform.",
+      "example": "Core AI Pipeline Team USES Neo4j 5",
+      "allowed_directions": {
+        "from": [
+          "Project",
+          "Task",
+          "Team"
+        ],
+        "to": [
+          "Tool"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "WORKS_AT": {
+      "tier": 2,
+      "definition": "Associates an employed person with their workplace or employer organization.",
+      "example": "David WORKS_AT InnoTech Labs",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Organization"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    },
+    "WORKS_ON": {
+      "tier": 1,
+      "definition": "Associates a person with a project they contribute to.",
+      "example": "David WORKS_ON Local Voice AI Assistant",
+      "allowed_directions": {
+        "from": [
+          "Person"
+        ],
+        "to": [
+          "Project"
+        ]
+      },
+      "is_single_valued": false,
+      "is_symmetric": false
+    }
+  },
+  "single_valued_relationships": [
+    "DUE_ON",
+    "LIVES_IN",
+    "SCHEDULED_ON"
+  ],
+  "symmetric_relationships": [
+    "COLLABORATES_WITH",
+    "FRIEND_OF",
+    "PARTNER_OF"
+  ],
+  "properties": {
+    "status": {
+      "type": "str (scalar)",
+      "allowed_values": [
+        "active",
+        "agreed",
+        "answered",
+        "blocked",
+        "cancelled",
+        "done",
+        "in progress",
+        "open",
+        "planned",
+        "superseded"
+      ],
+      "synonyms": {
+        "completed": "done",
+        "complete": "done",
+        "finished": "done",
+        "in-progress": "in progress",
+        "in_progress": "in progress",
+        "ongoing": "in progress",
+        "started": "in progress",
+        "wip": "in progress",
+        "canceled": "cancelled",
+        "dropped": "cancelled",
+        "called off": "cancelled",
+        "pending": "open",
+        "todo": "open",
+        "to do": "open",
+        "new": "open",
+        "waiting": "blocked",
+        "stuck": "blocked",
+        "decided": "agreed",
+        "approved": "agreed",
+        "confirmed": "agreed",
+        "accepted": "agreed",
+        "resolved": "done",
+        "closed": "done",
+        "solved": "done"
+      },
+      "description": "Lifecycle state (e.g. open, in progress, blocked, done, cancelled, planned, active, agreed, superseded, answered). Unknown values are dropped with a logged warning."
+    },
+    "priority": {
+      "type": "str (scalar)",
+      "allowed_values": [
+        "high",
+        "low",
+        "medium",
+        "urgent"
+      ],
+      "synonyms": {
+        "critical": "urgent",
+        "asap": "urgent",
+        "immediately": "urgent",
+        "important": "high",
+        "normal": "medium",
+        "ok": "medium",
+        "moderate": "medium",
+        "minor": "low",
+        "whenever": "low",
+        "optional": "low"
+      },
+      "description": "Priority ranking (low, medium, high, urgent). Unknown values are dropped with a logged warning."
+    },
+    "progress": {
+      "type": "scalar",
+      "description": "Completion indicator or percentage."
+    },
+    "date": {
+      "type": "scalar",
+      "description": "ISO date string (YYYY-MM-DD)."
+    },
+    "time": {
+      "type": "scalar",
+      "description": "Time string (HH:MM:SS)."
+    },
+    "duration": {
+      "type": "scalar",
+      "description": "Meeting or activity duration string."
+    },
+    "recurrence": {
+      "type": "scalar",
+      "description": "Recurrence frequency string."
+    },
+    "value": {
+      "type": "scalar",
+      "description": "Numeric parameter or score."
+    },
+    "unit": {
+      "type": "scalar",
+      "description": "Measurement unit string."
+    },
+    "title": {
+      "type": "scalar",
+      "description": "Formal document or role title."
+    },
+    "severity": {
+      "type": "str (scalar)",
+      "allowed_values": [
+        "critical",
+        "high",
+        "low",
+        "medium"
+      ],
+      "synonyms": {
+        "blocker": "critical",
+        "major": "high",
+        "minor": "low",
+        "normal": "medium"
+      },
+      "description": "Severity assessment (low, medium, high, critical). Unknown values are dropped with a logged warning."
+    },
+    "kind": {
+      "type": "scalar",
+      "description": "Kinship or sub-category classifier (e.g. 'sister', 'mother')."
+    },
+    "description": {
+      "type": "scalar",
+      "description": "Detailed explanation or text description."
+    },
+    "rationale": {
+      "type": "scalar",
+      "description": "Reasoning behind a decision."
+    },
+    "quote": {
+      "type": "scalar",
+      "description": "Verbatim quote excerpt."
+    },
+    "timestamp": {
+      "type": "scalar",
+      "description": "ISO timestamp of statement."
+    },
+    "confidence": {
+      "type": "float [0.0 - 1.0]",
+      "description": "Extraction certainty score (e.g. 'Maybe Friday' -> confidence: 0.5)."
+    },
+    "label": {
+      "type": "scalar",
+      "description": "Original relationship type when converted to RELATED_TO."
+    },
+    "original_type": {
+      "type": "scalar",
+      "description": "Original entity type when converted to Concept."
+    },
+    "age": {
+      "type": "int/scalar",
+      "description": "Age of a person in years."
+    },
+    "aliases": {
+      "type": "list[str]",
+      "description": "List of alternate names or nicknames."
+    },
+    "email": {
+      "type": "str",
+      "description": "Email address string."
+    },
+    "phone": {
+      "type": "str",
+      "description": "Phone number string."
+    },
+    "birthday": {
+      "type": "str",
+      "description": "Birth date stored as ISO string (do not parse)."
+    },
+    "sensitivity": {
+      "type": "str ('normal' | 'private')",
+      "description": "Privacy classification flag."
+    },
+    "speaker": {
+      "type": "str",
+      "description": "Speaker identity in multi-speaker audio."
+    }
+  },
+  "layer_c_signals": {
+    "op": {
+      "values": [
+        "add",
+        "update",
+        "retract"
+      ],
+      "default": "add",
+      "description": "Operation flag indicating lifecycle signal from conversation.",
+      "examples": {
+        "add": "Create entity or relationship if missing (default behavior).",
+        "update": "'No, I meant Tuesday' -> op: update (correction trigger for conflict resolution).",
+        "retract": "'Cancel the meeting' -> op: retract (cancellation / removal trigger)."
+      }
+    },
+    "confidence": {
+      "description": "Uncertainty quantification.",
+      "example": "'Maybe Friday' -> confidence: 0.5"
+    },
+    "alias_disambiguation": {
+      "description": "Entity resolution via ALIAS_OF edge.",
+      "example": "'Sarah is also called Sarah Perera' -> Person('Sarah') -[:ALIAS_OF]-> Person('Sarah Perera')"
+    }
+  }
+}

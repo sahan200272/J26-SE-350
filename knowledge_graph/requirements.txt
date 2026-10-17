@@ -1,1 +1,9 @@
 # Python dependencies for the knowledge graph
+neo4j
+pydantic
+python-dotenv
+rapidfuzz
+fastapi
+uvicorn
+ollama
+pytest

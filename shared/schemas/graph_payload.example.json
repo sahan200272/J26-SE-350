@@ -1,0 +1,224 @@
+{
+  "source": "voice_convo_20261011_1030_sprint_sync",
+  "entities": [
+    {
+      "type": "Meeting",
+      "name": "Sprint 14 Architecture Sync",
+      "props": {
+        "date": "2026-10-11",
+        "duration": "45m",
+        "description": "Weekly engineering architecture alignment meeting"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Sarah Chen",
+      "props": {
+        "title": "Staff AI Engineer",
+        "description": "Team lead and system architect"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "David Miller",
+      "props": {
+        "title": "Senior Backend Engineer",
+        "description": "Core speech pipeline and runtime engineer"
+      }
+    },
+    {
+      "type": "Person",
+      "name": "Elena Rostova",
+      "props": {
+        "title": "DevOps Engineer",
+        "description": "Container infrastructure and deployment specialist"
+      }
+    },
+    {
+      "type": "Team",
+      "name": "Platform Core Team",
+      "props": {
+        "description": "Engineering team maintaining local AI assistant core"
+      }
+    },
+    {
+      "type": "Organization",
+      "name": "InnoTech Labs",
+      "props": {
+        "description": "Parent organization"
+      }
+    },
+    {
+      "type": "Location",
+      "name": "Conference Room A",
+      "props": {
+        "description": "Headquarters 3rd Floor Meeting Room"
+      }
+    },
+    {
+      "type": "Issue",
+      "name": "Whisper Memory Limit Exceeded",
+      "props": {
+        "severity": "high",
+        "status": "open",
+        "description": "Local speech transcription exceeds 8GB RAM on base laptops"
+      }
+    },
+    {
+      "type": "Question",
+      "name": "Can embedding computation be offloaded to Apple Neural Engine?",
+      "props": {
+        "status": "open",
+        "description": "Inquiry regarding CoreML acceleration feasibility"
+      }
+    },
+    {
+      "type": "Idea",
+      "name": "Cache acoustic embeddings in SQLite",
+      "props": {
+        "status": "open",
+        "description": "Proposed suggestion to avoid duplicate voice embedding calculations"
+      }
+    },
+    {
+      "type": "Decision",
+      "name": "Adopt Ollama 8B with 4-bit Quantization",
+      "props": {
+        "status": "decided",
+        "rationale": "Reduces peak resident memory to 3.8GB while maintaining accuracy",
+        "description": "Agreed architecture policy for local LLM inference"
+      }
+    },
+    {
+      "type": "Task",
+      "name": "Benchmark Ollama 8B inference latency",
+      "props": {
+        "priority": "high",
+        "status": "in_progress",
+        "description": "Run local throughput tests across M2 and M3 machines"
+      }
+    },
+    {
+      "type": "Deadline",
+      "name": "2026-10-18",
+      "props": {
+        "date": "2026-10-18"
+      }
+    },
+    {
+      "type": "Document",
+      "name": "RFC-204 Local Graph Storage Architecture",
+      "props": {
+        "title": "RFC-204 Specification",
+        "description": "Internal architectural proposal for graph memory"
+      }
+    },
+    {
+      "type": "Tool",
+      "name": "Neo4j 5",
+      "props": {
+        "kind": "database",
+        "description": "Graph database engine running locally in Docker"
+      }
+    },
+    {
+      "type": "Topic",
+      "name": "Memory Optimization and Inference Latency",
+      "props": {
+        "description": "Agenda topic covering runtime performance constraints"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "MEMBER_OF",
+      "to": { "type": "Team", "name": "Platform Core Team" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "LEADS",
+      "to": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "ATTENDED",
+      "to": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Person", "name": "Elena Rostova" },
+      "type": "ATTENDED",
+      "to": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" },
+      "type": "LOCATED_AT",
+      "to": { "type": "Location", "name": "Conference Room A" }
+    },
+    {
+      "from": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" },
+      "type": "ABOUT",
+      "to": { "type": "Topic", "name": "Memory Optimization and Inference Latency" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "RAISED",
+      "to": { "type": "Issue", "name": "Whisper Memory Limit Exceeded" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "RAISED",
+      "to": { "type": "Question", "name": "Can embedding computation be offloaded to Apple Neural Engine?" }
+    },
+    {
+      "from": { "type": "Person", "name": "David Miller" },
+      "type": "PROPOSED",
+      "to": { "type": "Idea", "name": "Cache acoustic embeddings in SQLite" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "AGREES_WITH",
+      "to": { "type": "Idea", "name": "Cache acoustic embeddings in SQLite" }
+    },
+    {
+      "from": { "type": "Person", "name": "Sarah Chen" },
+      "type": "DECIDED",
+      "to": { "type": "Decision", "name": "Adopt Ollama 8B with 4-bit Quantization" }
+    },
+    {
+      "from": { "type": "Decision", "name": "Adopt Ollama 8B with 4-bit Quantization" },
+      "type": "CREATED_IN",
+      "to": { "type": "Meeting", "name": "Sprint 14 Architecture Sync" }
+    },
+    {
+      "from": { "type": "Decision", "name": "Adopt Ollama 8B with 4-bit Quantization" },
+      "type": "RESOLVES",
+      "to": { "type": "Issue", "name": "Whisper Memory Limit Exceeded" }
+    },
+    {
+      "from": { "type": "Decision", "name": "Adopt Ollama 8B with 4-bit Quantization" },
+      "type": "ANSWERS",
+      "to": { "type": "Question", "name": "Can embedding computation be offloaded to Apple Neural Engine?" }
+    },
+    {
+      "from": { "type": "Decision", "name": "Adopt Ollama 8B with 4-bit Quantization" },
+      "type": "REFERENCES",
+      "to": { "type": "Document", "name": "RFC-204 Local Graph Storage Architecture" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B inference latency" },
+      "type": "ASSIGNED_TO",
+      "to": { "type": "Person", "name": "David Miller" }
+    },
+    {
+      "from": { "type": "Task", "name": "Benchmark Ollama 8B inference latency" },
+      "type": "DUE_ON",
+      "to": { "type": "Deadline", "name": "2026-10-18" }
+    },
+    {
+      "from": { "type": "Team", "name": "Platform Core Team" },
+      "type": "USES",
+      "to": { "type": "Tool", "name": "Neo4j 5" }
+    }
+  ]
+}

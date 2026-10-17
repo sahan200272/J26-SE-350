@@ -1,7 +1,9 @@
 # Python
 __pycache__/
+venv/
 .venv/
 *.pyc
+.pytest_cache/
 
 # Flutter / Dart
 build/
@@ -10,6 +12,7 @@ build/
 # Environment and secrets
 .env
 .env.*
+!.env.example
 gcp-oauth.keys.json
 token.json
 credentials.json
@@ -17,6 +20,7 @@ credentials.json
 # IDE
 .idea/
 .vscode/*
+.vscode/
 !.vscode/settings.json
 
 # Model weights
@@ -29,3 +33,16 @@ credentials.json
 *.wav
 *.opus
 *.mp3
+knowledge_graph/neo4j_data/
+.env
+*.m4a
+*.aac
+*.flac
+*.ogg
+*.amr
+*.mp4
+*.safetensors
+test_output/
+
+
+**/data/notifications.db
