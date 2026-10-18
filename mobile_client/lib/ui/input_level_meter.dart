@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'theme/app_theme.dart';
+
 /// Live input level while recording: a bar from [minDbfs] to 0 dBFS plus the
 /// RMS value. [dbfs] is null until the first frames arrive.
 class InputLevelMeter extends StatelessWidget {
@@ -31,35 +33,39 @@ class InputLevelMeter extends StatelessWidget {
     return Semantics(
       label: 'Input level ${format(level)}',
       excludeSemantics: true,
-      child: Column(
+      child: Row(
         key: const Key('level-meter'),
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.graphic_eq, color: scheme.onSurfaceVariant),
-              const SizedBox(width: 8),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    key: barKey,
-                    value: fraction(level),
-                    minHeight: 10,
-                    color: color,
-                    backgroundColor: scheme.surfaceContainerHighest,
-                  ),
-                ),
-              ),
-            ],
+          Icon(
+            Icons.graphic_eq_rounded,
+            color: scheme.onSurfaceVariant,
+            size: 20,
           ),
-          const SizedBox(height: 6),
-          Text(
-            key: valueKey,
-            format(level),
-            style: textTheme.bodyMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
-              fontFeatures: const [FontFeature.tabularFigures()],
+          const SizedBox(width: EvSpace.sm),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(EvRadius.pill),
+              child: LinearProgressIndicator(
+                key: barKey,
+                value: fraction(level),
+                minHeight: 8,
+                color: color,
+                backgroundColor: scheme.surfaceContainerHighest,
+              ),
+            ),
+          ),
+          const SizedBox(width: EvSpace.sm),
+          SizedBox(
+            width: 84,
+            child: Text(
+              key: valueKey,
+              format(level),
+              textAlign: TextAlign.end,
+              maxLines: 1,
+              style: textTheme.bodySmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ],

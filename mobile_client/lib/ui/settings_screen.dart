@@ -7,6 +7,8 @@ import '../sync/peer_input.dart';
 import '../sync/syncthing_client.dart';
 import '../sync/syncthing_status.dart';
 import 'about_screen.dart';
+import 'components.dart';
+import 'theme/app_theme.dart';
 
 /// Sync settings (A5): this phone's Syncthing device ID (text and QR), the
 /// PC's device ID and fixed LAN address, and the live connection and sync
@@ -145,7 +147,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sync settings'),
+        title: const Text('Connect to your PC'),
         actions: [
           IconButton(
             tooltip: 'About',
@@ -156,18 +158,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(
+            EvSpace.md,
+            EvSpace.xs,
+            EvSpace.md,
+            EvSpace.xl,
+          ),
           children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: EvSpace.xxs),
+              child: Text(
+                'Pair once with your PC. After that, recordings move from '
+                'this phone to your PC over your local network only. Your PC '
+                'needs Syncthing installed (part of the Echo Vault PC '
+                'setup).',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+              ),
+            ),
+            const SizedBox(height: EvSpace.md),
             _StatusCard(status: _status, error: _statusError),
-            const SizedBox(height: 16),
+            const SizedBox(height: EvSpace.md),
             _ThisPhoneCard(status: _status, qr: _qr),
-            const SizedBox(height: 16),
+            const SizedBox(height: EvSpace.md),
             _pcCard(context),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.description_outlined),
-              title: const Text('About and licences'),
-              onTap: () => _openAbout(context),
+            const SizedBox(height: EvSpace.md),
+            GroupCard(
+              children: [
+                InfoRow(
+                  icon: Icons.description_outlined,
+                  iconColor: EvColors.textMuted,
+                  title: 'About and licences',
+                  onTap: () => _openAbout(context),
+                ),
+              ],
             ),
           ],
         ),
@@ -198,7 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('PC', style: textTheme.titleMedium),
+            Text('Your PC', style: textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
               'In Syncthing on the PC: Actions → Show ID. Find the PC’s IP '
@@ -214,7 +239,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 hintText: 'XXXXXXX-XXXXXXX-…',
                 errorText: _pcIdError,
                 errorMaxLines: 3,
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(EvRadius.md),
+                ),
               ),
               style: const TextStyle(fontFamily: 'monospace'),
               textCapitalization: TextCapitalization.characters,
@@ -233,7 +260,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 helperText: preview == null ? null : 'Address: $preview',
                 errorText: _pcIpError,
                 errorMaxLines: 3,
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(EvRadius.md),
+                ),
               ),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -282,7 +311,7 @@ class _StatusCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Status', style: textTheme.titleMedium),
+            Text('Connection', style: textTheme.titleMedium),
             const SizedBox(height: 8),
             if (s == null && error == null)
               const LinearProgressIndicator()
@@ -422,13 +451,20 @@ class _ThisPhoneCard extends StatelessWidget {
               ),
               if (qr case final png?)
                 Center(
-                  child: Image.memory(
-                    key: SettingsScreen.qrKey,
-                    png,
-                    width: 220,
-                    height: 220,
-                    filterQuality: FilterQuality.none,
-                    semanticLabel: 'QR code of this phone’s device ID',
+                  child: Container(
+                    padding: const EdgeInsets.all(EvSpace.sm),
+                    decoration: BoxDecoration(
+                      color: EvColors.snow,
+                      borderRadius: BorderRadius.circular(EvRadius.md),
+                    ),
+                    child: Image.memory(
+                      key: SettingsScreen.qrKey,
+                      png,
+                      width: 220,
+                      height: 220,
+                      filterQuality: FilterQuality.none,
+                      semanticLabel: 'QR code of this phone’s device ID',
+                    ),
                   ),
                 ),
             ],
