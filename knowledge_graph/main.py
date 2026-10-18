@@ -17,11 +17,15 @@ from graph_schema.adapters import triples_to_payload
 from graph_schema.ingest import IngestResult, ingest_payload
 from graph_schema.models import Payload
 from graph_schema.schema import get_driver
+from graphrag.baseline_keyword import compare_retrieval
+from graphrag.context_builder import get_pending_items_context
+from graphrag.models import RetrievalRequest, RetrievalResult
+from graphrag.retriever import retrieve_subgraph
 
 app = FastAPI(
-    title="Knowledge Graph Ingestion API",
-    description="Automated graph construction and entity ingestion service bound strictly to 127.0.0.1.",
-    version="1.0.0",
+    title="Knowledge Graph & GraphRAG API",
+    description="Automated graph construction, entity ingestion, and multi-hop GraphRAG retrieval service bound strictly to 127.0.0.1.",
+    version="1.1.0",
 )
 
 
@@ -66,6 +70,35 @@ def ingest_triples_endpoint(
         payload = triples_to_payload(req.triples, source=req.source, timestamp=req.timestamp)
         result: IngestResult = ingest_payload(payload, dry_run=dry_run)
         return result.to_dict()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/retrieve", response_model=RetrievalResult)
+def retrieve_endpoint(request: RetrievalRequest) -> RetrievalResult:
+    """Execute constrained multi-hop GraphRAG traversal with mathematical scoring."""
+    try:
+        return retrieve_subgraph(request)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/retrieve/compare")
+def retrieve_compare_endpoint(request: RetrievalRequest) -> Dict[str, Any]:
+    """Compare GraphRAG retrieval against flat keyword baseline to evaluate multi-hop gain."""
+    try:
+        return compare_retrieval(request)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/retrieve/pending")
+def retrieve_pending_endpoint(
+    include_private: bool = Query(default=False, description="Include private task/issue items"),
+) -> Dict[str, Any]:
+    """Retrieve actionable pending tasks, blockers, deadlines, and assignees for Component 4."""
+    try:
+        return get_pending_items_context(include_private=include_private)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
