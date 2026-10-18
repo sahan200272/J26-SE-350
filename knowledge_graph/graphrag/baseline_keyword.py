@@ -55,17 +55,18 @@ def keyword_baseline_search(
     cypher = """
     MATCH (n)
     WHERE NOT n:Conversation
-      AND ($include_private OR n.sensitivity IS NULL OR n.sensitivity <> 'private')
+      AND n.key IS NOT NULL
+      AND ($include_private OR coalesce(n['sensitivity'], 'normal') <> 'private')
       AND ANY(term IN $terms WHERE
-          toLower(n.name) CONTAINS term
-          OR (n.description IS NOT NULL AND toLower(n.description) CONTAINS term)
+          (n.name IS NOT NULL AND toLower(n.name) CONTAINS term)
+          OR (n['description'] IS NOT NULL AND toLower(n['description']) CONTAINS term)
       )
     RETURN n.key AS key,
            n.name AS name,
            labels(n)[0] AS type,
-           n.description AS description,
-           n.status AS status,
-           n.priority AS priority
+           n['description'] AS description,
+           n['status'] AS status,
+           n['priority'] AS priority
     LIMIT $top_k
     """
 
@@ -78,9 +79,11 @@ def keyword_baseline_search(
                 top_k=top_k,
             )
             for rec in records:
+                if not rec.get("key"):
+                    continue
                 results.append({
-                    "key": rec["key"],
-                    "name": rec.get("name") or rec["key"],
+                    "key": str(rec["key"]),
+                    "name": str(rec.get("name") or rec["key"]),
                     "type": rec.get("type") or "Concept",
                     "description": rec.get("description"),
                     "status": rec.get("status"),

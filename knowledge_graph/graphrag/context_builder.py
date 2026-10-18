@@ -96,24 +96,25 @@ def get_pending_items_context(
 
     query = """
     MATCH (t:Task)
-    WHERE (t.status IN ['open', 'in progress', 'blocked'] OR t.status IS NULL)
-      AND ($include_private OR t.sensitivity IS NULL OR t.sensitivity <> 'private')
+    WHERE t.key IS NOT NULL
+      AND (t['status'] IN ['open', 'in progress', 'blocked'] OR t['status'] IS NULL)
+      AND ($include_private OR coalesce(t['sensitivity'], 'normal') <> 'private')
     OPTIONAL MATCH (t)-[:DUE_ON]->(d:Deadline)
-    WHERE ($include_private OR d.sensitivity IS NULL OR d.sensitivity <> 'private')
+    WHERE ($include_private OR coalesce(d['sensitivity'], 'normal') <> 'private')
     OPTIONAL MATCH (t)-[:ASSIGNED_TO]->(p:Person)
-    WHERE ($include_private OR p.sensitivity IS NULL OR p.sensitivity <> 'private')
+    WHERE ($include_private OR coalesce(p['sensitivity'], 'normal') <> 'private')
     OPTIONAL MATCH (t)-[:BLOCKED_BY]->(i:Issue)
-    WHERE ($include_private OR i.sensitivity IS NULL OR i.sensitivity <> 'private')
+    WHERE ($include_private OR coalesce(i['sensitivity'], 'normal') <> 'private')
     RETURN t.key AS task_key,
            t.name AS task_name,
-           t.status AS status,
-           t.priority AS priority,
-           t.description AS description,
+           t['status'] AS status,
+           t['priority'] AS priority,
+           t['description'] AS description,
            d.name AS deadline,
-           d.date AS deadline_date,
+           d['date'] AS deadline_date,
            p.name AS assignee,
-           collect(DISTINCT {name: i.name, severity: i.severity, status: i.status}) AS blockers
-    ORDER BY CASE t.priority
+           collect(DISTINCT {name: i.name, severity: i['severity'], status: i['status']}) AS blockers
+    ORDER BY CASE t['priority']
         WHEN 'urgent' THEN 1
         WHEN 'high' THEN 2
         WHEN 'medium' THEN 3

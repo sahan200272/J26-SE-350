@@ -302,7 +302,7 @@ def retrieve_subgraph(
             MATCH (a)
             WHERE a.key IN $anchor_keys
             MATCH p = (a)-[r*1..{max_hops}]-(b)
-            WHERE ALL(n IN nodes(p) WHERE ($include_private OR n.sensitivity IS NULL OR n.sensitivity <> 'private'))
+            WHERE ALL(n IN nodes(p) WHERE n.key IS NOT NULL AND ($include_private OR coalesce(n['sensitivity'], 'normal') <> 'private'))
               AND ALL(n IN nodes(p)[1..-1] WHERE NOT n:Conversation)
               AND NOT b:Conversation
             RETURN p

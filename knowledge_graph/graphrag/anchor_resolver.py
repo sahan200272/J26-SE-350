@@ -288,24 +288,29 @@ def resolve_seed_anchors(
     cypher = """
     MATCH (n)
     WHERE NOT n:Conversation
-      AND ($include_private OR n.sensitivity IS NULL OR n.sensitivity <> 'private')
+      AND n.key IS NOT NULL
+      AND ($include_private OR coalesce(n['sensitivity'], 'normal') <> 'private')
     RETURN n.key AS key,
            n.name AS name,
            labels(n)[0] AS type,
-           n.aliases AS aliases,
-           n.sensitivity AS sensitivity
+           n['aliases'] AS aliases,
+           n['sensitivity'] AS sensitivity
     """
     records = session.run(cypher, include_private=include_private)
 
     nodes = []
     for rec in records:
+        key_val = rec.get("key")
+        if not key_val:
+            continue
+        name_val = rec.get("name") or str(key_val)
         node_type = rec.get("type") or "Concept"
         aliases = rec.get("aliases") or []
         if not isinstance(aliases, list):
             aliases = []
         nodes.append({
-            "key": rec["key"],
-            "name": rec.get("name") or rec["key"],
+            "key": str(key_val),
+            "name": str(name_val),
             "type": node_type,
             "aliases": aliases,
         })
