@@ -8,14 +8,20 @@ import '../platform/app_channel.dart';
 import '../session/clock.dart';
 import '../session/recording_session.dart';
 import '../sync/syncthing_client.dart';
+import 'components.dart';
 import 'elapsed_format.dart';
 import 'input_level_meter.dart';
 import 'lifecycle_source.dart';
+import 'live_waveform.dart';
 import 'recording_controller.dart';
 import 'settings_screen.dart';
+import 'theme/app_theme.dart';
 
-/// Main screen: status (idle / recording indicator with input level /
-/// paused / stopped), messages and the Start, Pause/Resume and Stop buttons.
+/// Recording screen: status (ready / recording / paused / stopped), a large
+/// timer, a live waveform of the microphone level, and the Start,
+/// Pause/Resume and Stop buttons. Recording only ever starts from a user
+/// action (Start here, or Start recording on Home, which opens this screen
+/// with [autoStart]).
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({
     super.key,
@@ -32,13 +38,20 @@ class RecordingScreen extends StatefulWidget {
     this.syncthing,
     this.appVersion,
     this.log,
+    this.onSessionOpenChanged,
+    this.autoStart = false,
   });
 
-  /// Opens the sync settings from the app bar; no button when null.
+  /// Opens the PC connection settings from the app bar; no button when null.
   final SyncthingClient? syncthing;
   final Future<String>? appVersion;
 
   static const settingsKey = Key('sync-settings-button');
+  static const doneKey = Key('recording-done');
+
+  /// Shown when the user tries to leave while a session is open.
+  static const leaveBlockedMessage =
+      'Stop the recording before leaving this screen.';
 
   final MicrophonePermission permission;
   final AudioCapture capture;
@@ -51,6 +64,14 @@ class RecordingScreen extends StatefulWidget {
   final FrameSinkFactory? debugFrameSinkFactory;
   final SegmentSinkFactory? debugSegmentSinkFactory;
   final void Function(String message)? log;
+
+  /// Called with true when a session opens (recording or paused) and false
+  /// when it stops.
+  final ValueChanged<bool>? onSessionOpenChanged;
+
+  /// Press Start once when the screen opens. Only used when the user opened
+  /// this screen by tapping "Start recording".
+  final bool autoStart;
 
   @override
   State<RecordingScreen> createState() => _RecordingScreenState();
@@ -71,59 +92,148 @@ class _RecordingScreenState extends State<RecordingScreen> {
     log: widget.log,
   );
 
+  static const _maxLevels = 48;
+  List<double> _levels = const [];
+  bool _sessionOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onControllerChanged);
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _controller.canStart) _controller.start();
+      });
+    }
+  }
+
+  void _onControllerChanged() {
+    final state = _controller.state;
+    // Waveform: one level sample per controller update while audio flows.
+    if (state == SessionState.recording && !_controller.isStartingCapture) {
+      final level = InputLevelMeter.fraction(_controller.inputLevelDbfs);
+      final next = [..._levels, level];
+      _levels = List.unmodifiable(
+        next.length > _maxLevels
+            ? next.sublist(next.length - _maxLevels)
+            : next,
+      );
+    } else if (state == SessionState.idle || state == SessionState.stopped) {
+      if (_levels.isNotEmpty) _levels = const [];
+    }
+
+    final open = switch (state) {
+      SessionState.recording || SessionState.paused => true,
+      SessionState.idle || SessionState.stopped => false,
+    };
+    if (open != _sessionOpen) {
+      _sessionOpen = open;
+      widget.onSessionOpenChanged?.call(open);
+      if (mounted) setState(() {}); // Updates PopScope.canPop.
+    }
+  }
+
   @override
   void dispose() {
+    _controller.removeListener(_onControllerChanged);
     _controller.dispose();
     super.dispose();
   }
 
+  void _blockedLeave() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(content: Text(RecordingScreen.leaveBlockedMessage)),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Echo Vault'),
-        actions: [
-          if (widget.syncthing case final syncthing?)
-            ListenableBuilder(
-              listenable: _controller,
-              // Only between sessions: the recording indicator (FR1) must
-              // stay on screen while a session is open.
-              builder: (context, _) => IconButton(
-                key: RecordingScreen.settingsKey,
-                tooltip: 'Sync settings',
-                icon: const Icon(Icons.sync),
-                onPressed: switch (_controller.state) {
-                  SessionState.idle ||
-                  SessionState.stopped => () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => SettingsScreen(
-                        syncthing: syncthing,
-                        appVersion: widget.appVersion,
+    final canLeave = Navigator.of(context).canPop();
+    return PopScope(
+      canPop: !_sessionOpen,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _blockedLeave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('New recording'),
+          centerTitle: true,
+          actions: [
+            if (widget.syncthing case final syncthing?)
+              ListenableBuilder(
+                listenable: _controller,
+                // Only between sessions: the recording indicator (FR1) must
+                // stay on screen while a session is open.
+                builder: (context, _) => IconButton(
+                  key: RecordingScreen.settingsKey,
+                  tooltip: 'Connect to your PC',
+                  icon: const Icon(Icons.sync_rounded),
+                  onPressed: switch (_controller.state) {
+                    SessionState.idle ||
+                    SessionState.stopped => () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => SettingsScreen(
+                          syncthing: syncthing,
+                          appVersion: widget.appVersion,
+                        ),
+                      ),
+                    ),
+                    _ => null,
+                  },
+                ),
+              ),
+            const SizedBox(width: EvSpace.xxs),
+          ],
+        ),
+        body: SafeArea(
+          child: ListenableBuilder(
+            listenable: _controller,
+            builder: (context, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(
+                EvSpace.lg,
+                0,
+                EvSpace.lg,
+                EvSpace.md,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, box) => SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: box.maxHeight,
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: EvSpace.md,
+                              ),
+                              child: _StatusView(
+                                controller: _controller,
+                                levels: _levels,
+                                onDone: canLeave
+                                    ? () => Navigator.of(context).maybePop()
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  _ => null,
-                },
+                  if (_controller.message case final message?) ...[
+                    _PermissionMessage(message: message),
+                    const SizedBox(height: EvSpace.sm),
+                  ],
+                  _Controls(controller: _controller),
+                  const SizedBox(height: EvSpace.sm),
+                  const _PrivacyFootnote(),
+                ],
               ),
-            ),
-        ],
-      ),
-      body: SafeArea(
-        child: ListenableBuilder(
-          listenable: _controller,
-          builder: (context, _) => Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Center(child: _StatusView(controller: _controller)),
-                ),
-                if (_controller.message case final message?)
-                  _PermissionMessage(message: message),
-                const SizedBox(height: 16),
-                _Controls(controller: _controller),
-              ],
             ),
           ),
         ),
@@ -133,75 +243,197 @@ class _RecordingScreenState extends State<RecordingScreen> {
 }
 
 class _StatusView extends StatelessWidget {
-  const _StatusView({required this.controller});
+  const _StatusView({
+    required this.controller,
+    required this.levels,
+    required this.onDone,
+  });
 
   final RecordingController controller;
+  final List<double> levels;
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final muted = textTheme.bodyMedium?.copyWith(color: EvColors.textMuted);
     final elapsed = formatElapsed(controller.elapsed);
+    const gap = SizedBox(height: EvSpace.lg);
     return switch (controller.state) {
-      SessionState.recording when controller.isStartingCapture =>
-        StartingIndicator(elapsed: elapsed),
+      SessionState.recording when controller.isStartingCapture => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          StartingIndicator(elapsed: elapsed),
+          gap,
+          const LiveWaveform(levels: [], active: false),
+        ],
+      ),
       SessionState.recording => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           RecordingIndicator(elapsed: elapsed),
-          const SizedBox(height: 24),
-          InputLevelMeter(dbfs: controller.inputLevelDbfs),
-          const SizedBox(height: 16),
-          SpeechStatus(
-            speech: controller.isSpeechDetected,
-            segments: controller.segmentCount,
+          gap,
+          LiveWaveform(
+            levels: levels,
+            color: controller.isSpeechDetected
+                ? EvColors.teal
+                : EvColors.textMuted,
           ),
+          const SizedBox(height: EvSpace.md),
+          SpeechStatus(speech: controller.isSpeechDetected),
         ],
       ),
       SessionState.paused => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           PausedIndicator(elapsed: elapsed),
+          gap,
+          LiveWaveform(levels: levels, active: false),
           if (controller.pauseReason == PauseReason.autoBackground) ...[
-            const SizedBox(height: 24),
+            gap,
             const AutoPauseNotice(),
+          ] else ...[
+            const SizedBox(height: EvSpace.md),
+            Text(
+              'Nothing is being recorded while paused.',
+              style: muted,
+              textAlign: TextAlign.center,
+            ),
           ],
         ],
       ),
-      SessionState.idle => Text(
-        controller.isRequestingPermission
-            ? 'Requesting microphone access…'
-            : 'Ready to record',
-        style: textTheme.titleMedium,
+      SessionState.idle => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const _MicBadge(),
+          gap,
+          Text(
+            controller.isRequestingPermission
+                ? 'Requesting microphone access…'
+                : 'Ready to record',
+            style: textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: EvSpace.xs),
+          Text(
+            'Recording begins when you tap Start and ends when you tap Stop.',
+            style: muted,
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
       SessionState.stopped => Column(
         key: const Key('stopped-summary'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Stopped', style: textTheme.titleLarge),
-          const SizedBox(height: 8),
+          const StatusPill(label: 'Stopped', icon: Icons.stop_circle_outlined),
+          const SizedBox(height: EvSpace.md),
           Text(
             'Recorded $elapsed · ${controller.pauseCount} '
             '${controller.pauseCount == 1 ? 'pause' : 'pauses'}',
-            style: textTheme.bodyLarge,
+            style: textTheme.titleMedium,
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
-          Text(
-            key: const Key('segment-summary'),
-            '${controller.segmentCount} speech '
-            '${controller.segmentCount == 1 ? 'segment' : 'segments'}',
-            style: textTheme.bodyMedium,
-          ),
-          if (controller.sessionId case final id?) ...[
-            const SizedBox(height: 4),
-            SelectableText(
-              key: const Key('session-id'),
-              'Session $id',
-              style: textTheme.bodySmall,
+          if (controller.chunkPipeline case final pipeline?) ...[
+            const SizedBox(height: EvSpace.md),
+            _SaveResult(
+              key: ValueKey(controller.sessionId),
+              manifest: pipeline.manifest,
+            ),
+          ],
+          if (onDone != null) ...[
+            gap,
+            TextButton.icon(
+              key: RecordingScreen.doneKey,
+              onPressed: onDone,
+              icon: const Icon(Icons.check_rounded),
+              label: const Text('Done'),
             ),
           ],
         ],
       ),
     };
+  }
+}
+
+class _MicBadge extends StatelessWidget {
+  const _MicBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: Container(
+        width: 112,
+        height: 112,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: EvColors.teal.withValues(alpha: 0.08),
+          border: Border.all(color: EvColors.teal.withValues(alpha: 0.35)),
+        ),
+        child: const Icon(
+          Icons.mic_none_rounded,
+          size: 44,
+          color: EvColors.teal,
+        ),
+      ),
+    );
+  }
+}
+
+/// After Stop: confirms the recording is stored on the phone only when the
+/// save actually finished (the pipeline's manifest future), never before.
+class _SaveResult extends StatelessWidget {
+  const _SaveResult({super.key, required this.manifest});
+
+  final Future<Map<String, Object?>> manifest;
+
+  static const resultKey = Key('outbox-result');
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, Object?>>(
+      future: manifest,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const NoticeCard(
+            key: resultKey,
+            icon: Icons.error_outline_rounded,
+            title: 'The recording could not be saved completely',
+            message: 'Some audio may be missing. Try recording again.',
+            tone: PillTone.danger,
+          );
+        }
+        final m = snapshot.data;
+        if (m == null) {
+          return const StatusPill(
+            key: resultKey,
+            icon: Icons.hourglass_top_rounded,
+            label: 'Saving…',
+          );
+        }
+        final failed = (m['failed_chunks'] as List<Object?>?)?.length ?? 0;
+        if (failed > 0) {
+          return const NoticeCard(
+            key: resultKey,
+            icon: Icons.warning_amber_rounded,
+            title: 'Saved, with gaps',
+            message:
+                'A few parts of this recording could not be saved. The rest '
+                'is on this phone and will be sent to your PC.',
+            tone: PillTone.warning,
+          );
+        }
+        return const NoticeCard(
+          key: resultKey,
+          icon: Icons.check_circle_outline_rounded,
+          title: 'Saved on this phone',
+          message:
+              'It will be sent to your PC over your local network. You can '
+              'find it in Sessions.',
+          tone: PillTone.positive,
+        );
+      },
+    );
   }
 }
 
@@ -217,7 +449,7 @@ class StartingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    const color = EvColors.textMuted;
     return Semantics(
       liveRegion: true,
       label: label,
@@ -228,75 +460,57 @@ class StartingIndicator extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox.square(
-                dimension: 16,
+              const SizedBox.square(
+                dimension: 14,
                 child: CircularProgressIndicator(strokeWidth: 2, color: color),
               ),
               const SizedBox(width: 10),
               Flexible(
                 child: Text(
                   label,
-                  style: textTheme.titleLarge?.copyWith(color: color),
+                  style: textTheme.titleSmall?.copyWith(color: color),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(elapsed, style: textTheme.displayMedium?.copyWith(color: color)),
+          const SizedBox(height: EvSpace.sm),
+          Text(elapsed, style: textTheme.displayLarge?.copyWith(color: color)),
         ],
       ),
     );
   }
 }
 
-/// While recording: whether the segmenter is inside speech, and how many
-/// segments the session has so far.
+/// While recording: whether speech is currently being heard.
 class SpeechStatus extends StatelessWidget {
-  const SpeechStatus({super.key, required this.speech, required this.segments});
+  const SpeechStatus({super.key, required this.speech});
 
   final bool speech;
-  final int segments;
 
   static const speechKey = Key('speech-detected');
   static const listeningKey = Key('listening');
-  static const countKey = Key('segment-count');
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final color = speech ? scheme.primary : scheme.onSurfaceVariant;
+    final color = speech ? EvColors.teal : EvColors.textMuted;
     return Semantics(
-      label:
-          '${speech ? 'Speech detected' : 'Listening for speech'}, '
-          '$segments ${segments == 1 ? 'segment' : 'segments'}',
+      label: speech ? 'Speech detected' : 'Listening for speech',
       excludeSemantics: true,
-      child: Column(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                speech ? Icons.record_voice_over : Icons.hearing,
-                color: color,
-              ),
-              const SizedBox(width: 8),
-              Flexible(
-                child: Text(
-                  key: speech ? speechKey : listeningKey,
-                  speech ? 'Speech detected' : 'Listening for speech',
-                  style: textTheme.titleMedium?.copyWith(color: color),
-                ),
-              ),
-            ],
+          Icon(
+            speech ? Icons.record_voice_over_rounded : Icons.hearing_rounded,
+            color: color,
+            size: 20,
           ),
-          const SizedBox(height: 4),
-          Text(
-            key: countKey,
-            'Segments: $segments',
-            style: textTheme.bodyMedium?.copyWith(
-              color: scheme.onSurfaceVariant,
+          const SizedBox(width: EvSpace.xs),
+          Flexible(
+            child: Text(
+              key: speech ? speechKey : listeningKey,
+              speech ? 'Speech detected' : 'Listening for speech',
+              style: textTheme.titleSmall?.copyWith(color: color),
             ),
           ),
         ],
@@ -324,27 +538,39 @@ class RecordingIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                key: dotKey,
-                width: 16,
-                height: 16,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: EvColors.recording.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(EvRadius.pill),
+              border: Border.all(
+                color: EvColors.recording.withValues(alpha: 0.35),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  key: dotKey,
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Recording',
-                style: textTheme.titleLarge?.copyWith(color: Colors.red),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  'Recording',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: EvColors.recording,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          Text(key: timerKey, elapsed, style: textTheme.displayMedium),
+          const SizedBox(height: EvSpace.sm),
+          Text(key: timerKey, elapsed, style: textTheme.displayLarge),
         ],
       ),
     );
@@ -362,7 +588,6 @@ class PausedIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final color = Theme.of(context).colorScheme.onSurfaceVariant;
     return Semantics(
       liveRegion: true,
       label: 'Paused, $elapsed recorded',
@@ -370,22 +595,38 @@ class PausedIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.pause_circle_filled, color: color),
-              const SizedBox(width: 8),
-              Text(
-                'Paused',
-                style: textTheme.titleLarge?.copyWith(color: color),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: EvColors.warning.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(EvRadius.pill),
+              border: Border.all(
+                color: EvColors.warning.withValues(alpha: 0.30),
               ),
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.pause_circle_filled,
+                  color: EvColors.warning,
+                  size: 18,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Paused',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: EvColors.warning,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: EvSpace.sm),
           Text(
             key: timerKey,
             elapsed,
-            style: textTheme.displayMedium?.copyWith(color: color),
+            style: textTheme.displayLarge?.copyWith(color: EvColors.textMuted),
           ),
         ],
       ),
@@ -405,38 +646,12 @@ class AutoPauseNotice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Card(
-      key: const Key('auto-pause-notice'),
-      color: scheme.tertiaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.info_outline, color: scheme.onTertiaryContainer),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: scheme.onTertiaryContainer,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    detail,
-                    style: TextStyle(color: scheme.onTertiaryContainer),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return const NoticeCard(
+      key: Key('auto-pause-notice'),
+      icon: Icons.info_outline_rounded,
+      title: title,
+      message: detail,
+      tone: PillTone.warning,
     );
   }
 }
@@ -448,25 +663,39 @@ class _PermissionMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
+    return NoticeCard(
       key: const Key('permission-message'),
-      color: scheme.errorContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.mic_off, color: scheme.onErrorContainer),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(color: scheme.onErrorContainer),
-              ),
-            ),
-          ],
+      icon: Icons.mic_off_rounded,
+      message: message,
+      tone: PillTone.danger,
+    );
+  }
+}
+
+class _PrivacyFootnote extends StatelessWidget {
+  const _PrivacyFootnote();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(
+          Icons.lock_outline_rounded,
+          size: 14,
+          color: EvColors.textSubtle,
         ),
-      ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            'Audio is captured only while this screen shows Recording',
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: EvColors.textSubtle),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -488,29 +717,31 @@ class _Controls extends StatelessWidget {
         Expanded(
           child: _ControlButton(
             buttonKey: startKey,
-            filled: true,
+            kind: _ButtonKind.primary,
             onPressed: controller.canStart ? controller.start : null,
-            icon: Icons.mic,
+            icon: Icons.mic_rounded,
             label: 'Start',
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: EvSpace.sm),
         Expanded(
           child: _ControlButton(
             buttonKey: pauseResumeKey,
+            kind: _ButtonKind.secondary,
             onPressed: paused
                 ? (controller.canResume ? controller.resume : null)
                 : (controller.canPause ? controller.pause : null),
-            icon: paused ? Icons.play_arrow : Icons.pause,
+            icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
             label: paused ? 'Resume' : 'Pause',
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: EvSpace.sm),
         Expanded(
           child: _ControlButton(
             buttonKey: stopKey,
+            kind: _ButtonKind.danger,
             onPressed: controller.canStop ? controller.stop : null,
-            icon: Icons.stop,
+            icon: Icons.stop_rounded,
             label: 'Stop',
           ),
         ),
@@ -518,6 +749,8 @@ class _Controls extends StatelessWidget {
     );
   }
 }
+
+enum _ButtonKind { primary, secondary, danger }
 
 /// Button with the icon above a label that never wraps: three buttons share
 /// a narrow phone width, so the label gets the full button width, and
@@ -529,7 +762,7 @@ class _ControlButton extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onPressed,
-    this.filled = false,
+    required this.kind,
   });
 
   /// Key for the underlying [ButtonStyleButton] (used by tests).
@@ -537,20 +770,17 @@ class _ControlButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onPressed;
-  final bool filled;
+  final _ButtonKind kind;
 
-  static const _style = ButtonStyle(
-    padding: WidgetStatePropertyAll(
-      EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-    ),
-  );
+  static const _padding = EdgeInsets.symmetric(horizontal: 4, vertical: 12);
+  static const _minSize = Size(64, 68);
 
   @override
   Widget build(BuildContext context) {
     final content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon),
+        Icon(icon, size: 26),
         const SizedBox(height: 4),
         FittedBox(
           fit: BoxFit.scaleDown,
@@ -558,18 +788,44 @@ class _ControlButton extends StatelessWidget {
         ),
       ],
     );
-    return filled
-        ? FilledButton(
-            key: buttonKey,
-            style: _style,
-            onPressed: onPressed,
-            child: content,
-          )
-        : OutlinedButton(
-            key: buttonKey,
-            style: _style,
-            onPressed: onPressed,
-            child: content,
-          );
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(EvRadius.lg),
+    );
+    return switch (kind) {
+      _ButtonKind.primary => FilledButton(
+        key: buttonKey,
+        style: FilledButton.styleFrom(
+          padding: _padding,
+          minimumSize: _minSize,
+          shape: shape,
+        ),
+        onPressed: onPressed,
+        child: content,
+      ),
+      _ButtonKind.secondary => FilledButton.tonal(
+        key: buttonKey,
+        style: FilledButton.styleFrom(
+          padding: _padding,
+          minimumSize: _minSize,
+          shape: shape,
+          backgroundColor: EvColors.surfaceHigh,
+          foregroundColor: EvColors.snow,
+        ),
+        onPressed: onPressed,
+        child: content,
+      ),
+      _ButtonKind.danger => FilledButton.tonal(
+        key: buttonKey,
+        style: FilledButton.styleFrom(
+          padding: _padding,
+          minimumSize: _minSize,
+          shape: shape,
+          backgroundColor: EvColors.recording.withValues(alpha: 0.16),
+          foregroundColor: EvColors.recording,
+        ),
+        onPressed: onPressed,
+        child: content,
+      ),
+    };
   }
 }

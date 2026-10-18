@@ -65,6 +65,24 @@ class FakeSyncthingClient implements SyncthingClient {
     calls.add('qr');
     return png;
   }
+
+  /// When set, [protectSession] throws it.
+  Object? protectError;
+
+  /// Returned by [sessionPendingFiles].
+  int? pendingForSession;
+
+  @override
+  Future<void> protectSession(String sessionId) async {
+    calls.add('protect:$sessionId');
+    if (protectError case final e?) throw e;
+  }
+
+  @override
+  Future<int?> sessionPendingFiles(String sessionId) async {
+    calls.add('pending:$sessionId');
+    return pendingForSession;
+  }
 }
 
 const phoneId =

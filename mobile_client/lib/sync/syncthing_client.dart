@@ -27,6 +27,16 @@ abstract interface class SyncthingClient {
 
   /// PNG of this phone's device ID as a QR code.
   Future<Uint8List> qrPng();
+
+  /// Makes Syncthing ignore the outbox session folder [sessionId], so that
+  /// deleting it on this phone is not sent to the PC (the outbox is
+  /// send-only and the PC's folder receive-only). The pattern is kept across
+  /// restarts. Throws a [PlatformException] if it cannot be put in place.
+  Future<void> protectSession(String sessionId);
+
+  /// Files of session [sessionId] the PC still needs; null when unknown
+  /// (Syncthing not running or no PC set).
+  Future<int?> sessionPendingFiles(String sessionId);
 }
 
 class MethodChannelSyncthingClient implements SyncthingClient {
@@ -57,6 +67,24 @@ class MethodChannelSyncthingClient implements SyncthingClient {
     }
     return png;
   }
+
+  @override
+  Future<void> protectSession(String sessionId) async {
+    final ok = await appChannel.invokeMethod<bool>(
+      'syncthingProtectSession',
+      {'sessionId': sessionId},
+    );
+    if (ok != true) {
+      throw PlatformException(
+        code: 'NOT_PROTECTED',
+        message: 'Session $sessionId could not be excluded from sync',
+      );
+    }
+  }
+
+  @override
+  Future<int?> sessionPendingFiles(String sessionId) => appChannel
+      .invokeMethod<int>('syncthingSessionPending', {'sessionId': sessionId});
 
   Future<SyncthingStatus> _status(String method, [Object? arguments]) async {
     final map = await appChannel.invokeMapMethod<Object?, Object?>(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'components.dart';
+import 'theme/app_theme.dart';
+
 /// The embedded Syncthing release; keep in step with `tool/fetch_syncthing.ps1`.
 const kSyncthingVersion = 'v2.1.6';
 const kSyncthingSourceUrl = 'https://github.com/syncthing/syncthing';
@@ -38,25 +41,48 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('About')),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text('Echo Vault', style: textTheme.headlineSmall),
-            FutureBuilder<String>(
-              future: appVersion,
-              builder: (context, snapshot) => Text(
-                'Version ${snapshot.data ?? '…'}',
-                style: textTheme.bodyMedium,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(
+            EvSpace.md,
+            EvSpace.md,
+            EvSpace.md,
+            EvSpace.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+            EvCard(
+              padding: const EdgeInsets.all(EvSpace.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const BrandLogo(height: 44),
+                  const SizedBox(height: EvSpace.md),
+                  Text(
+                    EvBrand.tagline,
+                    style: textTheme.titleSmall?.copyWith(
+                      color: EvColors.teal,
+                    ),
+                  ),
+                  const SizedBox(height: EvSpace.xs),
+                  FutureBuilder<String>(
+                    future: appVersion,
+                    builder: (context, snapshot) => Text(
+                      'Version ${snapshot.data ?? '…'}',
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                  const SizedBox(height: EvSpace.sm),
+                  Text(
+                    'A privacy-preserving voice assistant. This app records '
+                    'conversations when you choose and sends them to Echo '
+                    'Vault on your own PC over your local network.',
+                    style: textTheme.bodyMedium,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Capture client for Component 1 of J26-SE-350. Recordings stay '
-              'on this phone until Syncthing sends them to your PC over the '
-              'local network.',
-              style: textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: EvSpace.lg),
             Text('Syncthing', style: textTheme.titleMedium),
             const SizedBox(height: 4),
             Text(
@@ -89,10 +115,9 @@ class AboutScreen extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
+                    color: EvColors.surfaceLow,
+                    border: Border.all(color: EvColors.border),
+                    borderRadius: BorderRadius.circular(EvRadius.md),
                   ),
                   child: SelectableText(
                     key: licenseKey,
@@ -114,6 +139,7 @@ class AboutScreen extends StatelessWidget {
               child: const Text('Other open-source licences'),
             ),
           ],
+          ),
         ),
       ),
     );

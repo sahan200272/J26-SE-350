@@ -4,6 +4,7 @@ import 'package:echo_vault/capture/audio_capture.dart';
 import 'package:echo_vault/permissions/microphone_permission.dart';
 import 'package:echo_vault/ui/input_level_meter.dart';
 import 'package:echo_vault/ui/lifecycle_source.dart';
+import 'package:echo_vault/ui/live_waveform.dart';
 import 'package:echo_vault/ui/recording_controller.dart';
 import 'package:echo_vault/ui/recording_screen.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ final pausedIndicator = find.byType(PausedIndicator);
 final redDot = find.byKey(RecordingIndicator.dotKey);
 final permissionMessage = find.byKey(const Key('permission-message'));
 final levelMeter = find.byType(InputLevelMeter);
-final levelValue = find.byKey(InputLevelMeter.valueKey);
+final waveform = find.byType(LiveWaveform);
 final autoPauseNotice = find.byKey(const Key('auto-pause-notice'));
 
 bool isEnabled(WidgetTester tester, Finder button) =>
@@ -320,11 +321,15 @@ void main() {
       expect(screen.calls, [true, false]);
     });
 
-    testWidgets('Stop shows the session ID', (tester) async {
+    testWidgets('Stop shows a plain summary, no technical identifiers', (
+      tester,
+    ) async {
       await pumpScreen(tester);
       await tap(tester, startButton);
       await tap(tester, stopButton);
-      expect(find.text('Session 20261015T142300_a1b2'), findsOneWidget);
+      expect(find.text('Stopped'), findsOneWidget);
+      expect(find.text('Session 20261015T142300_a1b2'), findsNothing);
+      expect(find.textContaining('20261015T142300_a1b2'), findsNothing);
     });
 
     testWidgets('capture failure: stopped, message shown', (tester) async {
@@ -345,44 +350,30 @@ void main() {
     });
   });
 
-  group('input level meter', () {
-    testWidgets('shown only while recording, with the RMS level in dBFS', (
+  group('live waveform', () {
+    testWidgets('follows the real input level while recording', (
       tester,
     ) async {
       await pumpScreen(tester);
-      expect(levelMeter, findsNothing);
+      expect(waveform, findsNothing, reason: 'idle');
 
       await tap(tester, startButton);
-      expect(levelMeter, findsNothing, reason: 'starting microphone');
+      List<double> levels() => tester.widget<LiveWaveform>(waveform).levels;
+      expect(levels(), isEmpty, reason: 'starting microphone');
 
       capture.emit(constantPcm(1536, 3277)); // 3 frames, ≈ −20 dBFS
       await tester.pump();
-      expect(levelMeter, findsOneWidget);
-      expect(tester.widget<Text>(levelValue).data, '– dBFS');
       await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.widget<Text>(levelValue).data, '-20.0 dBFS');
-      final bar = tester.widget<LinearProgressIndicator>(
-        find.byKey(InputLevelMeter.barKey),
-      );
-      expect(bar.value, closeTo(40 / 60, 1e-3));
+      expect(levels().last, closeTo(40 / 60, 1e-3));
 
       capture.emit(constantPcm(1536, 0)); // digital silence
       await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.widget<Text>(levelValue).data, '-96.0 dBFS');
+      expect(levels().last, 0);
 
       await tap(tester, pauseResumeButton);
-      expect(levelMeter, findsNothing);
-      await tap(tester, pauseResumeButton);
-      expect(levelMeter, findsNothing, reason: 'starting microphone');
-      await feedAudio(tester);
-      expect(levelMeter, findsOneWidget);
-      expect(
-        tester.widget<Text>(levelValue).data,
-        '– dBFS',
-        reason: 'no stale level after resume',
-      );
+      expect(waveform, findsOneWidget, reason: 'flat while paused');
       await tap(tester, stopButton);
-      expect(levelMeter, findsNothing);
+      expect(waveform, findsNothing);
     });
 
     test('bar fraction and text formatting', () {
@@ -394,13 +385,12 @@ void main() {
     });
   });
 
-  group('speech indicator and segment count', () {
+  group('speech indicator', () {
     final listening = find.byKey(SpeechStatus.listeningKey);
     final speech = find.byKey(SpeechStatus.speechKey);
-    final count = find.byKey(SpeechStatus.countKey);
 
-    testWidgets('"Speech detected" during speech; count rises when the '
-        'segment ends; summary after Stop', (tester) async {
+    testWidgets('"Speech detected" during speech, "Listening" otherwise; '
+        'summary after Stop', (tester) async {
       await pumpScreen(tester);
       await tap(tester, startButton);
       expect(listening, findsNothing, reason: 'starting microphone');
@@ -409,21 +399,20 @@ void main() {
       await tester.pump();
       expect(listening, findsOneWidget);
       expect(speech, findsNothing);
-      expect(tester.widget<Text>(count).data, 'Segments: 0');
 
       capture.emit(constantPcm(512 * 31, 3277)); // ≈ 1 s at −20 dBFS
       await tester.pump();
       expect(speech, findsOneWidget);
       expect(find.text('Speech detected'), findsOneWidget);
-      expect(tester.widget<Text>(count).data, 'Segments: 0');
 
       capture.emit(constantPcm(512 * 25, 0)); // hangover ends the segment
       await tester.pump();
       expect(listening, findsOneWidget);
-      expect(tester.widget<Text>(count).data, 'Segments: 1');
 
       await tap(tester, stopButton);
-      expect(find.text('1 speech segment'), findsOneWidget);
+      expect(find.byKey(const Key('stopped-summary')), findsOneWidget);
+      expect(speech, findsNothing);
+      expect(listening, findsNothing);
     });
 
     testWidgets('not shown while starting or paused', (tester) async {
