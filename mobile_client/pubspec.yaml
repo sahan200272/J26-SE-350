@@ -57,6 +57,8 @@ flutter:
   # Syncthing's MPL-2.0 licence text, shown on the About screen (A5).
   assets:
     - assets/licenses/syncthing_LICENSE.txt
+    # Echo Vault brand kit (symbol for dark UI, horizontal logo for dark backgrounds).
+    - assets/brand/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
