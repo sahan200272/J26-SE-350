@@ -89,9 +89,21 @@ def test_error_text_never_contains_the_vault_path(server, vault):
     assert str(vault) not in str(info.value)
 
 
-def test_wrong_argument_type_is_an_error(server):
-    with pytest.raises(ToolError):
-        call(server, "write_note", {"folder": "Inbox", "title": 123, "content": "c"})
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        {"folder": "Inbox", "title": "SECRET", "content": ["SECRET"]},  # wrong type
+        {"folder": "Inbox", "title": 123, "content": "SECRET"},  # wrong type
+        {"folder": "Inbox", "title": "SECRET"},  # missing argument
+        {"folder": "Inbox", "title": "t", "content": "c", "extra": "SECRET"},  # extra argument
+    ],
+    ids=["wrong-type-list", "wrong-type-number", "missing-argument", "extra-argument"],
+)
+def test_bad_arguments_give_a_fixed_code_and_never_echo_the_input(server, arguments):
+    with pytest.raises(ToolError) as info:
+        call(server, "write_note", arguments)
+    assert str(info.value) == "REJECTED:BAD_ARGUMENTS"
+    assert "SECRET" not in str(info.value)
 
 
 def test_real_stdio_process_end_to_end(vault):

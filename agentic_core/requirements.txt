@@ -8,3 +8,4 @@ pytest
 
 
 pydantic>=2.5
+fastmcp==4.1.1

@@ -19,6 +19,7 @@ from pathlib import Path
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
+from ..safe_errors import HideValidationDetails
 from .notes import NoteError
 from .notes import write_note as _write_note
 from .sandbox import SandboxConfig, SandboxViolation
@@ -35,7 +36,12 @@ def create_server(config: SandboxConfig) -> FastMCP:
     """Build the server. Kept as a function so tests can use it without stdio."""
     # mask_error_details: an unexpected crash never leaks paths or stack text.
     # Our own ToolError messages (reason codes only) still reach the client.
-    mcp = FastMCP(name="vault-filesystem", instructions=INSTRUCTIONS, mask_error_details=True)
+    mcp = FastMCP(
+        name="vault-filesystem",
+        instructions=INSTRUCTIONS,
+        mask_error_details=True,
+        middleware=[HideValidationDetails()],
+    )
 
     @mcp.tool(name="write_note")
     def write_note(folder: str, title: str, content: str) -> dict:
