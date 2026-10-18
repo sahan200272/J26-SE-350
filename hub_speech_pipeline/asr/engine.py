@@ -71,6 +71,17 @@ class WhisperXEngine:
             "decoded_duration_s": round(len(audio) / 16000, 4),
         }
 
+    def load_audio(self, audio_path: Path):
+        """Whole file as 16 kHz mono float32 (ffmpeg, as WhisperX does)."""
+        return self._whisperx.load_audio(str(audio_path))
+
+    def transcribe_array(self, audio) -> tuple[list[dict], float]:
+        """Transcription only (no alignment) of 16 kHz float32 audio already in memory:
+        (segments, milliseconds). Used for evaluation, where word times are not needed."""
+        start = time.perf_counter()
+        result = self.model.transcribe(audio, batch_size=self.batch_size, language=self.language)
+        return result.get("segments", []), (time.perf_counter() - start) * 1000
+
     @staticmethod
     def network_attempts() -> list[str]:
         return blocked_attempts()

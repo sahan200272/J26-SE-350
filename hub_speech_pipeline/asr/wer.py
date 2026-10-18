@@ -122,32 +122,64 @@ class WerResult:
         }
 
 
-def word_error_rate(reference: str, hypothesis: str, numbers: bool = False) -> WerResult:
-    """Levenshtein alignment of normalised words; ties prefer substitution, then deletion.
-    ``numbers`` applies :data:`NUMBER_WORDS` to both sides."""
-    ref, hyp = normalise(reference, numbers), normalise(hypothesis, numbers)
+#: Text normalisers for WER. ``whisper`` (the standard Whisper English text normaliser, see
+#: asr/normalizer.py) is the project's method from E0 on; ``raw`` and ``numbers`` are the
+#: earlier custom ones, kept so H1 figures can be compared.
+NORMALISERS = ("whisper", "raw", "numbers")
+
+
+def tokens(text: str, normaliser: str = "whisper") -> list[str]:
+    if normaliser == "whisper":
+        from .normalizer import whisper_normalize
+
+        return whisper_normalize(text).split()
+    if normaliser in ("raw", "numbers"):
+        return normalise(text, numbers=normaliser == "numbers")
+    raise ValueError(f"unknown normaliser {normaliser!r}; known: {NORMALISERS}")
+
+
+def align_words(ref: list[str], hyp: list[str]) -> WerResult:
+    """Minimal-edit alignment of two word lists.
+
+    Rolling cost rows plus one byte of backpointer per cell, so a whole meeting (thousands of
+    words on each side) fits in a few MB. At equal cost a cell prefers match/substitution,
+    then deletion, then insertion."""
     n, m = len(ref), len(hyp)
-    # cost[i][j] = edits to turn ref[:i] into hyp[:j]
-    cost = [[0] * (m + 1) for _ in range(n + 1)]
+    width = m + 1
+    back = bytearray(width * (n + 1))  # 0 = diagonal, 1 = deletion (up), 2 = insertion (left)
+    for j in range(1, width):
+        back[j] = 2
+    prev = list(range(width))
     for i in range(1, n + 1):
-        cost[i][0] = i
-    for j in range(1, m + 1):
-        cost[0][j] = j
-    for i in range(1, n + 1):
-        for j in range(1, m + 1):
-            same = ref[i - 1] == hyp[j - 1]
-            cost[i][j] = min(cost[i - 1][j - 1] + (0 if same else 1), cost[i - 1][j] + 1, cost[i][j - 1] + 1)
+        word = ref[i - 1]
+        cur = [i] + [0] * m
+        row = i * width
+        back[row] = 1
+        for j in range(1, width):
+            diag = prev[j - 1] + (word != hyp[j - 1])
+            up = prev[j] + 1
+            left = cur[j - 1] + 1
+            if diag <= up and diag <= left:
+                cur[j] = diag
+            elif up <= left:
+                cur[j] = up
+                back[row + j] = 1
+            else:
+                cur[j] = left
+                back[row + j] = 2
+        prev = cur
     i, j, ops = n, m, []
     s = d = ins = 0
     while i > 0 or j > 0:
-        if i > 0 and j > 0 and cost[i][j] == cost[i - 1][j - 1] + (0 if ref[i - 1] == hyp[j - 1] else 1):
+        step = back[i * width + j]
+        if step == 0:
             if ref[i - 1] == hyp[j - 1]:
                 ops.append(("ok", ref[i - 1], hyp[j - 1]))
             else:
                 ops.append(("sub", ref[i - 1], hyp[j - 1]))
                 s += 1
             i, j = i - 1, j - 1
-        elif i > 0 and cost[i][j] == cost[i - 1][j] + 1:
+        elif step == 1:
             ops.append(("del", ref[i - 1], None))
             d += 1
             i -= 1
@@ -157,6 +189,12 @@ def word_error_rate(reference: str, hypothesis: str, numbers: bool = False) -> W
             j -= 1
     ops.reverse()
     return WerResult(n, m, s, d, ins, ops)
+
+
+def word_error_rate(reference: str, hypothesis: str, normaliser: str = "whisper") -> WerResult:
+    """WER of ``hypothesis`` against ``reference`` after normalising both with ``normaliser``
+    (one of :data:`NORMALISERS`; the standard Whisper normaliser by default)."""
+    return align_words(tokens(reference, normaliser), tokens(hypothesis, normaliser))
 
 
 def transcript_text(path: Path) -> str:
@@ -179,17 +217,23 @@ def main(argv: list[str] | None = None) -> int:
     hypothesis = (args.hypothesis.read_text(encoding="utf-8") if args.hypothesis
                   else transcript_text(args.transcript))
     if args.entities:
-        entities = {w for item in args.entities.split(",") for w in normalise(item)}
+        names = [item.strip() for item in args.entities.split(",") if item.strip()]
         source = "explicit list (--entities)"
     else:
-        entities = reference_entities(reference)
+        names = sorted(reference_entities(reference))
         source = "heuristic: capitalised mid-sentence words of the reference"
+    from .normalizer import provenance
+
     out = {"reference_file": str(args.reference), "hypothesis_file": str(args.hypothesis or args.transcript),
            "hypothesis_text": hypothesis.strip(),
-           "normalisation": "lowercase; punctuation -> space; edge apostrophes dropped",
-           "named_entities": sorted(entities), "named_entities_source": source, "number_words": NUMBER_WORDS}
-    for label, numbers in (("raw", False), ("number_normalised", True)):
-        result = word_error_rate(reference, hypothesis, numbers)
+           "normalisers": {"whisper": provenance(),
+                           "raw": "legacy (H1): lowercase; punctuation -> space; edge apostrophes dropped",
+                           "number_normalised": "legacy (H1): raw + NUMBER_WORDS mapping"},
+           "named_entities": names, "named_entities_source": source, "number_words": NUMBER_WORDS}
+    # The standard (Whisper) result first; the legacy H1 normalisers kept for comparison.
+    for label, mode in (("whisper", "whisper"), ("raw", "raw"), ("number_normalised", "numbers")):
+        entities = {w for name in names for w in tokens(name, mode)}
+        result = word_error_rate(reference, hypothesis, mode)
         doc = result.to_json(entities)
         out[label] = doc
         print(f"{label} WER {result.wer:.4f} = ({result.substitutions} S + {result.deletions} D + "
