@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A5.1 (FR5/NFR4): Android 12+ backup rules. Nothing of this app is copied anywhere by
+     Android: no cloud backup (Google Drive) and no device-to-device transfer. App data
+     (recordings in files/outbox and files/debug, Syncthing keys and config in
+     files/syncthing) leaves the phone only through the LAN-only Syncthing folder.
+     android:allowBackup="false" alone does not stop device-to-device transfer on Android 12+;
+     these rules do. Older versions use backup_rules.xml (android:fullBackupContent). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="device_root" path="." />
+        <exclude domain="device_file" path="." />
+        <exclude domain="device_database" path="." />
+        <exclude domain="device_sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="device_root" path="." />
+        <exclude domain="device_file" path="." />
+        <exclude domain="device_database" path="." />
+        <exclude domain="device_sharedpref" path="." />
+    </device-transfer>
+</data-extraction-rules>
