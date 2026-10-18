@@ -334,7 +334,7 @@ def _check_audio(report: Report, seq: int, audio: Path, sidecar: dict, probe: Ca
     ok = actual is not None and abs(actual - expected) <= tolerance
     report.add(f"#{seq} duration matches sample count",
                ok, f"ffprobe {actual} s vs {expected:.4f} s from {sidecar.get('samples')} samples "
-                   f"(tolerance ±{tolerance * 1000:.1f} ms = pre-skip {head.pre_skip} + 20 ms frame + 1 ms)")
+                   f"(tolerance +/-{tolerance * 1000:.1f} ms = pre-skip {head.pre_skip} + 20 ms frame + 1 ms)")
     row.update({
         "ffprobe_duration_s": actual,
         "expected_duration_s": round(expected, 4),
@@ -567,8 +567,8 @@ def _print_report(report: Report) -> None:
         for r in lat["chunks"]:
             print(f"{r['seq']:4d}  {r['latency_ms']:10.1f}  {r['encode_ms'] or 0:9.1f}  {r['arrival_pc']}")
         print(f"median {lat['median_ms']} ms, max {lat['max_ms']} ms, min {lat['min_ms']} ms; "
-              f"uncertainty ±{lat['uncertainty_ms']} ms (clock offset {lat['clock_offset_ms']} ms "
-              f"±{lat['clock_uncertainty_ms']} ms, arrival ±{lat['arrival_uncertainty_ms']} ms, timestamps ±0.5 ms)")
+              f"uncertainty +/-{lat['uncertainty_ms']} ms (clock offset {lat['clock_offset_ms']} ms "
+              f"+/-{lat['clock_uncertainty_ms']} ms, arrival +/-{lat['arrival_uncertainty_ms']} ms, timestamps +/-0.5 ms)")
     print("\nALL CHECKS PASSED" if report.ok else "\nSOME CHECKS FAILED")
 
 

@@ -4,4 +4,11 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <application>
+        <!-- A5.1, debug builds only: encoder benchmark started from adb
+             (see src/debug/kotlin/.../EncodeBenchActivity.kt). -->
+        <activity
+            android:name=".EncodeBenchActivity"
+            android:exported="true" />
+    </application>
 </manifest>
