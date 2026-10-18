@@ -229,6 +229,20 @@ def _clean_text(s: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", s)).strip().lower()
 
 
+ANCHOR_STOPWORDS = {
+    "a", "an", "the", "and", "or", "in", "on", "at", "to", "for", "of", "with",
+    "by", "from", "up", "about", "into", "over", "after", "is", "are", "was",
+    "were", "be", "been", "being", "have", "has", "had", "do", "does", "did",
+    "what", "who", "whom", "whose", "when", "where", "why", "how", "which",
+    "that", "this", "these", "those", "they", "them", "their", "there", "here",
+    "can", "could", "will", "would", "shall", "should", "may", "might", "must",
+    "not", "no", "nor", "any", "all", "some", "such", "than", "too", "very",
+    "issues", "issue", "task", "tasks", "project", "projects", "meeting", "meetings",
+    "person", "people", "deadline", "deadlines", "blocking", "blocked", "assigned",
+    "raise", "raised", "resolved", "resolve",
+}
+
+
 def _extract_query_phrases(query: str) -> List[str]:
     """Extract candidate phrases and n-grams from a query for entity matching."""
     clean = query.strip()
@@ -247,6 +261,8 @@ def _extract_query_phrases(query: str) -> List[str]:
     for n in range(1, min(5, num_raw + 1)):
         for i in range(num_raw - n + 1):
             ngram = " ".join(raw_words[i : i + n])
+            if n == 1 and ngram.lower() in ANCHOR_STOPWORDS:
+                continue
             if len(ngram) >= 3:
                 phrases.append(ngram)
 
@@ -256,6 +272,8 @@ def _extract_query_phrases(query: str) -> List[str]:
     for n in range(1, min(5, num_words + 1)):
         for i in range(num_words - n + 1):
             ngram = " ".join(words[i : i + n])
+            if n == 1 and ngram.lower() in ANCHOR_STOPWORDS:
+                continue
             if len(ngram) >= 3:
                 phrases.append(ngram)
 
@@ -350,6 +368,8 @@ def resolve_seed_anchors(
         # Check query phrases
         for phrase in candidate_phrases:
             norm_phrase = normalize_key(phrase)
+            if norm_phrase in ANCHOR_STOPWORDS:
+                continue
 
             # 1. Exact normalized key match
             if norm_phrase == node_key:
@@ -368,13 +388,18 @@ def resolve_seed_anchors(
                     best_score = 0.95
                     best_match_type = "exact_alias"
 
-            # 3. Substring match
+            # 3. Substring match on meaningful word boundaries (min 4 chars)
             norm_name = normalize_key(node_name)
-            if len(norm_name) >= 3 and (norm_name in norm_phrase or norm_phrase in norm_name):
-                sub_score = min(0.90, max(0.85, float(token_sort_ratio(norm_phrase, norm_name)) / 100.0))
-                if sub_score > best_score:
-                    best_score = sub_score
-                    best_match_type = "substring"
+            if len(norm_name) >= 4 and len(norm_phrase) >= 4:
+                is_word_sub = bool(
+                    re.search(rf"\b{re.escape(norm_name)}\b", norm_phrase)
+                    or re.search(rf"\b{re.escape(norm_phrase)}\b", norm_name)
+                )
+                if is_word_sub:
+                    sub_score = min(0.90, max(0.85, float(token_sort_ratio(norm_phrase, norm_name)) / 100.0))
+                    if sub_score > best_score:
+                        best_score = sub_score
+                        best_match_type = "substring"
 
             # 4. RapidFuzz token_sort_ratio >= 80
             ratio = float(token_sort_ratio(norm_phrase, node_key))

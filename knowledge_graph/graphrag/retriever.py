@@ -291,6 +291,13 @@ def retrieve_subgraph(
                     latency_ms=round((time.perf_counter() - start_time) * 1000.0, 2),
                 )
                 empty_result.formatted_context = build_formatted_context(empty_result)
+                if request.synthesize_answer:
+                    from graphrag.llm_synthesizer import synthesize_grounded_answer
+
+                    syn = synthesize_grounded_answer(empty_result, model=request.llm_model)
+                    empty_result.synthesized_answer = syn["answer"]
+                    empty_result.llm_model_used = syn["model_used"]
+                    empty_result.synthesis_latency_ms = syn["latency_ms"]
                 return empty_result
 
             anchor_keys = [a.key for a in anchors]
@@ -433,6 +440,13 @@ def retrieve_subgraph(
             )
 
             result.formatted_context = build_formatted_context(result)
+            if request.synthesize_answer:
+                from graphrag.llm_synthesizer import synthesize_grounded_answer
+
+                syn = synthesize_grounded_answer(result, model=request.llm_model)
+                result.synthesized_answer = syn["answer"]
+                result.llm_model_used = syn["model_used"]
+                result.synthesis_latency_ms = syn["latency_ms"]
             return result
     finally:
         if close_driver:

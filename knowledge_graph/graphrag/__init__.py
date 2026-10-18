@@ -7,6 +7,10 @@ from graphrag.anchor_resolver import (
 )
 from graphrag.baseline_keyword import compare_retrieval, keyword_baseline_search
 from graphrag.context_builder import build_formatted_context, get_pending_items_context
+from graphrag.llm_synthesizer import (
+    deterministic_fallback_synthesis,
+    synthesize_grounded_answer,
+)
 from graphrag.models import (
     AnchorMatch,
     PathHop,
@@ -35,4 +39,6 @@ __all__ = [
     "get_pending_items_context",
     "compare_retrieval",
     "keyword_baseline_search",
+    "synthesize_grounded_answer",
+    "deterministic_fallback_synthesis",
 ]

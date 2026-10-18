@@ -408,3 +408,69 @@ def test_fastapi_endpoints_with_test_client() -> None:
         res3 = client.get("/retrieve/pending")
         assert res3.status_code == 200
         assert res3.json()["count"] == 1
+
+
+def test_llm_synthesizer_with_mocked_ollama_and_fallback() -> None:
+    """Verify local Ollama LLaMA 3 8B answer synthesis and offline deterministic fallback."""
+    from graphrag.llm_synthesizer import synthesize_grounded_answer
+
+    sample_result = RetrievalResult(
+        query="What is blocking the payment flow task?",
+        detected_intent="blocker_chain",
+        anchors=[
+            AnchorMatch(
+                key="test payment flow",
+                name="Test payment flow",
+                type="Task",
+                match_type="exact_key",
+                score=1.0,
+            )
+        ],
+        ranked_paths=[
+            ScoredPath(
+                nodes=[
+                    {"key": "test payment flow", "name": "Test payment flow", "type": "Task"},
+                    {"key": "payment api not available", "name": "Payment API not available", "type": "Issue"},
+                ],
+                relationships=["BLOCKED_BY"],
+                hops=[
+                    PathHop(
+                        from_node={"key": "test payment flow", "name": "Test payment flow", "type": "Task"},
+                        relationship_type="BLOCKED_BY",
+                        to_node={"key": "payment api not available", "name": "Payment API not available", "type": "Issue"},
+                        confidence=0.95,
+                    )
+                ],
+                length=1,
+                hop_decay=1.0,
+                confidence_score=0.95,
+                intent_salience=1.0,
+                recency_score=0.85,
+                final_score=0.965,
+            )
+        ],
+        formatted_context="### [Multi-Hop Relational Paths with Scores]\n1. (Task: Test payment flow) --[BLOCKED_BY]--> (Issue: Payment API not available)",
+    )
+
+    # 1. Mocked Ollama LLaMA 3 8B online response
+    with patch("graphrag.llm_synthesizer.ollama.Client") as mock_ollama_cls:
+        mock_client = MagicMock()
+        mock_msg = MagicMock()
+        mock_msg.content = "The 'Test payment flow' task is BLOCKED_BY the issue 'Payment API not available'."
+        mock_resp = MagicMock()
+        mock_resp.message = mock_msg
+        mock_client.chat.return_value = mock_resp
+        mock_ollama_cls.return_value = mock_client
+
+        syn = synthesize_grounded_answer(sample_result, model="llama3:8b")
+        assert syn["used_fallback"] is False
+        assert syn["model_used"] == "llama3:8b"
+        assert "BLOCKED_BY" in syn["answer"]
+
+    # 2. Offline Ollama fallback
+    with patch("graphrag.llm_synthesizer.ollama.Client", side_effect=ConnectionError("Ollama offline")):
+        syn_fb = synthesize_grounded_answer(sample_result, model="llama3:8b")
+        assert syn_fb["used_fallback"] is True
+        assert "deterministic_fallback" in syn_fb["model_used"]
+        assert "Test payment flow (Task) --[BLOCKED_BY]--> Payment API not available (Issue)" in syn_fb["answer"]
+

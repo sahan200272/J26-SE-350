@@ -75,6 +75,19 @@ def main(argv: Optional[List[str]] = None) -> int:
         dest="formatted",
         help="Print formatted Markdown context block ready for LLM synthesis.",
     )
+    parser.add_argument(
+        "--answer",
+        "--synthesize",
+        action="store_true",
+        dest="synthesize_answer",
+        help="Synthesize a graph-grounded natural language answer using local Ollama LLaMA 3 (8B).",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="llama3:8b",
+        help="Local Ollama LLM model name for answer synthesis (default: llama3:8b).",
+    )
 
     args = parser.parse_args(argv)
 
@@ -110,6 +123,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             max_hops=args.hops,
             top_k=args.top_k,
             include_private=args.include_private,
+            synthesize_answer=args.synthesize_answer,
+            llm_model=args.model,
         )
 
         # 2. Side-by-side comparison against flat keyword baseline
@@ -151,6 +166,15 @@ def main(argv: Optional[List[str]] = None) -> int:
             print(result.model_dump_json(indent=2))
         else:
             print(result.formatted_context)
+            if result.synthesized_answer:
+                print("=" * 70)
+                print(
+                    f"### [LLaMA 3 8B Graph-Grounded Answer] "
+                    f"(model: {result.llm_model_used}, latency: {result.synthesis_latency_ms} ms)"
+                )
+                print("-" * 70)
+                print(result.synthesized_answer)
+                print("=" * 70)
 
         return 0
     finally:

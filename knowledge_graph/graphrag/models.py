@@ -41,6 +41,14 @@ class RetrievalRequest(BaseModel):
         default=None,
         description="Optional forced query intent; detected automatically if None.",
     )
+    synthesize_answer: bool = Field(
+        default=False,
+        description="Whether to synthesize a natural-language answer using local Ollama LLaMA 3 8B.",
+    )
+    llm_model: str = Field(
+        default="llama3:8b",
+        description="Local Ollama model name used when synthesize_answer=True.",
+    )
 
     @field_validator("max_hops", mode="before")
     @classmethod
@@ -140,6 +148,18 @@ class RetrievalResult(BaseModel):
     )
     formatted_context: str = Field(
         default="", description="Structured Markdown block formatted for downstream LLM synthesis."
+    )
+    synthesized_answer: Optional[str] = Field(
+        default=None,
+        description="Graph-grounded natural language answer synthesized via local LLaMA 3 8B.",
+    )
+    llm_model_used: Optional[str] = Field(
+        default=None,
+        description="Identifier of the local Ollama model (or fallback) used for synthesis.",
+    )
+    synthesis_latency_ms: Optional[float] = Field(
+        default=None,
+        description="LLM synthesis execution latency in milliseconds.",
     )
     latency_ms: float = Field(
         default=0.0, description="Retrieval and ranking execution latency in milliseconds."

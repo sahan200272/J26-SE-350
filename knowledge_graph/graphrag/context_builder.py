@@ -46,7 +46,13 @@ def build_formatted_context(result: RetrievalResult) -> str:
             chain_parts = [f"({path.hops[0].from_node['type']}: {path.hops[0].from_node['name']})"]
             for hop in path.hops:
                 conf_str = f" [conf: {hop.confidence:.2f}]" if hop.confidence < 1.0 else ""
-                chain_parts.append(f"--[{hop.relationship_type}{conf_str}]--> ({hop.to_node['type']}: {hop.to_node['name']})")
+                orig_label = hop.props.get("label") if hop.props else None
+                rel_display = (
+                    f"{hop.relationship_type} ({orig_label})"
+                    if hop.relationship_type == "RELATED_TO" and orig_label
+                    else hop.relationship_type
+                )
+                chain_parts.append(f"--[{rel_display}{conf_str}]--> ({hop.to_node['type']}: {hop.to_node['name']})")
             
             chain_repr = " ".join(chain_parts)
             lines.append(f"{idx}. {chain_repr}")
