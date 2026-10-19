@@ -10,6 +10,7 @@ import 'home_screen.dart';
 import 'sessions_screen.dart';
 import 'settings_home_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Bottom navigation: Home, Sessions, Settings. The app focuses on
 /// recording; there are no Knowledge or Assistant screens.
@@ -68,6 +69,10 @@ class _AppShellState extends State<AppShell> {
           }),
     );
   }
+
+  /// Every tab now has the dark black / deep-red look, with its background
+  /// running behind the floating bar.
+  bool get _immersive => true;
 
   void _select(_Tab tab) {
     if (tab == _tab) return;
@@ -131,8 +136,8 @@ class _AppShellState extends State<AppShell> {
         if (!didPop) setState(() => _tab = _Tab.home);
       },
       child: Scaffold(
-        // Home's background photo runs behind the floating navigation bar.
-        extendBody: _tab == _Tab.home,
+        // Home's and Sessions' backgrounds run behind the floating bar.
+        extendBody: _immersive,
         body: IndexedStack(
           index: index,
           children: [
@@ -145,7 +150,7 @@ class _AppShellState extends State<AppShell> {
           ],
         ),
         bottomNavigationBar: _FloatingNavBar(
-          immersive: _tab == _Tab.home,
+          immersive: _immersive,
           child: NavigationBar(
             key: AppShell.navKey,
             selectedIndex: index,
@@ -166,8 +171,8 @@ class _FloatingNavBar extends StatelessWidget {
 
   final Widget child;
 
-  /// On Home: a dark frosted-glass bar over the background photo, with
-  /// neutral (white) selection instead of the teal accent.
+  /// A dark frosted-glass bar over the background, with neutral (white)
+  /// selection (the teal style is kept for [immersive] false).
   final bool immersive;
 
   @override
@@ -254,14 +259,14 @@ class _FloatingNavBar extends StatelessWidget {
   }
 }
 
-/// Plain navy screen while the first-run check finishes (normally a few
+/// Plain black screen while the first-run check finishes (normally a few
 /// milliseconds).
 class LaunchPlaceholder extends StatelessWidget {
   const LaunchPlaceholder({super.key});
 
   @override
   Widget build(BuildContext context) => const ColoredBox(
-    color: EvColors.navy,
+    color: EvEmber.black,
     child: Center(child: BrandSymbol(size: 112)),
   );
 }

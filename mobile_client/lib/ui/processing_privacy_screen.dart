@@ -4,6 +4,7 @@ import '../capture/audio_capture.dart';
 import '../encoding/opus_encoder.dart';
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Where each step of Echo Vault runs, and which steps exist today.
 enum StepStatus {
@@ -77,8 +78,13 @@ class ProcessingPrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Processing & privacy')),
+    return EmberPage(
+      child: Scaffold(
+      appBar: AppBar(
+        // Opaque black: the top of the Ember background is black too.
+        backgroundColor: EvEmber.black,
+        title: const Text('Processing & privacy'),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -94,7 +100,7 @@ class ProcessingPrivacyScreen extends StatelessWidget {
                 'What happens to your voice, step by step, and what is '
                 'still being built.',
                 style: textTheme.bodyLarge?.copyWith(
-                  color: EvColors.textMuted,
+                  color: EvEmber.textSoft,
                 ),
               ),
             ),
@@ -147,6 +153,7 @@ class ProcessingPrivacyScreen extends StatelessWidget {
           ],
         ),
       ),
+      ),
     );
   }
 }
@@ -172,9 +179,9 @@ class _StepRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final color = switch (status) {
-      StepStatus.phone => EvColors.teal,
-      StepStatus.pc => EvColors.indigo,
-      StepStatus.planned => EvColors.textSubtle,
+      StepStatus.phone => EvEmber.accentSoft,
+      StepStatus.pc => Colors.white,
+      StepStatus.planned => EvEmber.textFaint,
     };
     return IntrinsicHeight(
       child: Row(
@@ -190,7 +197,7 @@ class _StepRow extends StatelessWidget {
                     child: Container(
                       width: 2,
                       margin: const EdgeInsets.symmetric(vertical: 4),
-                      color: EvColors.border,
+                      color: EvEmber.hairline,
                     ),
                   ),
               ],
@@ -253,7 +260,7 @@ class _TechnicalDetails extends StatelessWidget {
             EvSpace.md,
             EvSpace.sm,
           ),
-          leading: const Icon(Icons.code_rounded, color: EvColors.textMuted),
+          leading: const Icon(Icons.code_rounded, color: EvEmber.textSoft),
           title: Text('Technical details', style: textTheme.titleSmall),
           subtitle: Text(
             'For researchers and evaluators',

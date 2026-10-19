@@ -12,6 +12,7 @@ import 'session_detail_screen.dart';
 import 'session_dialogs.dart';
 import 'settings_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Recordings stored on this phone, newest first, with search and a
 /// day filter (All / Today / Older). Reloads when [refreshToken] changes and
@@ -121,81 +122,110 @@ class _SessionsScreenState extends State<SessionsScreen> {
   @override
   Widget build(BuildContext context) {
     final sessions = _sessions;
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          color: EvColors.teal,
-          backgroundColor: EvColors.surface,
-          onRefresh: _load,
-          child: ListView(
-            key: SessionsScreen.listKey,
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(
-              EvSpace.md,
-              EvSpace.xs,
-              EvSpace.md,
-              EvSpace.xl,
-            ),
-            children: [
-              PageHeader(
-                title: 'Your Recordings',
-                subtitle: sessions == null
-                    ? null
-                    : sessions.isEmpty
-                    ? 'Nothing recorded yet'
-                    : '${plural(sessions.length, 'recording')} on this phone',
-              ),
-              if (widget.syncthing != null && sessions != null) ...[
-                const SizedBox(height: EvSpace.sm),
-                PcLinkCard(status: _sync, onTap: _openPairing),
-              ],
-              if (_failed && sessions == null)
-                EmptyState(
-                  key: SessionsScreen.errorKey,
-                  icon: Icons.error_outline_rounded,
-                  title: 'Recordings could not be loaded',
-                  message: 'Something went wrong reading this phone’s '
-                      'storage. Pull down or try again.',
-                  action: OutlinedButton.icon(
-                    onPressed: _load,
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Try again'),
+    // The navigation bar floats over this screen; keep the list clear of it.
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    // EmberScope: dialogs opened here (rename, delete) use the Ember look.
+    return EmberScope(
+      child: Scaffold(
+      backgroundColor: EvEmber.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const EmberBackdrop(),
+          SafeArea(
+            bottom: false,
+            child: RefreshIndicator(
+              color: EvEmber.accent,
+              backgroundColor: EvEmber.deep,
+              onRefresh: _load,
+              child: ListView(
+                key: SessionsScreen.listKey,
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  EvSpace.md,
+                  EvSpace.xs,
+                  EvSpace.md,
+                  EvSpace.xl + bottomInset,
+                ),
+                children: [
+                  _SessionsHeader(
+                    subtitle: sessions == null
+                        ? null
+                        : sessions.isEmpty
+                        ? 'Nothing recorded yet'
+                        : '${plural(sessions.length, 'recording')} on this '
+                              'phone',
+                    onNewRecording: widget.onStartRecording,
                   ),
-                )
-              else if (sessions == null)
-                const Column(
-                  key: SessionsScreen.loadingKey,
-                  children: [
-                    SizedBox(height: EvSpace.md),
-                    SkeletonCard(),
-                    SizedBox(height: EvSpace.sm),
-                    SkeletonCard(),
-                    SizedBox(height: EvSpace.sm),
-                    SkeletonCard(),
+                  if (widget.syncthing != null && sessions != null) ...[
+                    const SizedBox(height: EvSpace.sm),
+                    _GlassPcLink(status: _sync, onTap: _openPairing),
                   ],
-                )
-              else if (sessions.isEmpty)
-                EmptyState(
-                  key: SessionsScreen.emptyKey,
-                  icon: Icons.graphic_eq_rounded,
-                  title: 'No recordings yet',
-                  message:
-                      'Conversations you record appear here, ready to be '
-                      'sent to your PC.',
-                  action: widget.onStartRecording == null
-                      ? null
-                      : FilledButton.icon(
-                          onPressed: widget.onStartRecording,
-                          icon: const Icon(Icons.mic_rounded),
-                          label: const Text('Start recording'),
+                  if (_failed && sessions == null)
+                    _GlassMessage(
+                      child: EmptyState(
+                        key: SessionsScreen.errorKey,
+                        icon: Icons.error_outline_rounded,
+                        title: 'Recordings could not be loaded',
+                        message: 'Something went wrong reading this phone’s '
+                            'storage. Pull down or try again.',
+                        action: OutlinedButton.icon(
+                          onPressed: _load,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(
+                              color: EvEmber.glassBorder,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('Try again'),
                         ),
-                )
-              else
-                ..._grouped(sessions),
-            ],
+                      ),
+                    )
+                  else if (sessions == null)
+                    const Column(
+                      key: SessionsScreen.loadingKey,
+                      children: [
+                        SizedBox(height: EvSpace.md),
+                        _CardSkeleton(),
+                        SizedBox(height: EvSpace.sm),
+                        _CardSkeleton(),
+                        SizedBox(height: EvSpace.sm),
+                        _CardSkeleton(),
+                      ],
+                    )
+                  else if (sessions.isEmpty)
+                    _GlassMessage(
+                      child: EmptyState(
+                        key: SessionsScreen.emptyKey,
+                        icon: Icons.graphic_eq_rounded,
+                        title: 'No recordings yet',
+                        message:
+                            'Conversations you record appear here, ready to '
+                            'be sent to your PC.',
+                        action: widget.onStartRecording == null
+                            ? null
+                            : FilledButton.icon(
+                                onPressed: widget.onStartRecording,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: EvEmber.black,
+                                  shape: const StadiumBorder(),
+                                ),
+                                icon: const Icon(Icons.mic_rounded),
+                                label: const Text('Start recording'),
+                              ),
+                      ),
+                    )
+                  else
+                    ..._grouped(sessions),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
+      ),
       ),
     );
   }
@@ -333,9 +363,9 @@ class _SessionsScreenState extends State<SessionsScreen> {
       final day = s.start == null ? 'Unknown date' : formatDay(s.start!, now);
       if (day != currentDay) {
         currentDay = day;
-        widgets.add(SectionLabel(day));
+        widgets.add(_DayLabel(day));
       } else {
-        widgets.add(const Divider(indent: 56));
+        widgets.add(const SizedBox(height: EvSpace.sm));
       }
       widgets.add(
         SessionTile(
@@ -384,12 +414,14 @@ class _DayFilterChips extends StatelessWidget {
             showCheckmark: false,
             shape: const StadiumBorder(),
             side: BorderSide(
-              color: f == selected ? EvColors.teal : EvColors.border,
+              color: f == selected
+                  ? EvEmber.accent.withValues(alpha: 0.7)
+                  : EvEmber.glassBorder,
             ),
-            backgroundColor: EvColors.surfaceLow,
-            selectedColor: EvColors.teal.withValues(alpha: 0.16),
+            backgroundColor: EvEmber.glass,
+            selectedColor: EvEmber.accent.withValues(alpha: 0.22),
             labelStyle: textTheme.labelLarge?.copyWith(
-              color: f == selected ? EvColors.teal : EvColors.textMuted,
+              color: f == selected ? Colors.white : EvEmber.textSoft,
             ),
           ),
       ],
@@ -423,26 +455,20 @@ String sessionTitle(SessionSummary s) =>
     s.title ??
     (s.start == null ? 'Recording' : 'Recording at ${formatClock(s.start!)}');
 
-/// One recording in a list: title, length, status, speech activity,
-/// whether a transcript is available, and (when given) a menu with Rename
-/// and Delete.
+/// One recording as a liquid-glass card: title, date and time, pauses,
+/// length, speech activity, status, whether a transcript is available, and
+/// (when given) a menu with Rename and Delete.
 class SessionTile extends StatelessWidget {
   const SessionTile({
     super.key,
     required this.session,
     this.onTap,
-    this.showDay = false,
-    this.now,
     this.onRename,
     this.onDelete,
   });
 
   final SessionSummary session;
   final VoidCallback? onTap;
-
-  /// Prefix the length with the day (for lists not grouped by day).
-  final bool showDay;
-  final DateTime? now;
 
   /// Row menu actions; the menu is hidden when both are null.
   final VoidCallback? onRename;
@@ -453,44 +479,34 @@ class SessionTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final s = session;
     final length = s.recordedMs ?? s.sessionEndMs;
-    final details = [
-      if (showDay && s.start != null)
-        formatDay(s.start!, now ?? DateTime.now()),
-      // The automatic title already contains the time.
-      if (s.title != null && s.start != null) formatClock(s.start!),
-      if (length != null) formatSpan(length),
-      if (s.pauseCount > 0) plural(s.pauseCount, 'pause'),
-    ].join(' · ');
     final hasMenu = onRename != null || onDelete != null;
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(EvRadius.md),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            EvSpace.xxs,
-            EvSpace.sm,
-            hasMenu ? 0 : EvSpace.xxs,
-            EvSpace.sm,
-          ),
-          child: Row(
+    return LiquidGlass(
+      onTap: onTap,
+      radius: 22,
+      padding: EdgeInsets.fromLTRB(
+        EvSpace.md,
+        EvSpace.md,
+        hasMenu ? EvSpace.xxs : EvSpace.md,
+        EvSpace.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: EvColors.teal.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: EvColors.teal.withValues(alpha: 0.18),
-                  ),
+                  shape: BoxShape.circle,
+                  color: EvEmber.glassStrong,
+                  border: Border.all(color: EvEmber.glassBorder),
                 ),
                 child: const Icon(
                   Icons.graphic_eq_rounded,
-                  color: EvColors.teal,
-                  size: 22,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: EvSpace.sm),
@@ -498,31 +514,32 @@ class SessionTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Text(
+                      sessionTitle(s),
+                      style: textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: EvSpace.xxs),
+                    Wrap(
+                      spacing: EvSpace.sm,
+                      runSpacing: 2,
                       children: [
-                        Expanded(
-                          child: Text(
-                            sessionTitle(s),
-                            style: textTheme.titleMedium,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        _Meta(
+                          icon: Icons.calendar_today_outlined,
+                          text: s.start == null
+                              ? 'Unknown date'
+                              : formatDateTime(s.start!),
                         ),
-                        const SizedBox(width: EvSpace.xs),
-                        SessionStatusPill(session: s),
+                        if (s.pauseCount > 0)
+                          _Meta(
+                            icon: Icons.pause_circle_outline_rounded,
+                            text: plural(s.pauseCount, 'pause'),
+                          ),
                       ],
                     ),
-                    if (details.isNotEmpty) ...[
-                      const SizedBox(height: 2),
-                      Text(details, style: textTheme.bodySmall),
-                    ],
-                    if (s.chunks.isNotEmpty && s.timelineMs > 0) ...[
-                      const SizedBox(height: EvSpace.xs),
-                      SessionTimeline(session: s, height: 4),
-                    ],
-                    const SizedBox(height: EvSpace.xs),
-                    const TranscriptAvailability(),
                   ],
                 ),
               ),
@@ -534,8 +551,74 @@ class SessionTile extends StatelessWidget {
                 ),
             ],
           ),
-        ),
+          const SizedBox(height: EvSpace.sm),
+          const Divider(color: EvEmber.hairline, height: 1),
+          const SizedBox(height: EvSpace.sm),
+          Padding(
+            padding: EdgeInsets.only(right: hasMenu ? EvSpace.sm : 0),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.schedule_rounded,
+                  size: 15,
+                  color: EvEmber.textSoft,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  length == null ? '–' : formatSpan(length),
+                  style: textTheme.labelLarge?.copyWith(
+                    color: Colors.white,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+                const SizedBox(width: EvSpace.sm),
+                Expanded(
+                  child: s.chunks.isNotEmpty && s.timelineMs > 0
+                      ? SessionTimeline(
+                          session: s,
+                          height: 4,
+                          color: EvEmber.accent,
+                          trackColor: EvEmber.hairline,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                const SizedBox(width: EvSpace.sm),
+                SessionStatusPill(session: s),
+              ],
+            ),
+          ),
+          const SizedBox(height: EvSpace.xs),
+          const TranscriptAvailability(color: EvEmber.textFaint),
+        ],
       ),
+    );
+  }
+}
+
+/// Small icon + text, e.g. the date line of a card.
+class _Meta extends StatelessWidget {
+  const _Meta({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: EvEmber.textFaint),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: EvEmber.textSoft),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -558,8 +641,8 @@ class _RowMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<_RowAction>(
       tooltip: 'More options for $title',
-      icon: const Icon(Icons.more_vert_rounded, color: EvColors.textMuted),
-      color: EvColors.surfaceHigh,
+      icon: const Icon(Icons.more_vert_rounded, color: EvEmber.textSoft),
+      color: const Color(0xFF241011),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(EvRadius.md),
       ),
@@ -604,22 +687,24 @@ class _RowMenu extends StatelessWidget {
 /// One line saying whether a transcript can be shown. Transcripts are made
 /// on the PC and are never sent back to the phone in this version.
 class TranscriptAvailability extends StatelessWidget {
-  const TranscriptAvailability({super.key});
+  const TranscriptAvailability({super.key, this.color = EvColors.textSubtle});
 
   static const label = 'Transcript not available on this phone yet';
+
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(Icons.notes_rounded, size: 16, color: EvColors.textSubtle),
+        Icon(Icons.notes_rounded, size: 16, color: color),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             label,
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: EvColors.textSubtle),
+            ).textTheme.bodySmall?.copyWith(color: color),
           ),
         ),
       ],
@@ -640,17 +725,23 @@ class _SearchField extends StatelessWidget {
       key: SessionsScreen.searchKey,
       controller: controller,
       onChanged: onChanged,
+      style: const TextStyle(color: Colors.white),
+      cursorColor: EvEmber.accent,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: 'Search recordings…',
-        prefixIcon: const Icon(Icons.search_rounded),
+        hintStyle: const TextStyle(color: EvEmber.textFaint),
+        prefixIcon: const Icon(Icons.search_rounded, color: EvEmber.textSoft),
         suffixIcon: ListenableBuilder(
           listenable: controller,
           builder: (context, _) => controller.text.isEmpty
               ? const SizedBox.shrink()
               : IconButton(
                   tooltip: 'Clear search',
-                  icon: const Icon(Icons.close_rounded),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: EvEmber.textSoft,
+                  ),
                   onPressed: () {
                     controller.clear();
                     onChanged('');
@@ -658,16 +749,22 @@ class _SearchField extends StatelessWidget {
                 ),
         ),
         filled: true,
-        fillColor: EvColors.surfaceLow,
+        fillColor: EvEmber.glass,
         isDense: true,
         contentPadding: const EdgeInsets.symmetric(vertical: EvSpace.sm),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(EvRadius.pill),
-          borderSide: const BorderSide(color: EvColors.border),
+          borderSide: const BorderSide(color: EvEmber.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(EvRadius.pill),
-          borderSide: const BorderSide(color: EvColors.border),
+          borderSide: const BorderSide(color: EvEmber.glassBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(EvRadius.pill),
+          borderSide: BorderSide(
+            color: EvEmber.accent.withValues(alpha: 0.7),
+          ),
         ),
       ),
     );
@@ -714,10 +811,20 @@ class SessionStatusPill extends StatelessWidget {
 /// The recording as a track, with the moments where speech was heard
 /// drawn at their positions.
 class SessionTimeline extends StatelessWidget {
-  const SessionTimeline({super.key, required this.session, this.height = 8});
+  const SessionTimeline({
+    super.key,
+    required this.session,
+    this.height = 8,
+    this.color = EvColors.teal,
+    this.trackColor = EvColors.surfaceHigh,
+  });
 
   final SessionSummary session;
   final double height;
+
+  /// Speech parts and the track behind them.
+  final Color color;
+  final Color trackColor;
 
   @override
   Widget build(BuildContext context) {
@@ -733,7 +840,7 @@ class SessionTimeline extends StatelessWidget {
             child: Container(
               height: height,
               width: width,
-              color: EvColors.surfaceHigh,
+              color: trackColor,
               child: Stack(
                 children: [
                   for (final c in session.chunks)
@@ -745,13 +852,229 @@ class SessionTimeline extends StatelessWidget {
                                 .clamp(2.0, width),
                       top: 0,
                       bottom: 0,
-                      child: const ColoredBox(color: EvColors.teal),
+                      child: ColoredBox(color: color),
                     ),
                 ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// "Your Recordings", the count, and a glass "+" that starts a new
+/// recording (the same action as the microphone on Home).
+class _SessionsHeader extends StatelessWidget {
+  const _SessionsHeader({required this.subtitle, this.onNewRecording});
+
+  final String? subtitle;
+  final VoidCallback? onNewRecording;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        EvSpace.xxs,
+        EvSpace.md,
+        0,
+        EvSpace.xs,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Your Recordings',
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: EvSpace.xxs),
+                  Text(
+                    subtitle!,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: EvEmber.textSoft,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (onNewRecording != null)
+            IconButton(
+              tooltip: 'New recording',
+              onPressed: onNewRecording,
+              style: IconButton.styleFrom(
+                backgroundColor: EvEmber.glassStrong,
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: EvEmber.glassBorder),
+                minimumSize: const Size(48, 48),
+              ),
+              icon: const Icon(Icons.add_rounded),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The PC connection line as a glass card (same text as [PcLinkCard]).
+class _GlassPcLink extends StatelessWidget {
+  const _GlassPcLink({required this.status, required this.onTap});
+
+  final SyncthingStatus? status;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final info = PcLinkInfo.of(status);
+    return LiquidGlass(
+      key: PcLinkCard.cardKey,
+      onTap: onTap,
+      radius: 20,
+      padding: const EdgeInsets.symmetric(
+        horizontal: EvSpace.md,
+        vertical: EvSpace.sm,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: info.color.withValues(alpha: 0.16),
+            ),
+            child: Icon(info.icon, size: 18, color: info.color),
+          ),
+          const SizedBox(width: EvSpace.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  info.title,
+                  style: textTheme.titleSmall?.copyWith(color: Colors.white),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  info.subtitle,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: EvEmber.textSoft,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.chevron_right_rounded, color: EvEmber.textFaint),
+        ],
+      ),
+    );
+  }
+}
+
+/// Uppercase day heading above a group of cards.
+class _DayLabel extends StatelessWidget {
+  const _DayLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        EvSpace.xxs,
+        EvSpace.lg,
+        EvSpace.xxs,
+        EvSpace.sm,
+      ),
+      child: Text(
+        text.toUpperCase(),
+        style: Theme.of(
+          context,
+        ).textTheme.labelSmall?.copyWith(color: EvEmber.textFaint),
+      ),
+    );
+  }
+}
+
+/// Empty and error states on a glass card, with light text.
+class _GlassMessage extends StatelessWidget {
+  const _GlassMessage({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: EvSpace.md),
+      child: LiquidGlass(
+        padding: EdgeInsets.zero,
+        child: Theme(
+          data: theme.copyWith(
+            textTheme: theme.textTheme.apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Placeholder card while recordings load.
+class _CardSkeleton extends StatelessWidget {
+  const _CardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget bar(double width, double height) => Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: EvEmber.glassStrong,
+        borderRadius: BorderRadius.circular(EvRadius.sm),
+      ),
+    );
+    return ExcludeSemantics(
+      child: LiquidGlass(
+        radius: 22,
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: EvEmber.glassStrong,
+              ),
+            ),
+            const SizedBox(width: EvSpace.sm),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                bar(150, 12),
+                const SizedBox(height: EvSpace.xs),
+                bar(100, 10),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

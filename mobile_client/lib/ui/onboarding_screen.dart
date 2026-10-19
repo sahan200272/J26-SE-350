@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// First-run welcome: three short pages on what Echo Vault does, with Skip
 /// and Get started. Calls [onDone] when the user leaves it.
@@ -16,7 +17,7 @@ class OnboardingScreen extends StatefulWidget {
   static const _pages = [
     _Benefit(
       icon: Icons.mic_none_rounded,
-      color: EvColors.teal,
+      color: EvEmber.accentSoft,
       title: 'Capture naturally',
       body:
           'Record a conversation only when you choose. You start, pause and '
@@ -25,7 +26,7 @@ class OnboardingScreen extends StatefulWidget {
     ),
     _Benefit(
       icon: Icons.hub_outlined,
-      color: EvColors.indigo,
+      color: Colors.white,
       title: 'Connect knowledge',
       body:
           'Your recordings go to Echo Vault on your own PC, which turns '
@@ -34,7 +35,7 @@ class OnboardingScreen extends StatefulWidget {
     ),
     _Benefit(
       icon: Icons.shield_outlined,
-      color: EvColors.teal,
+      color: EvEmber.accentSoft,
       title: 'Keep control',
       body:
           'Speech detection runs on this phone, and recordings travel only '
@@ -78,8 +79,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: EvColors.navy,
+    return EmberPage(
+      child: Scaffold(
       body: SafeArea(
         child: Column(
           children: [
@@ -101,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       key: OnboardingScreen.skipKey,
                       onPressed: _last ? null : widget.onDone,
                       style: TextButton.styleFrom(
-                        foregroundColor: EvColors.textMuted,
+                        foregroundColor: EvEmber.textSoft,
                       ),
                       child: const Text('Skip'),
                     ),
@@ -144,6 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }
@@ -186,7 +188,7 @@ class _BenefitPage extends StatelessWidget {
               Text(
                 benefit.body,
                 style: textTheme.bodyLarge?.copyWith(
-                  color: EvColors.textMuted,
+                  color: EvEmber.textSoft,
                   height: 1.5,
                 ),
               ),
@@ -259,7 +261,7 @@ class _Dots extends StatelessWidget {
               width: i == index ? 22 : 7,
               height: 7,
               decoration: BoxDecoration(
-                color: i == index ? EvColors.teal : EvColors.borderStrong,
+                color: i == index ? Colors.white : EvEmber.glassBorder,
                 borderRadius: BorderRadius.circular(EvRadius.pill),
               ),
             ),

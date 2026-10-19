@@ -24,6 +24,7 @@ import 'ui/recording_controller.dart';
 import 'ui/recording_screen.dart';
 import 'ui/splash_screen.dart';
 import 'ui/theme/app_theme.dart';
+import 'ui/theme/ember_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +49,7 @@ void main() {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: EvColors.surfaceLow,
+      systemNavigationBarColor: EvEmber.black,
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );

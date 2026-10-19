@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// The embedded Syncthing release; keep in step with `tool/fetch_syncthing.ps1`.
 const kSyncthingVersion = 'v2.1.6';
@@ -38,8 +39,13 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      appBar: AppBar(title: const Text('About')),
+    return EmberPage(
+      child: Scaffold(
+      appBar: AppBar(
+        // Opaque black: the top of the Ember background is black too.
+        backgroundColor: EvEmber.black,
+        title: const Text('About'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
@@ -61,7 +67,7 @@ class AboutScreen extends StatelessWidget {
                   Text(
                     EvBrand.tagline,
                     style: textTheme.titleSmall?.copyWith(
-                      color: EvColors.teal,
+                      color: EvEmber.accentSoft,
                     ),
                   ),
                   const SizedBox(height: EvSpace.xs),
@@ -115,8 +121,8 @@ class AboutScreen extends StatelessWidget {
                 return Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: EvColors.surfaceLow,
-                    border: Border.all(color: EvColors.border),
+                    color: EvEmber.glass,
+                    border: Border.all(color: EvEmber.glassBorder),
                     borderRadius: BorderRadius.circular(EvRadius.md),
                   ),
                   child: SelectableText(
@@ -141,6 +147,7 @@ class AboutScreen extends StatelessWidget {
           ],
           ),
         ),
+      ),
       ),
     );
   }

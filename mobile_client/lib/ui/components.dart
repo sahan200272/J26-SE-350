@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Brand kit files (assets/brand/, copied unchanged from the Echo Vault brand
 /// kit). Only the dark-UI variants are used: the app has one dark theme.
@@ -110,12 +111,22 @@ class EvCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = EvPalette.of(context);
+    if (palette.glass && color == null) {
+      return LiquidGlass(
+        radius: EvRadius.lg,
+        padding: padding,
+        onTap: onTap,
+        shadow: false,
+        child: child,
+      );
+    }
     final radius = BorderRadius.circular(EvRadius.lg);
     return Material(
-      color: color ?? EvColors.surfaceLow,
+      color: color ?? palette.card,
       shape: RoundedRectangleBorder(
         borderRadius: radius,
-        side: BorderSide(color: borderColor ?? EvColors.border),
+        side: BorderSide(color: borderColor ?? palette.cardBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: onTap == null
@@ -149,9 +160,9 @@ class SectionLabel extends StatelessWidget {
           Expanded(
             child: Text(
               text.toUpperCase(),
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(color: EvColors.textMuted),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: EvPalette.of(context).muted,
+              ),
             ),
           ),
           ?trailing,
@@ -176,9 +187,9 @@ class StatusPill extends StatelessWidget {
   final IconData? icon;
   final PillTone tone;
 
-  Color get _color => switch (tone) {
-    PillTone.neutral => EvColors.textMuted,
-    PillTone.accent => EvColors.teal,
+  Color _color(EvPalette palette) => switch (tone) {
+    PillTone.neutral => palette.muted,
+    PillTone.accent => palette.accent,
     PillTone.positive => EvColors.success,
     PillTone.warning => EvColors.warning,
     PillTone.danger => EvColors.recording,
@@ -187,7 +198,7 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _color;
+    final color = _color(EvPalette.of(context));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -220,19 +231,17 @@ class StatusPill extends StatelessWidget {
 
 /// Tinted circle holding an icon, used as a leading visual.
 class IconBadge extends StatelessWidget {
-  const IconBadge(
-    this.icon, {
-    super.key,
-    this.color = EvColors.teal,
-    this.size = 40,
-  });
+  const IconBadge(this.icon, {super.key, this.color, this.size = 40});
 
   final IconData icon;
-  final Color color;
+
+  /// Defaults to the theme's accent (teal, or coral in the Ember look).
+  final Color? color;
   final double size;
 
   @override
   Widget build(BuildContext context) {
+    final color = this.color ?? EvPalette.of(context).accent;
     return Container(
       width: size,
       height: size,
@@ -255,7 +264,7 @@ class InfoRow extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onTap,
-    this.iconColor = EvColors.teal,
+    this.iconColor,
   });
 
   final IconData icon;
@@ -263,11 +272,14 @@ class InfoRow extends StatelessWidget {
   final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onTap;
-  final Color iconColor;
+
+  /// Defaults to the theme's accent.
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final palette = EvPalette.of(context);
     final row = Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: EvSpace.md,
@@ -275,7 +287,7 @@ class InfoRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          IconBadge(icon, color: iconColor, size: 36),
+          IconBadge(icon, color: iconColor ?? palette.accent, size: 36),
           const SizedBox(width: EvSpace.sm + 2),
           Expanded(
             child: Column(
@@ -293,7 +305,7 @@ class InfoRow extends StatelessWidget {
             const SizedBox(width: EvSpace.xs),
             trailing!,
           ] else if (onTap != null)
-            const Icon(Icons.chevron_right, color: EvColors.textSubtle),
+            Icon(Icons.chevron_right, color: palette.subtle),
         ],
       ),
     );
@@ -342,6 +354,7 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final muted = EvPalette.of(context).muted;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: EvSpace.lg,
@@ -350,13 +363,13 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconBadge(icon, size: 56, color: EvColors.textMuted),
+          IconBadge(icon, size: 56, color: muted),
           const SizedBox(height: EvSpace.md),
           Text(title, style: textTheme.titleMedium, textAlign: TextAlign.center),
           const SizedBox(height: EvSpace.xs),
           Text(
             message,
-            style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+            style: textTheme.bodyMedium?.copyWith(color: muted),
             textAlign: TextAlign.center,
           ),
           if (action != null) ...[
@@ -387,12 +400,13 @@ class NoticeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final palette = EvPalette.of(context);
     final color = switch (tone) {
       PillTone.danger => EvColors.recording,
       PillTone.warning => EvColors.warning,
-      PillTone.accent || PillTone.positive => EvColors.teal,
+      PillTone.accent || PillTone.positive => palette.accent,
       PillTone.indigo => const Color(0xFFA5B4FC),
-      PillTone.neutral => EvColors.textMuted,
+      PillTone.neutral => palette.muted,
     };
     return Container(
       padding: const EdgeInsets.all(EvSpace.md),
@@ -505,7 +519,7 @@ class PageHeader extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: textTheme.bodyMedium?.copyWith(
-                      color: EvColors.textMuted,
+                      color: EvPalette.of(context).muted,
                     ),
                   ),
                 ],
@@ -530,11 +544,12 @@ class SkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fill = EvPalette.of(context).skeleton;
     Widget bar(double width, double h) => Container(
       width: width,
       height: h,
       decoration: BoxDecoration(
-        color: EvColors.surfaceHigh,
+        color: fill,
         borderRadius: BorderRadius.circular(EvRadius.sm),
       ),
     );
@@ -548,7 +563,7 @@ class SkeletonCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: EvColors.surfaceHigh,
+                  color: fill,
                   borderRadius: BorderRadius.circular(13),
                 ),
               ),
