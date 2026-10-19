@@ -407,20 +407,10 @@ def retrieve_subgraph(
             subgraph_edges: List[Dict[str, Any]] = []
             seen_edge_signatures: Set[Tuple[str, str, str]] = set()
 
-            # Seed anchor nodes
-            for a in anchors:
-                if a.key not in subgraph_nodes_dict:
-                    subgraph_nodes_dict[a.key] = {
-                        "key": a.key,
-                        "name": a.name,
-                        "type": a.type,
-                        "props": {},
-                    }
-
-            # Elements from top ranked paths
+            # Elements from top ranked paths first (carrying full Neo4j properties)
             for path in top_paths:
                 for n in path.nodes:
-                    if n["key"] not in subgraph_nodes_dict:
+                    if n["key"] not in subgraph_nodes_dict or not subgraph_nodes_dict[n["key"]].get("props"):
                         subgraph_nodes_dict[n["key"]] = n
 
                 for hop in path.hops:
@@ -442,6 +432,26 @@ def retrieve_subgraph(
                             "confidence": hop.confidence,
                             "props": hop.props,
                         })
+
+            # Ensure all seed anchor nodes are present with their full Neo4j properties
+            missing_anchor_keys = [a.key for a in anchors if a.key not in subgraph_nodes_dict or not subgraph_nodes_dict[a.key].get("props")]
+            if missing_anchor_keys:
+                anchor_props_records = session.run(
+                    "MATCH (n) WHERE n.key IN $keys RETURN n",
+                    keys=missing_anchor_keys,
+                )
+                for rec in anchor_props_records:
+                    extracted = _extract_node_dict(rec["n"])
+                    subgraph_nodes_dict[extracted["key"]] = extracted
+
+            for a in anchors:
+                if a.key not in subgraph_nodes_dict:
+                    subgraph_nodes_dict[a.key] = {
+                        "key": a.key,
+                        "name": a.name,
+                        "type": a.type,
+                        "props": {},
+                    }
 
             # 4. Provenance Collection (Hub-Suppressed Attachment)
             all_node_keys = set(subgraph_nodes_dict.keys())
