@@ -1,0 +1,4 @@
+# Calendar server settings (RP-16). The numbers are untuned guesses.
+time_zone: Asia/Colombo        # Sri Lanka has no daylight saving time
+default_duration_minutes: 60   # plans have no end time, so we add this
+default_reminder_minutes: 10   # pop-up alert before the event starts
