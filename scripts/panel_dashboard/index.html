@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component 2 Objectives</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e2e2dc;
+    --met-bg: #e3f4e8; --met-fg: #1f6b3a;
+    --notmet-bg: #fbe5e3; --notmet-fg: #9b2a1f;
+    --none-bg: #ececea; --none-fg: #55554f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161615; --card: #1f1f1d; --text: #ecece8; --muted: #a0a09a; --line: #34342f;
+      --met-bg: #1d3a26; --met-fg: #8fdca6;
+      --notmet-bg: #42201c; --notmet-fg: #f1a197;
+      --none-bg: #2c2c29; --none-fg: #bdbdb6;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .count { padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 13px; }
+  button { margin-left: auto; padding: 6px 14px; border: 1px solid var(--line); border-radius: 6px;
+           background: var(--card); color: var(--text); cursor: pointer; font: inherit; }
+  table { width: 100%; border-collapse: collapse; background: var(--card);
+          border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+  td.target { white-space: nowrap; }
+  .badge { display: inline-block; white-space: nowrap; padding: 3px 9px; border-radius: 4px;
+           font-weight: 700; font-size: 12px; }
+  .MET { background: var(--met-bg); color: var(--met-fg); }
+  .NOT-MET { background: var(--notmet-bg); color: var(--notmet-fg); }
+  .NOT-MEASURED { background: var(--none-bg); color: var(--none-fg); }
+  .reason, .where { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  code { font-size: 13px; overflow-wrap: anywhere; }
+  ul { margin: 0; padding-left: 18px; font-size: 13px; }
+  .error { color: var(--notmet-fg); }
+  @media (max-width: 760px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+    td { border: none; padding: 4px 12px; }
+    td::before { content: attr(data-label); display: block; font-size: 11px;
+                 text-transform: uppercase; color: var(--muted); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Component 2: Agentic Reasoning Core</h1>
+  <p class="sub">PP1 objectives: target against measured value. Read from the result files when the page loads.</p>
+  <div class="bar" id="bar"><button id="reload" type="button">Reload</button></div>
+  <table>
+    <thead><tr>
+      <th>Objective</th><th>Target</th><th>Status</th><th>Measured</th>
+      <th>Where / when</th><th>Evidence</th><th>Limits</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="sub" id="footer"></p>
+</main>
+<script>
+  const STATUSES = ["MET", "NOT MET", "NOT MEASURED"];
+
+  function el(tag, attrs, children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) node.setAttribute(k, v);
+    for (const child of [].concat(children || [])) {
+      node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    }
+    return node;
+  }
+
+  function badge(status) {
+    return el("span", { class: "badge " + status.replace(/ /g, "-") }, status);
+  }
+
+  function render(data) {
+    const body = document.getElementById("rows");
+    body.replaceChildren();
+    for (const r of data.rows) {
+      body.append(el("tr", {}, [
+        el("td", { "data-label": "Objective" }, [el("strong", {}, r.name)]),
+        el("td", { "data-label": "Target", class: "target" }, r.target),
+        el("td", { "data-label": "Status" }, [badge(r.status), el("div", { class: "reason" }, r.reason)]),
+        el("td", { "data-label": "Measured" }, r.measured),
+        el("td", { "data-label": "Where / when" }, [r.machine, el("div", { class: "where" }, r.date)]),
+        el("td", { "data-label": "Evidence" }, [el("code", {}, r.evidence)]),
+        el("td", { "data-label": "Limits" }, [el("ul", {}, r.limits.map(t => el("li", {}, t)))]),
+      ]));
+    }
+    const bar = document.getElementById("bar");
+    bar.querySelectorAll(".count").forEach(n => n.remove());
+    for (const s of STATUSES) {
+      const n = data.rows.filter(r => r.status === s).length;
+      bar.insertBefore(el("span", { class: "count " + s.replace(/ /g, "-") }, `${s}: ${n}`),
+                       document.getElementById("reload"));
+    }
+    document.getElementById("footer").textContent =
+      `Read from ${data.eval_dir} at ${data.generated_at}. Grey means no valid measurement exists yet.`;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("/api/status", { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      render(await res.json());
+    } catch (err) {
+      const footer = document.getElementById("footer");
+      footer.className = "sub error";
+      footer.textContent = "Could not load /api/status: " + err.message;
+    }
+  }
+
+  document.getElementById("reload").addEventListener("click", load);
+  load();
+</script>
+</body>
+</html>
