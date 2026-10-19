@@ -5,6 +5,7 @@ import '../sessions/session_titles.dart';
 import 'elapsed_format.dart';
 import 'live_waveform.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Shows the "Name This Recording" sheet after Stop.
 ///
@@ -28,18 +29,21 @@ Future<String?> showSaveRecordingSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    backgroundColor: EvColors.surface,
+    backgroundColor: const Color(0xFF170707),
     barrierColor: Colors.black.withValues(alpha: 0.6),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
     ),
     clipBehavior: Clip.antiAlias,
-    builder: (_) => SaveRecordingSheet(
+    // The Ember look (white Save, glass field) for the sheet's content.
+    builder: (_) => EmberScope(
+      child: SaveRecordingSheet(
       defaultTitle: defaultTitle,
       duration: duration,
       levels: levels,
       saved: saved,
       onRename: onRename,
+      ),
     ),
   );
 }
@@ -163,7 +167,7 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: EvColors.borderStrong,
+                    color: EvEmber.glassBorder,
                     borderRadius: BorderRadius.circular(EvRadius.pill),
                   ),
                 ),
@@ -186,8 +190,8 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
                     tooltip: 'Close',
                     onPressed: _busy ? null : _close,
                     style: IconButton.styleFrom(
-                      backgroundColor: EvColors.surfaceHigh,
-                      foregroundColor: EvColors.snow,
+                      backgroundColor: EvEmber.glassStrong,
+                      foregroundColor: Colors.white,
                     ),
                     icon: const Icon(Icons.close_rounded, size: 20),
                   ),
@@ -216,15 +220,15 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
                   errorMaxLines: 3,
                   counterText: '',
                   filled: true,
-                  fillColor: EvColors.surfaceLow,
+                  fillColor: EvEmber.glass,
                   prefixIcon: const Icon(Icons.edit_outlined, size: 20),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(EvRadius.md),
-                    borderSide: const BorderSide(color: EvColors.border),
+                    borderSide: const BorderSide(color: EvEmber.glassBorder),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(EvRadius.md),
-                    borderSide: const BorderSide(color: EvColors.border),
+                    borderSide: const BorderSide(color: EvEmber.glassBorder),
                   ),
                 ),
               ),
@@ -254,7 +258,7 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
                               dimension: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: EvColors.textMuted,
+                                color: EvEmber.textFaint,
                               ),
                             )
                           : const Text('Save'),
@@ -283,7 +287,7 @@ class _SaveStatus extends StatelessWidget {
       future: saved,
       builder: (context, snapshot) {
         IconData icon = Icons.hourglass_top_rounded;
-        Color color = EvColors.textMuted;
+        Color color = EvEmber.textSoft;
         String text = 'Saving to this phone…';
         final data = snapshot.data;
         if (snapshot.hasError) {
@@ -317,7 +321,7 @@ class _SaveStatus extends StatelessWidget {
               Expanded(
                 child: Text(
                   text,
-                  style: style?.copyWith(color: EvColors.textMuted),
+                  style: style?.copyWith(color: EvEmber.textSoft),
                 ),
               ),
             ],
@@ -348,9 +352,9 @@ class _AudioSummary extends StatelessWidget {
           vertical: EvSpace.sm,
         ),
         decoration: BoxDecoration(
-          color: EvColors.surfaceLow,
+          color: EvEmber.glass,
           borderRadius: BorderRadius.circular(EvRadius.md),
-          border: Border.all(color: EvColors.border),
+          border: Border.all(color: EvEmber.glassBorder),
         ),
         child: Row(
           children: [
@@ -359,12 +363,12 @@ class _AudioSummary extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: EvColors.teal.withValues(alpha: 0.14),
+                color: EvEmber.accent.withValues(alpha: 0.18),
               ),
               child: const Icon(
                 Icons.graphic_eq_rounded,
                 size: 18,
-                color: EvColors.teal,
+                color: EvEmber.accentSoft,
               ),
             ),
             const SizedBox(width: EvSpace.sm),
@@ -374,6 +378,7 @@ class _AudioSummary extends StatelessWidget {
                 active: levels.isNotEmpty,
                 height: 32,
                 bars: 32,
+                animate: false,
               ),
             ),
             const SizedBox(width: EvSpace.sm),

@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
-/// Short branded launch screen. Continues the native launch window (same
-/// navy background and centred symbol), then calls [onFinished]. A tap
+/// Short branded launch screen on the Ember background, continuing the
+/// near-black native launch window, then calls [onFinished]. A tap
 /// skips it; with reduced motion it shows without animation.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({
@@ -68,8 +69,8 @@ class _SplashScreenState extends State<SplashScreen>
       parent: _controller,
       curve: const Interval(0.35, 1, curve: Curves.easeOut),
     );
-    return Scaffold(
-      backgroundColor: EvColors.navy,
+    return EmberPage(
+      child: Scaffold(
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _finish,
@@ -104,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
                             'Echo Vault',
                             textAlign: TextAlign.center,
                             style: textTheme.headlineMedium?.copyWith(
-                              color: EvColors.snow,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: EvSpace.xs),
@@ -112,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                             EvBrand.tagline,
                             textAlign: TextAlign.center,
                             style: textTheme.bodyMedium?.copyWith(
-                              color: EvColors.textMuted,
+                              color: EvEmber.textSoft,
                             ),
                           ),
                         ],
@@ -125,6 +126,7 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ),
       ),
+    ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../sessions/session_titles.dart';
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Asks for a new recording title. Returns the cleaned-up title, or null if
 /// the user cancelled or left the title unchanged.
@@ -52,7 +53,7 @@ class _RenameDialogState extends State<_RenameDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       key: SessionDialogKeys.rename,
-      backgroundColor: EvColors.surface,
+      backgroundColor: EvPalette.of(context).dialog,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(EvRadius.lg),
       ),
@@ -125,7 +126,7 @@ Future<bool> showDeleteDialog(
     context: context,
     builder: (context) => AlertDialog(
       key: SessionDialogKeys.delete,
-      backgroundColor: EvColors.surface,
+      backgroundColor: EvPalette.of(context).dialog,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(EvRadius.lg),
       ),

@@ -6,6 +6,7 @@ import 'components.dart';
 import 'processing_privacy_screen.dart';
 import 'settings_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Settings: the PC connection, privacy, and app information, in plain
 /// language. Implementation details live in Processing & privacy.
@@ -33,15 +34,18 @@ class SettingsHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
+    // The navigation bar floats over this screen; keep the list clear of it.
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    return EmberPage(
+      child: Scaffold(
       body: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(
+          padding: EdgeInsets.fromLTRB(
             EvSpace.md,
             EvSpace.xs,
             EvSpace.md,
-            EvSpace.xl,
+            EvSpace.xl + bottomInset,
           ),
           children: [
             const PageHeader(
@@ -97,13 +101,13 @@ class SettingsHomeScreen extends StatelessWidget {
                 if (onShowWelcome != null)
                   InfoRow(
                     icon: Icons.waving_hand_outlined,
-                    iconColor: EvColors.textMuted,
+                    iconColor: EvEmber.textSoft,
                     title: 'Show welcome screens',
                     onTap: onShowWelcome,
                   ),
                 InfoRow(
                   icon: Icons.info_outline_rounded,
-                  iconColor: EvColors.textMuted,
+                  iconColor: EvEmber.textSoft,
                   title: 'About Echo Vault',
                   subtitle: 'Version, licences and open source',
                   onTap: () =>
@@ -111,14 +115,14 @@ class SettingsHomeScreen extends StatelessWidget {
                 ),
                 InfoRow(
                   icon: Icons.tag_rounded,
-                  iconColor: EvColors.textMuted,
+                  iconColor: EvEmber.textSoft,
                   title: 'Version',
                   trailing: FutureBuilder<String>(
                     future: appVersion,
                     builder: (context, snapshot) => Text(
                       snapshot.data ?? (appVersion == null ? '–' : '…'),
                       style: textTheme.bodyMedium?.copyWith(
-                        color: EvColors.textMuted,
+                        color: EvEmber.textSoft,
                       ),
                     ),
                   ),
@@ -131,10 +135,11 @@ class SettingsHomeScreen extends StatelessWidget {
             Text(
               EvBrand.tagline,
               textAlign: TextAlign.center,
-              style: textTheme.bodySmall?.copyWith(color: EvColors.textSubtle),
+              style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import '../sync/syncthing_status.dart';
 import 'about_screen.dart';
 import 'components.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Sync settings (A5): this phone's Syncthing device ID (text and QR), the
 /// PC's device ID and fixed LAN address, and the live connection and sync
@@ -145,8 +146,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return EmberPage(
+      child: Scaffold(
       appBar: AppBar(
+        // Opaque black: the top of the Ember background is black too.
+        backgroundColor: EvEmber.black,
         title: const Text('Connect to your PC'),
         actions: [
           IconButton(
@@ -174,7 +178,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 'setup).',
                 style: Theme.of(
                   context,
-                ).textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+                ).textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
               ),
             ),
             const SizedBox(height: EvSpace.md),
@@ -188,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 InfoRow(
                   icon: Icons.description_outlined,
-                  iconColor: EvColors.textMuted,
+                  iconColor: EvEmber.textSoft,
                   title: 'About and licences',
                   onTap: () => _openAbout(context),
                 ),
@@ -196,6 +200,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

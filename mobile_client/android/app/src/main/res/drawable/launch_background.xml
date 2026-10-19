@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Launch window before Flutter draws (Android 11 and older): brand navy with the
-     Echo Vault symbol centred, matching the first frame of the in-app splash. -->
+<!-- Launch window before Flutter draws (Android 11 and older): near-black with the
+     Echo Vault Keyhole Wave mark centred, matching the first frame of the in-app splash. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/ev_navy" />
+    <item android:drawable="@color/ev_black" />
     <item>
         <bitmap
             android:gravity="center"

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -7,12 +8,18 @@ import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'display_format.dart';
+import 'immersive_backdrop.dart';
 import 'processing_privacy_screen.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
 
 /// Home: a compact greeting, the microphone button that opens the recording
 /// screen, and the three most recent recordings with a way to see them all.
+///
+/// Visual layers, back to front: the background video
+/// ([kBackgroundVideo], when present) or photo ([kBackgroundImage]), a
+/// blurred dark "glass" layer that blends it into black and deep red, then
+/// the content on frosted-glass cards ([ImmersiveBackdrop]).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
@@ -22,6 +29,7 @@ class HomeScreen extends StatefulWidget {
     this.onStartRecording,
     this.onOpenSessions,
     this.now = DateTime.now,
+    this.isVisible = true,
   });
 
   /// Recent recordings; the section is hidden when null.
@@ -34,15 +42,38 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback? onOpenSessions;
   final DateTime Function() now;
 
+  /// Home is the selected tab: the background video plays only then.
+  final bool isVisible;
+
   static const startKey = Key('home-start-recording');
   static const recentKey = Key('home-recent');
   static const privacyKey = Key('home-privacy');
+  static const backgroundKey = ImmersiveBackdrop.imageKey;
 
   /// How many recent recordings Home shows.
   static const recentCount = 3;
 
+  /// The background photo. Replace this file to change it (portrait,
+  /// about 1080 × 1920 or larger works best).
+  static const backgroundAsset = kBackgroundImage;
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+}
+
+/// Home's dark, deep-red palette.
+abstract final class _Ember {
+  static const black = Color(0xFF070304);
+  static const deep = Color(0xFF160606);
+  static const wine = Color(0xFF3A0D0D);
+  static const red = Color(0xFF8E1B16);
+  static const accent = Color(0xFFFF4A3D);
+  static const accentSoft = Color(0xFFFF8A7C);
+  static const textSoft = Color(0xB8FFFFFF); // 72 % white
+  static const textFaint = Color(0x85FFFFFF); // 52 % white
+  static const glass = Color(0x14FFFFFF); // 8 % white
+  static const glassStrong = Color(0x1FFFFFFF); // 12 % white
+  static const glassBorder = Color(0x26FFFFFF); // 15 % white
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -100,61 +131,90 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    const padding = EdgeInsets.fromLTRB(
+    // The navigation bar floats over Home (the photo runs behind it); keep
+    // the content clear of it.
+    final padding = EdgeInsets.fromLTRB(
       EvSpace.md,
       EvSpace.sm,
       EvSpace.md,
-      EvSpace.md,
+      EvSpace.md + MediaQuery.paddingOf(context).bottom,
     );
     return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: LayoutBuilder(
-          builder: (context, box) => SingleChildScrollView(
-            padding: padding,
-            child: ConstrainedBox(
-              // Fill the screen on tall phones (the microphone sits in the
-              // middle); scroll on short ones or at large text sizes.
-              constraints: BoxConstraints(
-                minHeight: math.max(0.0, box.maxHeight - padding.vertical),
-              ),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _HomeHeader(onOpenPrivacy: _openPrivacy),
-                    const SizedBox(height: EvSpace.lg),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: EvSpace.xxs,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _greeting(widget.now()),
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: EvColors.textMuted,
-                            ),
+      backgroundColor: _Ember.black,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          ImmersiveBackdrop(
+            videoAsset: kBackgroundVideo,
+            playing: widget.isVisible,
+          ),
+          SafeArea(
+            bottom: false,
+            child: LayoutBuilder(
+              builder: (context, box) => SingleChildScrollView(
+                padding: padding,
+                child: ConstrainedBox(
+                  // Fill the screen on tall phones (the microphone sits in
+                  // the middle); scroll on short ones or at large text.
+                  constraints: BoxConstraints(
+                    minHeight: math.max(0.0, box.maxHeight - padding.vertical),
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _HomeHeader(onOpenPrivacy: _openPrivacy),
+                        const SizedBox(height: EvSpace.xl),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: EvSpace.xxs,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Capture what matters',
-                            style: textTheme.headlineSmall,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _greeting(widget.now()),
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: _Ember.textSoft,
+                                ),
+                              ),
+                              const SizedBox(height: EvSpace.xxs),
+                              Text.rich(
+                                const TextSpan(
+                                  text: 'Capture what ',
+                                  children: [
+                                    TextSpan(
+                                      text: 'matters',
+                                      style: TextStyle(
+                                        color: _Ember.accent,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: _Ember.accent,
+                                        decorationThickness: 2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                style: textTheme.headlineMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.15,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const Expanded(child: SizedBox(height: EvSpace.lg)),
+                        _RecordHero(onTap: widget.onStartRecording),
+                        const Expanded(child: SizedBox(height: EvSpace.lg)),
+                        if (widget.sessions != null) _recentCard(context),
+                      ],
                     ),
-                    const Expanded(child: SizedBox(height: EvSpace.lg)),
-                    _RecordHero(onTap: widget.onStartRecording),
-                    const Expanded(child: SizedBox(height: EvSpace.lg)),
-                    if (widget.sessions != null) _recentCard(context),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -162,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _recentCard(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final openAll = widget.onOpenSessions;
-    return EvCard(
+    return _Glass(
+      radius: 24,
       padding: const EdgeInsets.fromLTRB(
         EvSpace.md,
         EvSpace.xxs,
@@ -192,13 +253,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Icon(
                             Icons.graphic_eq_rounded,
                             size: 18,
-                            color: EvColors.teal,
+                            color: _Ember.accent,
                           ),
                           const SizedBox(width: EvSpace.xs),
                           Flexible(
                             child: Text(
                               'Recent recordings',
-                              style: textTheme.titleSmall,
+                              style: textTheme.titleSmall?.copyWith(
+                                color: Colors.white,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -209,7 +272,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               if (openAll != null)
-                TextButton(onPressed: openAll, child: const Text('See all')),
+                TextButton(
+                  onPressed: openAll,
+                  style: TextButton.styleFrom(
+                    foregroundColor: _Ember.accentSoft,
+                  ),
+                  child: const Text('See all'),
+                ),
             ],
           ),
           const SizedBox(height: EvSpace.xs),
@@ -229,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return Text(
         key: HomeScreen.recentKey,
         'Recent recordings could not be loaded.',
-        style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+        style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
       );
     }
     if (recent == null) {
@@ -242,17 +311,25 @@ class _HomeScreenState extends State<HomeScreen> {
       return Row(
         key: HomeScreen.recentKey,
         children: [
-          const IconBadge(
-            Icons.mic_none_rounded,
-            color: EvColors.textMuted,
-            size: 40,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: _Ember.glassStrong,
+            ),
+            child: const Icon(
+              Icons.mic_none_rounded,
+              size: 20,
+              color: _Ember.textSoft,
+            ),
           ),
           const SizedBox(width: EvSpace.sm),
           Expanded(
             child: Text(
               'No recordings yet. Tap the microphone to capture your first '
               'conversation.',
-              style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+              style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
             ),
           ),
         ],
@@ -269,7 +346,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Brand on the left; on the right a small "Private" chip that opens
+/// A frosted-glass surface: blurs what is behind it, with a faint white
+/// fill and a hairline border.
+class _Glass extends StatelessWidget {
+  const _Glass({
+    required this.child,
+    this.radius = 20,
+    this.padding = const EdgeInsets.all(EvSpace.md),
+  });
+
+  final Widget child;
+  final double radius;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final shape = BorderRadius.circular(radius);
+    return ClipRRect(
+      borderRadius: shape,
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Material(
+          color: _Ember.glass,
+          shape: RoundedRectangleBorder(
+            borderRadius: shape,
+            side: const BorderSide(color: _Ember.glassBorder),
+          ),
+          child: Padding(padding: padding, child: child),
+        ),
+      ),
+    );
+  }
+}
+
+/// Brand on the left; on the right a small glass "Private" chip that opens
 /// Processing & privacy.
 class _HomeHeader extends StatelessWidget {
   const _HomeHeader({required this.onOpenPrivacy});
@@ -295,9 +405,9 @@ class _HomeHeader extends StatelessWidget {
           excludeSemantics: true,
           child: Material(
             key: HomeScreen.privacyKey,
-            color: EvColors.surfaceLow,
+            color: _Ember.glass,
             shape: const StadiumBorder(
-              side: BorderSide(color: EvColors.border),
+              side: BorderSide(color: _Ember.glassBorder),
             ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -312,13 +422,13 @@ class _HomeHeader extends StatelessWidget {
                       const Icon(
                         Icons.shield_outlined,
                         size: 16,
-                        color: EvColors.teal,
+                        color: Colors.white,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         'Private',
                         style: textTheme.labelLarge?.copyWith(
-                          color: EvColors.snow,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -348,13 +458,13 @@ class _RecordHero extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 148,
+          height: _MicButton.size,
           child: Row(
             children: [
               const Expanded(child: _WaveIllustration()),
-              const SizedBox(width: EvSpace.sm),
+              const SizedBox(width: EvSpace.xs),
               _MicButton(onTap: onTap),
-              const SizedBox(width: EvSpace.sm),
+              const SizedBox(width: EvSpace.xs),
               const Expanded(child: _WaveIllustration(mirrored: true)),
             ],
           ),
@@ -362,7 +472,7 @@ class _RecordHero extends StatelessWidget {
         const SizedBox(height: EvSpace.md),
         Text(
           'Start recording',
-          style: textTheme.titleMedium,
+          style: textTheme.titleMedium?.copyWith(color: Colors.white),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: EvSpace.xxs),
@@ -370,7 +480,7 @@ class _RecordHero extends StatelessWidget {
           enabled
               ? 'Your conversations, your control.'
               : 'Recording is not available right now.',
-          style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+          style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
           textAlign: TextAlign.center,
         ),
       ],
@@ -378,66 +488,79 @@ class _RecordHero extends StatelessWidget {
   }
 }
 
+/// White microphone on a near-black core, inside dark and deep-red rings.
 class _MicButton extends StatelessWidget {
   const _MicButton({required this.onTap});
 
   final VoidCallback? onTap;
 
-  static const double _core = 88;
+  static const double size = 168;
+  static const double _core = 84;
 
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    final accent = enabled ? EvColors.teal : EvColors.textSubtle;
+    Widget ring(double diameter, Color fill, Color border, Widget child) =>
+        Container(
+          width: diameter,
+          height: diameter,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: fill,
+            border: Border.all(color: border),
+          ),
+          child: child,
+        );
     return Semantics(
       button: true,
       enabled: enabled,
       label: 'Start recording',
       excludeSemantics: true,
-      child: Container(
-        width: 148,
-        height: 148,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: accent.withValues(alpha: 0.05),
-          border: Border.all(color: accent.withValues(alpha: 0.10)),
-        ),
-        child: Container(
-          width: 118,
-          height: 118,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: accent.withValues(alpha: 0.09),
-            border: Border.all(color: accent.withValues(alpha: 0.22)),
-          ),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: enabled
-                  ? [
-                      BoxShadow(
-                        color: EvColors.teal.withValues(alpha: 0.35),
-                        blurRadius: 28,
-                        spreadRadius: 1,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Material(
-              key: HomeScreen.startKey,
-              shape: const CircleBorder(),
-              clipBehavior: Clip.antiAlias,
-              color: enabled ? EvColors.teal : EvColors.surfaceHigh,
-              child: InkWell(
-                onTap: onTap,
-                child: SizedBox.square(
-                  dimension: _core,
-                  child: Icon(
-                    Icons.mic_rounded,
-                    size: 38,
-                    color: enabled ? EvColors.navy : EvColors.textSubtle,
+      child: ring(
+        size,
+        _Ember.red.withValues(alpha: enabled ? 0.10 : 0.05),
+        Colors.white.withValues(alpha: 0.06),
+        ring(
+          138,
+          _Ember.wine.withValues(alpha: enabled ? 0.55 : 0.3),
+          _Ember.red.withValues(alpha: 0.35),
+          ring(
+            110,
+            _Ember.deep.withValues(alpha: 0.85),
+            _Ember.red.withValues(alpha: 0.45),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: enabled
+                    ? [
+                        BoxShadow(
+                          color: _Ember.accent.withValues(alpha: 0.30),
+                          blurRadius: 30,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Material(
+                key: HomeScreen.startKey,
+                shape: CircleBorder(
+                  side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                color: _Ember.black,
+                child: InkWell(
+                  onTap: onTap,
+                  splashColor: _Ember.accent.withValues(alpha: 0.25),
+                  child: SizedBox.square(
+                    dimension: _core,
+                    child: Icon(
+                      Icons.mic_rounded,
+                      size: 38,
+                      color: enabled ? Colors.white : _Ember.textFaint,
+                    ),
                   ),
                 ),
               ),
@@ -497,7 +620,7 @@ class _WaveIllustrationPainter extends CustomPainter {
       final fromMic = slot * i + slot / 2;
       final x = mirrored ? fromMic : size.width - fromMic;
       final fade = count <= 1 ? 1.0 : 1 - i / (count - 1);
-      paint.color = EvColors.textMuted.withValues(alpha: 0.12 + 0.38 * fade);
+      paint.color = Colors.white.withValues(alpha: 0.08 + 0.42 * fade);
       canvas.drawLine(Offset(x, mid - half), Offset(x, mid + half), paint);
     }
   }
@@ -550,31 +673,44 @@ class _RecentTile extends StatelessWidget {
     final length = s.recordedMs ?? s.sessionEndMs;
     final meta = TextStyle(
       fontSize: textTheme.bodySmall?.fontSize,
-      color: EvColors.textMuted,
+      color: _Ember.textFaint,
       height: 1.3,
     );
     return Material(
-      color: EvColors.surface,
+      color: _Ember.glass,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(EvRadius.md),
-        side: const BorderSide(color: EvColors.border),
+        side: const BorderSide(color: _Ember.glassBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
+        splashColor: _Ember.accent.withValues(alpha: 0.18),
         child: Padding(
           padding: const EdgeInsets.all(EvSpace.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const IconBadge(Icons.graphic_eq_rounded, size: 32),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _Ember.accent.withValues(alpha: 0.16),
+                ),
+                child: const Icon(
+                  Icons.graphic_eq_rounded,
+                  size: 16,
+                  color: _Ember.accentSoft,
+                ),
+              ),
               const SizedBox(height: EvSpace.sm),
               Text(
                 sessionTitle(s),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.labelLarge?.copyWith(
-                  color: EvColors.snow,
+                  color: Colors.white,
                   height: 1.25,
                 ),
               ),
@@ -584,7 +720,7 @@ class _RecentTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: meta.copyWith(
-                  color: EvColors.teal,
+                  color: _Ember.accentSoft,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -612,7 +748,7 @@ class _TileSkeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: EvColors.surfaceHigh,
+        color: _Ember.glassStrong,
         borderRadius: BorderRadius.circular(EvRadius.sm),
       ),
     );
@@ -620,9 +756,9 @@ class _TileSkeleton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(EvSpace.sm),
         decoration: BoxDecoration(
-          color: EvColors.surface,
+          color: _Ember.glass,
           borderRadius: BorderRadius.circular(EvRadius.md),
-          border: Border.all(color: EvColors.border),
+          border: Border.all(color: _Ember.glassBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

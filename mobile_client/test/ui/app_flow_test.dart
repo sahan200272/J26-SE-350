@@ -104,6 +104,19 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Scrolls Home to its end, so the Recent recordings card sits above the
+  /// floating navigation bar (Home's content runs behind the bar).
+  Future<void> scrollHomeToEnd(WidgetTester tester) async {
+    await tester.drag(
+      find.descendant(
+        of: find.byType(HomeScreen),
+        matching: find.byType(SingleChildScrollView),
+      ),
+      const Offset(0, -600),
+    );
+    await tester.pumpAndSettle();
+  }
+
   group('launch', () {
     testWidgets('first run: splash, welcome screens, then Home', (
       tester,
@@ -351,8 +364,7 @@ void main() {
       expect(inRecent('Recording at 10:02'), findsOneWidget);
       expect(inRecent('Recording at 10:01'), findsNothing);
 
-      await tester.ensureVisible(inRecent('Recording at 10:03'));
-      await tester.pumpAndSettle();
+      await scrollHomeToEnd(tester);
       await tester.tap(inRecent('Recording at 10:03'));
       await tester.pumpAndSettle();
       expect(find.byType(SessionDetailScreen), findsOneWidget);
@@ -370,8 +382,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      await tester.ensureVisible(find.text('Recent recordings'));
-      await tester.pumpAndSettle();
+      await scrollHomeToEnd(tester);
       await tester.tap(find.text('Recent recordings'));
       await tester.pumpAndSettle();
       expect(find.byType(SessionsScreen), findsOneWidget);
