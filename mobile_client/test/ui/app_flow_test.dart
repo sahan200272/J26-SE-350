@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:echo_vault/main.dart';
 import 'package:echo_vault/sessions/session_store.dart';
 import 'package:echo_vault/ui/app_shell.dart';
-import 'package:echo_vault/ui/assistant_screen.dart';
 import 'package:echo_vault/ui/home_screen.dart';
-import 'package:echo_vault/ui/knowledge_screen.dart';
 import 'package:echo_vault/ui/onboarding_screen.dart';
 import 'package:echo_vault/ui/onboarding_store.dart';
 import 'package:echo_vault/ui/processing_privacy_screen.dart';
@@ -155,27 +153,19 @@ void main() {
   });
 
   group('navigation', () {
-    testWidgets('Home, Sessions, Knowledge, Assistant, Settings', (
-      tester,
-    ) async {
+    testWidgets('exactly Home, Sessions, Settings', (tester) async {
       await tester.pumpWidget(app(sessions: FakeSessionSource()));
       await tester.pumpAndSettle();
-      for (final label in [
-        'Home',
-        'Sessions',
-        'Knowledge',
-        'Assistant',
-        'Settings',
-      ]) {
+      for (final label in ['Home', 'Sessions', 'Settings']) {
         expect(navLabel(label), findsOneWidget, reason: label);
       }
+      for (final label in ['Knowledge', 'Assistant']) {
+        expect(navLabel(label), findsNothing, reason: label);
+      }
+      expect(find.byType(NavigationDestination), findsNWidgets(3));
 
-      await openTab(tester, 'Knowledge');
-      expect(find.byKey(KnowledgeScreen.unavailableKey), findsOneWidget);
-
-      await openTab(tester, 'Assistant');
-      expect(find.byKey(AssistantScreen.composerKey), findsOneWidget);
-      expect(find.text(AssistantScreen.unavailableMessage), findsOneWidget);
+      await openTab(tester, 'Sessions');
+      expect(find.byType(SessionsScreen), findsOneWidget);
 
       await openTab(tester, 'Settings');
       expect(find.byType(SettingsHomeScreen), findsOneWidget);
@@ -190,19 +180,14 @@ void main() {
       expect(navLabel('Home'), findsOneWidget);
     });
 
-    testWidgets('Home explore tiles open Knowledge and Assistant', (
+    testWidgets('Home privacy chip opens Processing & privacy', (
       tester,
     ) async {
       await tester.pumpWidget(app());
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(
-        find.text('Ask about past conversations'),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      await tester.tap(find.text('Ask about past conversations'));
+      await tester.tap(find.byKey(HomeScreen.privacyKey));
       await tester.pumpAndSettle();
-      expect(find.byType(AssistantScreen), findsOneWidget);
+      expect(find.byType(ProcessingPrivacyScreen), findsOneWidget);
     });
   });
 
@@ -341,6 +326,118 @@ void main() {
       await tester.tap(find.text('See all'));
       await tester.pumpAndSettle();
       expect(find.byType(SessionsScreen), findsOneWidget);
+    });
+
+    testWidgets('Home shows only the three newest recordings; a tile opens '
+        'its detail', (tester) async {
+      SessionSummary at(int minute) => SessionSummary(
+        id: '20261018T10${minute.toString().padLeft(2, '0')}00_aaaa',
+        complete: true,
+        start: DateTime(2026, 10, 18, 10, minute),
+        recordedMs: 4000,
+        chunks: const [],
+      );
+      // Newest first, as SessionSource.list() returns them.
+      await tester.pumpWidget(
+        app(sessions: FakeSessionSource([at(4), at(3), at(2), at(1)])),
+      );
+      await tester.pumpAndSettle();
+      Finder inRecent(String text) => find.descendant(
+        of: find.byKey(HomeScreen.recentKey),
+        matching: find.text(text),
+      );
+      expect(inRecent('Recording at 10:04'), findsOneWidget);
+      expect(inRecent('Recording at 10:03'), findsOneWidget);
+      expect(inRecent('Recording at 10:02'), findsOneWidget);
+      expect(inRecent('Recording at 10:01'), findsNothing);
+
+      await tester.ensureVisible(inRecent('Recording at 10:03'));
+      await tester.pumpAndSettle();
+      await tester.tap(inRecent('Recording at 10:03'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SessionDetailScreen), findsOneWidget);
+    });
+
+    testWidgets('Home: empty recent state; heading opens Sessions', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app(sessions: FakeSessionSource()));
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: find.byKey(HomeScreen.recentKey),
+          matching: find.textContaining('No recordings yet'),
+        ),
+        findsOneWidget,
+      );
+      await tester.ensureVisible(find.text('Recent recordings'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Recent recordings'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SessionsScreen), findsOneWidget);
+    });
+
+    testWidgets('Sessions: search and the Today / Older filter', (
+      tester,
+    ) async {
+      final now = DateTime.now();
+      final today = SessionSummary(
+        id: '20261019T090000_bbbb',
+        complete: true,
+        start: DateTime(now.year, now.month, now.day, 9),
+        recordedMs: 3000,
+        chunks: const [],
+        title: 'Standup notes',
+      );
+      await tester.pumpWidget(
+        app(sessions: FakeSessionSource([today, sampleSession])),
+      );
+      await openTab(tester, 'Sessions');
+      expect(find.text('Standup notes'), findsOneWidget);
+      expect(find.text('Recording at 01:39'), findsOneWidget);
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(SessionsScreen.filterKey),
+          matching: find.text('Today'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Standup notes'), findsOneWidget);
+      expect(find.text('Recording at 01:39'), findsNothing);
+
+      await tester.tap(find.text('Older'));
+      await tester.pumpAndSettle();
+      expect(find.text('Standup notes'), findsNothing);
+      expect(find.text('Recording at 01:39'), findsOneWidget);
+
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(SessionsScreen.searchKey), 'zzz');
+      await tester.pumpAndSettle();
+      expect(find.byKey(SessionsScreen.noMatchKey), findsOneWidget);
+    });
+
+    testWidgets('Sessions row menu renames with the existing dialog', (
+      tester,
+    ) async {
+      final source = FakeSessionSource([sampleSession]);
+      await tester.pumpWidget(app(sessions: source));
+      await openTab(tester, 'Sessions');
+      await tester.tap(find.byTooltip('More options for Recording at 01:39'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Rename'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(SessionDialogKeys.rename), findsOneWidget);
+      await tester.enterText(
+        find.byKey(SessionDialogKeys.renameField),
+        'Design review',
+      );
+      await tester.tap(find.byKey(SessionDialogKeys.save));
+      await tester.pumpAndSettle();
+      expect(source.renamed, {sampleSession.id: 'Design review'});
+      expect(find.text('Design review'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
     });
   });
 

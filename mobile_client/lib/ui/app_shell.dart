@@ -4,19 +4,20 @@ import 'package:flutter/material.dart';
 
 import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
-import 'assistant_screen.dart';
 import 'components.dart';
 import 'home_screen.dart';
-import 'knowledge_screen.dart';
 import 'sessions_screen.dart';
 import 'settings_home_screen.dart';
 import 'theme/app_theme.dart';
 
-/// Bottom navigation: Home, Sessions, Knowledge, Assistant, Settings.
+/// Bottom navigation: Home, Sessions, Settings.
+///
+/// Knowledge and Assistant are not shown in the navigation; their screens
+/// (knowledge_screen.dart, assistant_screen.dart) are kept unchanged.
 ///
 /// Recording happens on its own full-screen page, opened from Home (or the
-/// Sessions/Knowledge empty states). That page cannot be left while a
-/// session is open, so the recording indicator always stays visible (FR1).
+/// Sessions empty state). That page cannot be left while a session is open,
+/// so the recording indicator always stays visible (FR1).
 class AppShell extends StatefulWidget {
   const AppShell({
     super.key,
@@ -42,7 +43,7 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-enum _Tab { home, sessions, knowledge, assistant, settings }
+enum _Tab { home, sessions, settings }
 
 class _AppShellState extends State<AppShell> {
   _Tab _tab = _Tab.home;
@@ -51,8 +52,6 @@ class _AppShellState extends State<AppShell> {
   List<_Tab> get _tabs => [
     _Tab.home,
     if (widget.sessions != null) _Tab.sessions,
-    _Tab.knowledge,
-    _Tab.assistant,
     _Tab.settings,
   ];
 
@@ -88,8 +87,6 @@ class _AppShellState extends State<AppShell> {
       onOpenSessions: widget.sessions == null
           ? null
           : () => _select(_Tab.sessions),
-      onOpenKnowledge: () => _select(_Tab.knowledge),
-      onOpenAssistant: () => _select(_Tab.assistant),
     ),
     _Tab.sessions => SessionsScreen(
       source: widget.sessions!,
@@ -98,8 +95,6 @@ class _AppShellState extends State<AppShell> {
       refreshToken: _refresh,
       onStartRecording: _startRecording,
     ),
-    _Tab.knowledge => KnowledgeScreen(onStartRecording: _startRecording),
-    _Tab.assistant => const AssistantScreen(),
     _Tab.settings => SettingsHomeScreen(
       syncthing: widget.syncthing,
       appVersion: widget.appVersion,
@@ -117,16 +112,6 @@ class _AppShellState extends State<AppShell> {
       icon: Icon(Icons.graphic_eq_rounded),
       selectedIcon: Icon(Icons.graphic_eq_rounded),
       label: 'Sessions',
-    ),
-    _Tab.knowledge => const NavigationDestination(
-      icon: Icon(Icons.hub_outlined),
-      selectedIcon: Icon(Icons.hub_rounded),
-      label: 'Knowledge',
-    ),
-    _Tab.assistant => const NavigationDestination(
-      icon: Icon(Icons.auto_awesome_outlined),
-      selectedIcon: Icon(Icons.auto_awesome_rounded),
-      label: 'Assistant',
     ),
     _Tab.settings => const NavigationDestination(
       icon: Icon(Icons.settings_outlined),
@@ -158,15 +143,69 @@ class _AppShellState extends State<AppShell> {
               ),
           ],
         ),
-        bottomNavigationBar: DecoratedBox(
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: EvColors.border)),
-          ),
+        bottomNavigationBar: _FloatingNavBar(
           child: NavigationBar(
             key: AppShell.navKey,
             selectedIndex: index,
             onDestinationSelected: (i) => _select(tabs[i]),
             destinations: [for (final tab in tabs) _destination(tab)],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The navigation bar as a rounded, floating pill above the system
+/// navigation area. The bar sits below the page content (not over it), so
+/// nothing is hidden behind it.
+class _FloatingNavBar extends StatelessWidget {
+  const _FloatingNavBar({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: EvColors.navy,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: EvSpace.xs),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            EvSpace.lg,
+            EvSpace.xxs,
+            EvSpace.lg,
+            EvSpace.xs,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(EvRadius.pill),
+              border: Border.all(color: EvColors.border),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66000000),
+                  blurRadius: 24,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(EvRadius.pill),
+              // The SafeArea above already keeps clear of the system bar.
+              child: MediaQuery.removePadding(
+                context: context,
+                removeBottom: true,
+                child: NavigationBarTheme(
+                  data: NavigationBarTheme.of(context).copyWith(
+                    height: 64,
+                    backgroundColor: EvColors.surface,
+                    indicatorShape: const StadiumBorder(),
+                  ),
+                  child: child,
+                ),
+              ),
+            ),
           ),
         ),
       ),

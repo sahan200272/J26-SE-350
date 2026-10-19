@@ -31,8 +31,12 @@ final levelMeter = find.byType(InputLevelMeter);
 final waveform = find.byType(LiveWaveform);
 final autoPauseNotice = find.byKey(const Key('auto-pause-notice'));
 
-bool isEnabled(WidgetTester tester, Finder button) =>
-    tester.widget<ButtonStyleButton>(button).onPressed != null;
+/// A control that is not shown cannot be pressed: the redesigned screen
+/// shows Start only while no session is open, and Pause/Resume and Stop only
+/// while one is.
+bool isEnabled(WidgetTester tester, Finder button) => tester
+    .widgetList<ButtonStyleButton>(button)
+    .any((b) => b.onPressed != null);
 
 /// Expected (start, pause/resume, stop) enabled states.
 void expectButtons(
@@ -106,7 +110,9 @@ void main() {
     expectRecordingIndicatorVisible(false);
     expect(pausedIndicator, findsNothing);
     expect(find.text('Ready to record'), findsOneWidget);
-    expect(find.text('Pause'), findsOneWidget);
+    expect(find.text('Start'), findsOneWidget);
+    expect(pauseResumeButton, findsNothing, reason: 'no session open');
+    expect(stopButton, findsNothing, reason: 'no session open');
     expectButtons(tester, start: true, pauseResume: false, stop: false);
     expect(permission.requestCount, 0, reason: 'no request before Start');
   });
@@ -547,37 +553,31 @@ void main() {
     }
 
     for (final (name, size, dpr, textScale, widthDp) in screens) {
-      testWidgets('$name, idle: Start / Pause / Stop', (tester) async {
+      testWidgets('$name, idle: Start', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
 
-        expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
-          'Pause': pauseResumeButton,
-          'Stop': stopButton,
-        });
+        expectSingleLineLabels(tester, widthDp, {'Start': startButton});
       });
 
-      testWidgets('$name, recording: Start / Pause / Stop', (tester) async {
+      testWidgets('$name, recording: Pause / Stop', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
         await tap(tester, startButton);
 
         expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
           'Pause': pauseResumeButton,
           'Stop': stopButton,
         });
       });
 
-      testWidgets('$name, paused: Start / Resume / Stop', (tester) async {
+      testWidgets('$name, paused: Resume / Stop', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
         await tap(tester, startButton);
         await tap(tester, pauseResumeButton);
 
         expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
           'Resume': pauseResumeButton,
           'Stop': stopButton,
         });

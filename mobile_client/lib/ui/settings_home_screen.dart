@@ -34,16 +34,20 @@ class SettingsHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings'), centerTitle: false),
       body: SafeArea(
+        bottom: false,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
             EvSpace.md,
-            0,
+            EvSpace.xs,
             EvSpace.md,
             EvSpace.xl,
           ),
           children: [
+            const PageHeader(
+              title: 'Settings',
+              subtitle: 'Your PC, privacy and app information',
+            ),
             if (syncthing case final client?) ...[
               const SectionLabel('Your PC'),
               GroupCard(
@@ -82,8 +86,8 @@ class SettingsHomeScreen extends StatelessWidget {
                   icon: Icons.folder_outlined,
                   title: 'Recordings on this phone',
                   subtitle:
-                      'Kept in Echo Vault’s private storage. Deleting them '
-                      'from the app is not available yet.',
+                      'Kept in Echo Vault’s private storage. To rename or '
+                      'delete one, use its menu in Sessions.',
                 ),
               ],
             ),

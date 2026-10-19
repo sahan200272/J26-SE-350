@@ -9,11 +9,13 @@ import 'components.dart';
 import 'display_format.dart';
 import 'pc_link_card.dart';
 import 'session_detail_screen.dart';
+import 'session_dialogs.dart';
 import 'settings_screen.dart';
 import 'theme/app_theme.dart';
 
-/// Recordings stored on this phone, newest first. Reloads when
-/// [refreshToken] changes and on pull-to-refresh.
+/// Recordings stored on this phone, newest first, with search and a
+/// day filter (All / Today / Older). Reloads when [refreshToken] changes and
+/// on pull-to-refresh. Each row's menu offers the existing Rename and Delete.
 class SessionsScreen extends StatefulWidget {
   const SessionsScreen({
     super.key,
@@ -40,6 +42,7 @@ class SessionsScreen extends StatefulWidget {
   static const loadingKey = Key('sessions-loading');
   static const searchKey = Key('sessions-search');
   static const noMatchKey = Key('sessions-no-match');
+  static const filterKey = Key('sessions-filter');
 
   @override
   State<SessionsScreen> createState() => _SessionsScreenState();
@@ -52,6 +55,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
   bool _loading = false;
   final _search = TextEditingController();
   String _query = '';
+  _DayFilter _dayFilter = _DayFilter.all;
 
   @override
   void dispose() {
@@ -118,8 +122,8 @@ class _SessionsScreenState extends State<SessionsScreen> {
   Widget build(BuildContext context) {
     final sessions = _sessions;
     return Scaffold(
-      appBar: AppBar(title: const Text('Sessions'), centerTitle: false),
       body: SafeArea(
+        bottom: false,
         child: RefreshIndicator(
           color: EvColors.teal,
           backgroundColor: EvColors.surface,
@@ -134,8 +138,18 @@ class _SessionsScreenState extends State<SessionsScreen> {
               EvSpace.xl,
             ),
             children: [
-              if (widget.syncthing != null && sessions != null)
+              PageHeader(
+                title: 'Your Recordings',
+                subtitle: sessions == null
+                    ? null
+                    : sessions.isEmpty
+                    ? 'Nothing recorded yet'
+                    : '${plural(sessions.length, 'recording')} on this phone',
+              ),
+              if (widget.syncthing != null && sessions != null) ...[
+                const SizedBox(height: EvSpace.sm),
                 PcLinkCard(status: _sync, onTap: _openPairing),
+              ],
               if (_failed && sessions == null)
                 EmptyState(
                   key: SessionsScreen.errorKey,
@@ -186,6 +200,68 @@ class _SessionsScreenState extends State<SessionsScreen> {
     );
   }
 
+  void _snack(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _errorText(Object e) => e is SessionActionException
+      ? e.message
+      : 'Something went wrong. Nothing was changed.';
+
+  /// Row menu: the same rename as the detail screen (dialog + store).
+  Future<void> _rename(SessionSummary s) async {
+    final title = await showRenameDialog(context, current: sessionTitle(s));
+    if (title == null || !mounted) return;
+    try {
+      await widget.source.rename(s.id, title);
+      if (!mounted) return;
+      _snack(SessionDetailScreen.renamedMessage);
+    } catch (e) {
+      if (mounted) _snack(_errorText(e));
+    }
+    if (mounted) await _load();
+  }
+
+  /// Row menu: the same delete as the detail screen (confirmation that says
+  /// what happens to the PC copy, then the store's guarded delete).
+  Future<void> _delete(SessionSummary s) async {
+    final pcCopy = await _pcCopyState(s.id);
+    if (!mounted) return;
+    final confirmed = await showDeleteDialog(
+      context,
+      title: sessionTitle(s),
+      pcCopy: pcCopy,
+    );
+    if (!confirmed || !mounted) return;
+    try {
+      await widget.source.delete(s.id);
+      if (!mounted) return;
+      _snack(SessionDetailScreen.deletedMessage);
+    } catch (e) {
+      if (mounted) _snack(_errorText(e));
+    }
+    if (mounted) await _load();
+  }
+
+  Future<PcCopyState> _pcCopyState(String id) async {
+    final client = widget.syncthing;
+    if (client == null) return PcCopyState.unknown;
+    try {
+      final pending = await client
+          .sessionPendingFiles(id)
+          .timeout(const Duration(seconds: 3));
+      return switch (pending) {
+        null => PcCopyState.unknown,
+        0 => PcCopyState.sent,
+        _ => PcCopyState.partlySent,
+      };
+    } catch (_) {
+      return PcCopyState.unknown;
+    }
+  }
+
   Future<void> _open(SessionSummary s) async {
     await openSessionDetail(
       context,
@@ -197,30 +273,48 @@ class _SessionsScreenState extends State<SessionsScreen> {
     if (mounted) await _load();
   }
 
-  /// Sessions whose title or day matches the search text.
+  /// Sessions in the chosen day filter whose title or day matches the
+  /// search text.
   List<SessionSummary> _filter(List<SessionSummary> sessions) {
     final q = _query.trim().toLowerCase();
-    if (q.isEmpty) return sessions;
     final now = widget.now();
+    final today = DateTime(now.year, now.month, now.day);
+    bool isToday(SessionSummary s) {
+      final t = s.start;
+      return t != null && DateTime(t.year, t.month, t.day) == today;
+    }
+
+    bool inDayFilter(SessionSummary s) => switch (_dayFilter) {
+      _DayFilter.all => true,
+      _DayFilter.today => isToday(s),
+      _DayFilter.older => !isToday(s),
+    };
+
+    bool matchesQuery(SessionSummary s) =>
+        q.isEmpty ||
+        sessionTitle(s).toLowerCase().contains(q) ||
+        (s.start != null && formatDay(s.start!, now).toLowerCase().contains(q));
+
     return [
       for (final s in sessions)
-        if (sessionTitle(s).toLowerCase().contains(q) ||
-            (s.start != null &&
-                formatDay(s.start!, now).toLowerCase().contains(q)))
-          s,
+        if (inDayFilter(s) && matchesQuery(s)) s,
     ];
   }
 
   List<Widget> _grouped(List<SessionSummary> all) {
     final now = widget.now();
     final widgets = <Widget>[
-      if (all.length > 1) ...[
-        const SizedBox(height: EvSpace.sm),
-        _SearchField(
-          controller: _search,
-          onChanged: (value) => setState(() => _query = value),
-        ),
-      ],
+      const SizedBox(height: EvSpace.md),
+      _SearchField(
+        controller: _search,
+        onChanged: (value) => setState(() => _query = value),
+      ),
+      const SizedBox(height: EvSpace.sm),
+      _DayFilterChips(
+        key: SessionsScreen.filterKey,
+        selected: _dayFilter,
+        onSelected: (f) => setState(() => _dayFilter = f),
+      ),
     ];
     final sessions = _filter(all);
     if (sessions.isEmpty) {
@@ -229,7 +323,7 @@ class _SessionsScreenState extends State<SessionsScreen> {
           key: SessionsScreen.noMatchKey,
           icon: Icons.search_off_rounded,
           title: 'No matching recordings',
-          message: 'Try a different name or day.',
+          message: 'Try a different name, day or filter.',
         ),
       );
       return widgets;
@@ -241,16 +335,65 @@ class _SessionsScreenState extends State<SessionsScreen> {
         currentDay = day;
         widgets.add(SectionLabel(day));
       } else {
-        widgets.add(const SizedBox(height: EvSpace.sm));
+        widgets.add(const Divider(indent: 56));
       }
       widgets.add(
         SessionTile(
           session: s,
           onTap: () => _open(s),
+          onRename: () => _rename(s),
+          onDelete: () => _delete(s),
         ),
       );
     }
     return widgets;
+  }
+}
+
+enum _DayFilter { all, today, older }
+
+/// All / Today / Older.
+class _DayFilterChips extends StatelessWidget {
+  const _DayFilterChips({
+    super.key,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final _DayFilter selected;
+  final ValueChanged<_DayFilter> onSelected;
+
+  static String _label(_DayFilter f) => switch (f) {
+    _DayFilter.all => 'All',
+    _DayFilter.today => 'Today',
+    _DayFilter.older => 'Older',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Wrap(
+      spacing: EvSpace.xs,
+      runSpacing: EvSpace.xs,
+      children: [
+        for (final f in _DayFilter.values)
+          ChoiceChip(
+            label: Text(_label(f)),
+            selected: f == selected,
+            onSelected: (_) => onSelected(f),
+            showCheckmark: false,
+            shape: const StadiumBorder(),
+            side: BorderSide(
+              color: f == selected ? EvColors.teal : EvColors.border,
+            ),
+            backgroundColor: EvColors.surfaceLow,
+            selectedColor: EvColors.teal.withValues(alpha: 0.16),
+            labelStyle: textTheme.labelLarge?.copyWith(
+              color: f == selected ? EvColors.teal : EvColors.textMuted,
+            ),
+          ),
+      ],
+    );
   }
 }
 
@@ -280,8 +423,9 @@ String sessionTitle(SessionSummary s) =>
     s.title ??
     (s.start == null ? 'Recording' : 'Recording at ${formatClock(s.start!)}');
 
-/// One recording in a list: time, length, status, speech activity and
-/// whether a transcript is available.
+/// One recording in a list: title, length, status, speech activity,
+/// whether a transcript is available, and (when given) a menu with Rename
+/// and Delete.
 class SessionTile extends StatelessWidget {
   const SessionTile({
     super.key,
@@ -289,6 +433,8 @@ class SessionTile extends StatelessWidget {
     this.onTap,
     this.showDay = false,
     this.now,
+    this.onRename,
+    this.onDelete,
   });
 
   final SessionSummary session;
@@ -298,6 +444,10 @@ class SessionTile extends StatelessWidget {
   final bool showDay;
   final DateTime? now;
 
+  /// Row menu actions; the menu is hidden when both are null.
+  final VoidCallback? onRename;
+  final VoidCallback? onDelete;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -306,47 +456,147 @@ class SessionTile extends StatelessWidget {
     final details = [
       if (showDay && s.start != null)
         formatDay(s.start!, now ?? DateTime.now()),
+      // The automatic title already contains the time.
+      if (s.title != null && s.start != null) formatClock(s.start!),
       if (length != null) formatSpan(length),
       if (s.pauseCount > 0) plural(s.pauseCount, 'pause'),
     ].join(' · ');
-    return EvCard(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    final hasMenu = onRename != null || onDelete != null;
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(EvRadius.md),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            EvSpace.xxs,
+            EvSpace.sm,
+            hasMenu ? 0 : EvSpace.xxs,
+            EvSpace.sm,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const IconBadge(Icons.graphic_eq_rounded, size: 40),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: EvColors.teal.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: EvColors.teal.withValues(alpha: 0.18),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.graphic_eq_rounded,
+                  color: EvColors.teal,
+                  size: 22,
+                ),
+              ),
               const SizedBox(width: EvSpace.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      sessionTitle(s),
-                      style: textTheme.titleMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            sessionTitle(s),
+                            style: textTheme.titleMedium,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: EvSpace.xs),
+                        SessionStatusPill(session: s),
+                      ],
                     ),
                     if (details.isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(details, style: textTheme.bodySmall),
                     ],
+                    if (s.chunks.isNotEmpty && s.timelineMs > 0) ...[
+                      const SizedBox(height: EvSpace.xs),
+                      SessionTimeline(session: s, height: 4),
+                    ],
+                    const SizedBox(height: EvSpace.xs),
+                    const TranscriptAvailability(),
                   ],
                 ),
               ),
-              const SizedBox(width: EvSpace.xs),
-              SessionStatusPill(session: s),
+              if (hasMenu)
+                _RowMenu(
+                  title: sessionTitle(s),
+                  onRename: onRename,
+                  onDelete: onDelete,
+                ),
             ],
           ),
-          if (s.chunks.isNotEmpty && s.timelineMs > 0) ...[
-            const SizedBox(height: EvSpace.md),
-            SessionTimeline(session: s, height: 6),
-          ],
-          const SizedBox(height: EvSpace.sm),
-          const TranscriptAvailability(),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+enum _RowAction { rename, delete }
+
+/// The "⋯" menu of a row.
+class _RowMenu extends StatelessWidget {
+  const _RowMenu({
+    required this.title,
+    required this.onRename,
+    required this.onDelete,
+  });
+
+  final String title;
+  final VoidCallback? onRename;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<_RowAction>(
+      tooltip: 'More options for $title',
+      icon: const Icon(Icons.more_vert_rounded, color: EvColors.textMuted),
+      color: EvColors.surfaceHigh,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(EvRadius.md),
+      ),
+      onSelected: (action) {
+        switch (action) {
+          case _RowAction.rename:
+            onRename?.call();
+          case _RowAction.delete:
+            onDelete?.call();
+        }
+      },
+      itemBuilder: (context) => [
+        if (onRename != null)
+          const PopupMenuItem(
+            value: _RowAction.rename,
+            child: ListTile(
+              leading: Icon(Icons.edit_outlined),
+              title: Text('Rename'),
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        if (onDelete != null)
+          const PopupMenuItem(
+            value: _RowAction.delete,
+            child: ListTile(
+              leading: Icon(
+                Icons.delete_outline_rounded,
+                color: EvColors.recording,
+              ),
+              title: Text(
+                'Delete recording',
+                style: TextStyle(color: EvColors.recording),
+              ),
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+      ],
     );
   }
 }
@@ -392,7 +642,7 @@ class _SearchField extends StatelessWidget {
       onChanged: onChanged,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
-        hintText: 'Search recordings',
+        hintText: 'Search recordings…',
         prefixIcon: const Icon(Icons.search_rounded),
         suffixIcon: ListenableBuilder(
           listenable: controller,
