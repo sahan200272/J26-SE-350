@@ -427,5 +427,36 @@ def resolve_seed_anchors(
                 score=round(best_score, 4),
             )
 
+    # Category-to-Label Fallback: if no specific entity name matched (e.g., "When is the meeting?"),
+    # anchor on nodes whose Neo4j label matches the category asked in the query.
+    if not matches_by_key:
+        lower_q = query.strip().lower()
+        category_label_map = {
+            "Meeting": ["meeting", "meetings", "sync", "standup", "call"],
+            "Deadline": ["deadline", "deadlines", "due date", "due on", "schedule", "scheduled"],
+            "Event": ["event", "events", "trip", "dinner", "party"],
+            "Task": ["task", "tasks", "todo", "todos", "action item", "assigned"],
+            "Issue": ["issue", "issues", "blocker", "blockers", "bug", "problem"],
+            "Decision": ["decision", "decisions", "decided", "agreed"],
+        }
+        target_labels: Set[str] = set()
+        for label_name, triggers in category_label_map.items():
+            if any(re.search(rf"\b{re.escape(t)}\b", lower_q) for t in triggers):
+                target_labels.add(label_name)
+                if label_name == "Deadline":
+                    target_labels.add("Meeting")
+                    target_labels.add("Event")
+
+        if target_labels:
+            for node in nodes:
+                if node["type"] in target_labels:
+                    matches_by_key[node["key"]] = AnchorMatch(
+                        key=node["key"],
+                        name=node["name"],
+                        type=node["type"],
+                        match_type="substring",
+                        score=0.85,
+                    )
+
     sorted_anchors = sorted(matches_by_key.values(), key=lambda m: m.score, reverse=True)
     return sorted_anchors

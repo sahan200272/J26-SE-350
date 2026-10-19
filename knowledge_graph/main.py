@@ -11,6 +11,7 @@ Run command:
 
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from graph_schema.adapters import triples_to_payload
@@ -19,6 +20,7 @@ from graph_schema.models import Payload
 from graph_schema.schema import get_driver
 from graphrag.baseline_keyword import compare_retrieval
 from graphrag.context_builder import get_pending_items_context
+from graphrag.demo_ui import DEMO_HTML, get_graph_snapshot
 from graphrag.models import RetrievalRequest, RetrievalResult
 from graphrag.retriever import retrieve_subgraph
 
@@ -33,6 +35,27 @@ class TriplesRequest(BaseModel):
     source: str
     timestamp: Optional[str] = None
     triples: List[Any] = Field(default_factory=list)
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/demo", response_class=HTMLResponse, tags=["Demo UI"])
+def demo_dashboard() -> HTMLResponse:
+    """Serve the interactive Knowledge Graph & Multi-Hop GraphRAG Demo Dashboard."""
+    return HTMLResponse(content=DEMO_HTML)
+
+
+@app.get("/graph/snapshot", tags=["Demo UI"])
+def graph_snapshot_endpoint(
+    limit: int = Query(default=120, ge=1, le=500),
+    include_private: bool = Query(default=False, description="Include private nodes in snapshot"),
+    keys: Optional[str] = Query(default=None, description="Comma-separated node keys to filter snapshot"),
+) -> Dict[str, Any]:
+    """Return a live snapshot of Neo4j nodes, edges, and label counts for 2D visualization."""
+    try:
+        key_list = [k.strip() for k in keys.split(",") if k.strip()] if keys else None
+        return get_graph_snapshot(limit=limit, include_private=include_private, keys=key_list)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 @app.get("/health")

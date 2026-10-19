@@ -141,17 +141,33 @@ def score_path(
     )
 
 
+def _sanitize_prop_value(val: Any) -> Any:
+    """Convert Neo4j DateTime/temporal objects into JSON-serializable ISO strings."""
+    if val is None or isinstance(val, (str, int, float, bool)):
+        return val
+    if isinstance(val, list):
+        return [_sanitize_prop_value(item) for item in val]
+    if isinstance(val, dict):
+        return {str(k): _sanitize_prop_value(v) for k, v in val.items()}
+    if hasattr(val, "isoformat"):
+        return str(val.isoformat())
+    if hasattr(val, "to_native"):
+        native = val.to_native()
+        return native.isoformat() if hasattr(native, "isoformat") else str(native)
+    return str(val)
+
+
 def _extract_node_dict(node: Any) -> Dict[str, Any]:
-    """Helper to convert Neo4j node or dict to standardized node dict."""
+    """Helper to convert Neo4j node or dict to standardized JSON-safe node dict."""
     if isinstance(node, dict):
-        props = dict(node.get("props", {}))
+        props = {str(k): _sanitize_prop_value(v) for k, v in dict(node.get("props", {})).items()}
         for k, v in node.items():
             if k not in ("key", "name", "type", "props"):
-                props[k] = v
+                props[str(k)] = _sanitize_prop_value(v)
         return {
-            "key": node["key"],
-            "name": node.get("name") or node["key"],
-            "type": node.get("type", "Concept"),
+            "key": str(node["key"]),
+            "name": str(node.get("name") or node["key"]),
+            "type": str(node.get("type", "Concept")),
             "props": props,
         }
 
@@ -159,9 +175,13 @@ def _extract_node_dict(node: Any) -> Dict[str, Any]:
     labels = list(node.labels) if hasattr(node, "labels") else ["Concept"]
     props = dict(node.items()) if hasattr(node, "items") else {}
     node_type = labels[0] if labels else "Concept"
-    key = props.get("key", "")
-    name = props.get("name", key)
-    clean_props = {k: v for k, v in props.items() if k not in ("key", "name")}
+    key = str(props.get("key", ""))
+    name = str(props.get("name") or key)
+    clean_props = {
+        str(k): _sanitize_prop_value(v)
+        for k, v in props.items()
+        if k not in ("key", "name")
+    }
 
     return {
         "key": key,
@@ -343,7 +363,11 @@ def retrieve_subgraph(
 
                     rel_props = dict(r.items()) if hasattr(r, "items") else {}
                     confidence = float(rel_props.get("confidence", 1.0))
-                    clean_props = {k: v for k, v in rel_props.items() if k != "confidence"}
+                    clean_props = {
+                        str(k): _sanitize_prop_value(v)
+                        for k, v in rel_props.items()
+                        if k != "confidence"
+                    }
 
                     hops.append(
                         PathHop(
@@ -383,20 +407,10 @@ def retrieve_subgraph(
             subgraph_edges: List[Dict[str, Any]] = []
             seen_edge_signatures: Set[Tuple[str, str, str]] = set()
 
-            # Seed anchor nodes
-            for a in anchors:
-                if a.key not in subgraph_nodes_dict:
-                    subgraph_nodes_dict[a.key] = {
-                        "key": a.key,
-                        "name": a.name,
-                        "type": a.type,
-                        "props": {},
-                    }
-
-            # Elements from top ranked paths
+            # Elements from top ranked paths first (carrying full Neo4j properties)
             for path in top_paths:
                 for n in path.nodes:
-                    if n["key"] not in subgraph_nodes_dict:
+                    if n["key"] not in subgraph_nodes_dict or not subgraph_nodes_dict[n["key"]].get("props"):
                         subgraph_nodes_dict[n["key"]] = n
 
                 for hop in path.hops:
@@ -418,6 +432,26 @@ def retrieve_subgraph(
                             "confidence": hop.confidence,
                             "props": hop.props,
                         })
+
+            # Ensure all seed anchor nodes are present with their full Neo4j properties
+            missing_anchor_keys = [a.key for a in anchors if a.key not in subgraph_nodes_dict or not subgraph_nodes_dict[a.key].get("props")]
+            if missing_anchor_keys:
+                anchor_props_records = session.run(
+                    "MATCH (n) WHERE n.key IN $keys RETURN n",
+                    keys=missing_anchor_keys,
+                )
+                for rec in anchor_props_records:
+                    extracted = _extract_node_dict(rec["n"])
+                    subgraph_nodes_dict[extracted["key"]] = extracted
+
+            for a in anchors:
+                if a.key not in subgraph_nodes_dict:
+                    subgraph_nodes_dict[a.key] = {
+                        "key": a.key,
+                        "name": a.name,
+                        "type": a.type,
+                        "props": {},
+                    }
 
             # 4. Provenance Collection (Hub-Suppressed Attachment)
             all_node_keys = set(subgraph_nodes_dict.keys())
@@ -451,3 +485,4 @@ def retrieve_subgraph(
     finally:
         if close_driver:
             driver.close()
+

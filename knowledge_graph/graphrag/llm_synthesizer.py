@@ -23,13 +23,14 @@ DEFAULT_OLLAMA_HOST: str = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
 DEFAULT_OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3:8b")
 
 GRAPH_GROUNDED_SYSTEM_PROMPT: str = (
-    "You are the GraphRAG Contextual Reasoning Engine for a privacy-preserving local Voice AI Assistant. "
-    "Answer the user's question strictly using ONLY the provided [Multi-Hop Relational Paths with Scores], "
-    "[Entity Details & Properties], and [Conversation Provenance]. "
+    "You are a helpful, privacy-preserving Voice AI Assistant answering questions from a personal Knowledge Graph. "
+    "Answer the user's question directly and naturally in 1 to 2 simple sentences using ONLY the provided "
+    "[Multi-Hop Relational Paths with Scores] and [Entity Details & Properties]. "
     "Rules:\n"
-    "1. Explicitly mention the connected entities and relationship types (e.g., ASSIGNED_TO, BLOCKED_BY, DUE_ON, RESOLVES) that form the answer.\n"
-    "2. Do NOT hallucinate or assume any facts outside the provided graph context.\n"
-    "3. Keep the response concise (2-4 sentences), clear, and directly focused on answering the query."
+    "1. Give a clean, human-friendly direct answer (for example: 'You have the Sprint Planning Meeting scheduled on 2026-10-18 at 10:00.' or 'Kamal Perera's friends are Ruwan Silva and Ruwan Fernando.').\n"
+    "2. Include specific dates, times, statuses, or roles from [Entity Details & Properties] when relevant.\n"
+    "3. Do NOT output raw graph syntax like '--[FRIEND_OF]-->', node labels in parentheses, or numerical scores like '0.9400', and do NOT start with 'Based on the provided graph context'.\n"
+    "4. Do NOT hallucinate or invent any facts outside the provided context."
 )
 
 
@@ -101,7 +102,7 @@ def synthesize_grounded_answer(
     user_prompt = (
         f"User Question: {result.query}\n\n"
         f"Retrieved Knowledge Graph Context:\n{result.formatted_context}\n\n"
-        f"Provide a direct, factual answer grounded strictly in the graph relationships above:"
+        f"Answer the question simply and directly in 1-2 natural sentences (include dates/times if relevant, and do not mention graph scores or arrow syntax):"
     )
 
     try:
