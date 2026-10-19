@@ -465,6 +465,63 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
+/// Large page title with an optional muted subtitle and trailing widget,
+/// used at the top of the main tabs (Sessions, Settings).
+class PageHeader extends StatelessWidget {
+  const PageHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+  });
+
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        EvSpace.xxs,
+        EvSpace.md,
+        EvSpace.xxs,
+        EvSpace.xs,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  header: true,
+                  child: Text(title, style: textTheme.headlineMedium),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: EvSpace.xxs),
+                  Text(
+                    subtitle!,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: EvColors.textMuted,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (trailing != null) ...[
+            const SizedBox(width: EvSpace.sm),
+            trailing!,
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 /// Placeholder block shown while content loads.
 class SkeletonCard extends StatelessWidget {
   const SkeletonCard({super.key, this.height = 84});

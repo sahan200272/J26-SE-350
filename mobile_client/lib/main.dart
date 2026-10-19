@@ -224,6 +224,8 @@ class _AppGateState extends State<_AppGate> {
       appVersion: app.appVersion,
       log: app.log,
       autoStart: true,
+      // After Stop: name the recording with the existing rename.
+      renameRecording: app.sessions?.rename,
     ),
   );
 

@@ -70,7 +70,7 @@ class ProcessingPrivacyScreen extends StatelessWidget {
       StepStatus.planned,
       Icons.phone_android_rounded,
       'Results on this phone',
-      'Seeing transcripts, knowledge and the assistant in this app.',
+      'Seeing transcripts and notifications in this app.',
     ),
   ];
 

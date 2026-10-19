@@ -1,16 +1,18 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
 import 'components.dart';
+import 'display_format.dart';
 import 'processing_privacy_screen.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
 
-/// Home: welcome, the Start recording action, recent recordings and the
-/// way into Knowledge and Assistant.
+/// Home: a compact greeting, the microphone button that opens the recording
+/// screen, and the three most recent recordings with a way to see them all.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
@@ -19,8 +21,6 @@ class HomeScreen extends StatefulWidget {
     this.refreshToken = 0,
     this.onStartRecording,
     this.onOpenSessions,
-    this.onOpenKnowledge,
-    this.onOpenAssistant,
     this.now = DateTime.now,
   });
 
@@ -32,8 +32,6 @@ class HomeScreen extends StatefulWidget {
   final int refreshToken;
   final VoidCallback? onStartRecording;
   final VoidCallback? onOpenSessions;
-  final VoidCallback? onOpenKnowledge;
-  final VoidCallback? onOpenAssistant;
   final DateTime Function() now;
 
   static const startKey = Key('home-start-recording');
@@ -85,108 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _ => 'Good evening',
   };
 
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(
-            EvSpace.md,
-            EvSpace.md,
-            EvSpace.md,
-            EvSpace.xl,
-          ),
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: EvSpace.xxs),
-              child: Row(children: [BrandTitle()]),
-            ),
-            const SizedBox(height: EvSpace.lg),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: EvSpace.xxs),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _greeting(widget.now()),
-                    style: textTheme.bodyLarge?.copyWith(
-                      color: EvColors.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: EvSpace.xxs),
-                  Text(
-                    'Capture what matters',
-                    style: textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: EvSpace.xs),
-                  Text(
-                    'Echo Vault records conversations only when you choose, '
-                    'and sends them to Echo Vault on your own computer, '
-                    'never to the cloud.',
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: EvColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: EvSpace.lg),
-            _StartRecordingCard(onTap: widget.onStartRecording),
-            if (widget.sessions != null) ...[
-              SectionTitle(
-                'Recent recordings',
-                actionLabel: 'See all',
-                onAction: widget.onOpenSessions,
-              ),
-              _recentSection(context),
-            ],
-            const SectionTitle('Explore'),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: _FeatureTile(
-                      icon: Icons.hub_outlined,
-                      title: 'Knowledge',
-                      subtitle: 'People, topics and how they connect',
-                      onTap: widget.onOpenKnowledge,
-                    ),
-                  ),
-                  const SizedBox(width: EvSpace.sm),
-                  Expanded(
-                    child: _FeatureTile(
-                      icon: Icons.auto_awesome_outlined,
-                      title: 'Assistant',
-                      subtitle: 'Ask about past conversations',
-                      onTap: widget.onOpenAssistant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: EvSpace.lg),
-            GroupCard(
-              children: [
-                InfoRow(
-                  key: HomeScreen.privacyKey,
-                  icon: Icons.shield_outlined,
-                  title: 'Private by design',
-                  subtitle: 'See how your recordings are handled',
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const ProcessingPrivacyScreen(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  void _openPrivacy() => Navigator.of(context).push(
+    MaterialPageRoute<void>(builder: (_) => const ProcessingPrivacyScreen()),
+  );
 
   Future<void> _open(SessionSummary s) async {
     await openSessionDetail(
@@ -198,60 +97,246 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) await _load();
   }
 
-  Widget _recentSection(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    const padding = EdgeInsets.fromLTRB(
+      EvSpace.md,
+      EvSpace.sm,
+      EvSpace.md,
+      EvSpace.md,
+    );
+    return Scaffold(
+      body: SafeArea(
+        bottom: false,
+        child: LayoutBuilder(
+          builder: (context, box) => SingleChildScrollView(
+            padding: padding,
+            child: ConstrainedBox(
+              // Fill the screen on tall phones (the microphone sits in the
+              // middle); scroll on short ones or at large text sizes.
+              constraints: BoxConstraints(
+                minHeight: math.max(0.0, box.maxHeight - padding.vertical),
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _HomeHeader(onOpenPrivacy: _openPrivacy),
+                    const SizedBox(height: EvSpace.lg),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: EvSpace.xxs,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _greeting(widget.now()),
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: EvColors.textMuted,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Capture what matters',
+                            style: textTheme.headlineSmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Expanded(child: SizedBox(height: EvSpace.lg)),
+                    _RecordHero(onTap: widget.onStartRecording),
+                    const Expanded(child: SizedBox(height: EvSpace.lg)),
+                    if (widget.sessions != null) _recentCard(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _recentCard(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final openAll = widget.onOpenSessions;
+    return EvCard(
+      padding: const EdgeInsets.fromLTRB(
+        EvSpace.md,
+        EvSpace.xxs,
+        EvSpace.xs,
+        EvSpace.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  button: openAll != null,
+                  label: 'Recent recordings',
+                  hint: openAll == null ? null : 'Opens all recordings',
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: openAll,
+                    borderRadius: BorderRadius.circular(EvRadius.sm),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: EvSpace.sm,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.graphic_eq_rounded,
+                            size: 18,
+                            color: EvColors.teal,
+                          ),
+                          const SizedBox(width: EvSpace.xs),
+                          Flexible(
+                            child: Text(
+                              'Recent recordings',
+                              style: textTheme.titleSmall,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (openAll != null)
+                TextButton(onPressed: openAll, child: const Text('See all')),
+            ],
+          ),
+          const SizedBox(height: EvSpace.xs),
+          Padding(
+            padding: const EdgeInsets.only(right: EvSpace.xs),
+            child: _recentBody(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _recentBody(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     final recent = _recent;
     if (_failed && recent == null) {
-      return const EvCard(
+      return Text(
         key: HomeScreen.recentKey,
-        child: Text('Recent recordings could not be loaded.'),
+        'Recent recordings could not be loaded.',
+        style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
       );
     }
     if (recent == null) {
-      return const SkeletonCard(key: HomeScreen.recentKey);
+      return const _RecentRow(
+        key: HomeScreen.recentKey,
+        children: [_TileSkeleton(), _TileSkeleton(), _TileSkeleton()],
+      );
     }
     if (recent.isEmpty) {
-      return EvCard(
+      return Row(
         key: HomeScreen.recentKey,
-        child: Row(
-          children: [
-            const IconBadge(
-              Icons.graphic_eq_rounded,
-              color: EvColors.textMuted,
+        children: [
+          const IconBadge(
+            Icons.mic_none_rounded,
+            color: EvColors.textMuted,
+            size: 40,
+          ),
+          const SizedBox(width: EvSpace.sm),
+          Expanded(
+            child: Text(
+              'No recordings yet. Tap the microphone to capture your first '
+              'conversation.',
+              style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
             ),
-            const SizedBox(width: EvSpace.sm),
-            Expanded(
-              child: Text(
-                'No recordings yet. Your first one will appear here.',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     }
     final now = widget.now();
-    return Column(
+    return _RecentRow(
       key: HomeScreen.recentKey,
       children: [
-        for (final (i, s) in recent.indexed) ...[
-          if (i > 0) const SizedBox(height: EvSpace.sm),
-          SessionTile(
-            session: s,
-            showDay: true,
-            now: now,
-            onTap: () => _open(s),
-          ),
-        ],
+        for (final s in recent)
+          _RecentTile(session: s, now: now, onTap: () => _open(s)),
       ],
     );
   }
 }
 
-/// The primary action: large, high-contrast, with one clear label.
-class _StartRecordingCard extends StatelessWidget {
-  const _StartRecordingCard({required this.onTap});
+/// Brand on the left; on the right a small "Private" chip that opens
+/// Processing & privacy.
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader({required this.onOpenPrivacy});
+
+  final VoidCallback onOpenPrivacy;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        const Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: BrandTitle(),
+          ),
+        ),
+        const SizedBox(width: EvSpace.xs),
+        Semantics(
+          button: true,
+          label: 'Private by design',
+          hint: 'See how your recordings are handled',
+          excludeSemantics: true,
+          child: Material(
+            key: HomeScreen.privacyKey,
+            color: EvColors.surfaceLow,
+            shape: const StadiumBorder(
+              side: BorderSide(color: EvColors.border),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onOpenPrivacy,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: EvSpace.sm),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.shield_outlined,
+                        size: 16,
+                        color: EvColors.teal,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Private',
+                        style: textTheme.labelLarge?.copyWith(
+                          color: EvColors.snow,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The main action: a large microphone button between two static waveform
+/// illustrations, with one short label.
+class _RecordHero extends StatelessWidget {
+  const _RecordHero({required this.onTap});
 
   final VoidCallback? onTap;
 
@@ -259,65 +344,103 @@ class _StartRecordingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final enabled = onTap != null;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 148,
+          child: Row(
+            children: [
+              const Expanded(child: _WaveIllustration()),
+              const SizedBox(width: EvSpace.sm),
+              _MicButton(onTap: onTap),
+              const SizedBox(width: EvSpace.sm),
+              const Expanded(child: _WaveIllustration(mirrored: true)),
+            ],
+          ),
+        ),
+        const SizedBox(height: EvSpace.md),
+        Text(
+          'Start recording',
+          style: textTheme.titleMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: EvSpace.xxs),
+        Text(
+          enabled
+              ? 'Your conversations, your control.'
+              : 'Recording is not available right now.',
+          style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+class _MicButton extends StatelessWidget {
+  const _MicButton({required this.onTap});
+
+  final VoidCallback? onTap;
+
+  static const double _core = 88;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final accent = enabled ? EvColors.teal : EvColors.textSubtle;
     return Semantics(
       button: true,
       enabled: enabled,
       label: 'Start recording',
       excludeSemantics: true,
-      child: Material(
-        key: HomeScreen.startKey,
-        color: enabled ? EvColors.teal : EvColors.surfaceHigh,
-        borderRadius: BorderRadius.circular(EvRadius.lg),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(EvSpace.lg),
-            child: Row(
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: EvColors.navy.withValues(alpha: enabled ? 1 : 0.4),
-                  ),
+      child: Container(
+        width: 148,
+        height: 148,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: accent.withValues(alpha: 0.05),
+          border: Border.all(color: accent.withValues(alpha: 0.10)),
+        ),
+        child: Container(
+          width: 118,
+          height: 118,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: accent.withValues(alpha: 0.09),
+            border: Border.all(color: accent.withValues(alpha: 0.22)),
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: enabled
+                  ? [
+                      BoxShadow(
+                        color: EvColors.teal.withValues(alpha: 0.35),
+                        blurRadius: 28,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Material(
+              key: HomeScreen.startKey,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              color: enabled ? EvColors.teal : EvColors.surfaceHigh,
+              child: InkWell(
+                onTap: onTap,
+                child: SizedBox.square(
+                  dimension: _core,
                   child: Icon(
                     Icons.mic_rounded,
-                    size: 28,
-                    color: enabled ? EvColors.teal : EvColors.textSubtle,
+                    size: 38,
+                    color: enabled ? EvColors.navy : EvColors.textSubtle,
                   ),
                 ),
-                const SizedBox(width: EvSpace.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Start recording',
-                        style: textTheme.titleLarge?.copyWith(
-                          color: enabled ? EvColors.navy : EvColors.textMuted,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        enabled
-                            ? 'Begins right away. You stay in control.'
-                            : 'Recording is not available right now.',
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: enabled
-                              ? EvColors.navy.withValues(alpha: 0.75)
-                              : EvColors.textSubtle,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: enabled ? EvColors.navy : EvColors.textSubtle,
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -326,35 +449,192 @@ class _StartRecordingCard extends StatelessWidget {
   }
 }
 
-class _FeatureTile extends StatelessWidget {
-  const _FeatureTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
+/// Static decorative bars beside the microphone. Purely an illustration: it
+/// does not move and does not show live audio.
+class _WaveIllustration extends StatelessWidget {
+  const _WaveIllustration({this.mirrored = false});
+
+  final bool mirrored;
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: SizedBox(
+        height: 64,
+        width: double.infinity,
+        child: CustomPaint(painter: _WaveIllustrationPainter(mirrored)),
+      ),
+    );
+  }
+}
+
+class _WaveIllustrationPainter extends CustomPainter {
+  _WaveIllustrationPainter(this.mirrored);
+
+  final bool mirrored;
+
+  // Fixed bar heights (0..1); the last value is the bar nearest the
+  // microphone.
+  static const _heights = [
+    0.18, 0.30, 0.22, 0.45, 0.32, 0.60, 0.40, 0.78, 0.52, 0.92, 0.66, 0.84, //
+    0.48, 0.70, 0.36,
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0) return;
+    const slot = 7.0;
+    final count = math.min(_heights.length, (size.width / slot).floor());
+    if (count <= 0) return;
+    final mid = size.height / 2;
+    final paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3;
+    for (var i = 0; i < count; i++) {
+      // Index 0 is the bar nearest the microphone.
+      final h = _heights[_heights.length - 1 - i];
+      final half = math.max(1.5, h * (size.height / 2 - 2));
+      final fromMic = slot * i + slot / 2;
+      final x = mirrored ? fromMic : size.width - fromMic;
+      final fade = count <= 1 ? 1.0 : 1 - i / (count - 1);
+      paint.color = EvColors.textMuted.withValues(alpha: 0.12 + 0.38 * fade);
+      canvas.drawLine(Offset(x, mid - half), Offset(x, mid + half), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_WaveIllustrationPainter old) => old.mirrored != mirrored;
+}
+
+/// Up to [HomeScreen.recentCount] equal-width tiles; empty slots keep the
+/// widths the same when there are fewer recordings.
+class _RecentRow extends StatelessWidget {
+  const _RecentRow({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < HomeScreen.recentCount; i++) ...[
+            if (i > 0) const SizedBox(width: EvSpace.xs),
+            Expanded(
+              child: i < children.length ? children[i] : const SizedBox(),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// One recent recording: icon, title, length and day.
+class _RecentTile extends StatelessWidget {
+  const _RecentTile({
+    required this.session,
+    required this.now,
     required this.onTap,
   });
 
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
+  final SessionSummary session;
+  final DateTime now;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return EvCard(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IconBadge(icon, color: EvColors.indigo, size: 40),
-          const SizedBox(height: EvSpace.sm),
-          Text(title, style: textTheme.titleMedium),
-          const SizedBox(height: 2),
-          Text(subtitle, style: textTheme.bodySmall),
-          const SizedBox(height: EvSpace.sm),
-          const StatusPill(label: 'Coming soon', tone: PillTone.indigo),
-        ],
+    final s = session;
+    final length = s.recordedMs ?? s.sessionEndMs;
+    final meta = TextStyle(
+      fontSize: textTheme.bodySmall?.fontSize,
+      color: EvColors.textMuted,
+      height: 1.3,
+    );
+    return Material(
+      color: EvColors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(EvRadius.md),
+        side: const BorderSide(color: EvColors.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(EvSpace.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const IconBadge(Icons.graphic_eq_rounded, size: 32),
+              const SizedBox(height: EvSpace.sm),
+              Text(
+                sessionTitle(s),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.labelLarge?.copyWith(
+                  color: EvColors.snow,
+                  height: 1.25,
+                ),
+              ),
+              const SizedBox(height: EvSpace.xxs),
+              Text(
+                length == null ? '–' : formatSpan(length),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: meta.copyWith(
+                  color: EvColors.teal,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (s.start != null)
+                Text(
+                  formatDay(s.start!, now),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: meta,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TileSkeleton extends StatelessWidget {
+  const _TileSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget bar(double width, double height) => Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: EvColors.surfaceHigh,
+        borderRadius: BorderRadius.circular(EvRadius.sm),
+      ),
+    );
+    return ExcludeSemantics(
+      child: Container(
+        padding: const EdgeInsets.all(EvSpace.sm),
+        decoration: BoxDecoration(
+          color: EvColors.surface,
+          borderRadius: BorderRadius.circular(EvRadius.md),
+          border: Border.all(color: EvColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            bar(32, 32),
+            const SizedBox(height: EvSpace.sm),
+            bar(64, 10),
+            const SizedBox(height: EvSpace.xs),
+            bar(40, 10),
+            const SizedBox(height: EvSpace.xs),
+          ],
+        ),
       ),
     );
   }
