@@ -11,6 +11,7 @@ import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'display_format.dart';
 import 'elapsed_format.dart';
+import 'immersive_backdrop.dart';
 import 'input_level_meter.dart';
 import 'lifecycle_source.dart';
 import 'live_waveform.dart';
@@ -18,6 +19,7 @@ import 'recording_controller.dart';
 import 'save_recording_sheet.dart';
 import 'settings_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Recording screen: status (ready / recording / paused / stopped), a large
 /// timer, a live waveform of the microphone level, and the controls: Start
@@ -218,139 +220,122 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   Widget build(BuildContext context) {
     final canLeave = Navigator.of(context).canPop();
-    final textTheme = Theme.of(context).textTheme;
-    return PopScope(
-      canPop: !_sessionOpen,
-      onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) _blockedLeave();
-      },
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          scrolledUnderElevation: 0,
-          automaticallyImplyLeading: false,
-          leading: canLeave
-              ? Center(
-                  child: _RoundIconButton(
-                    icon: Icons.arrow_back_rounded,
-                    tooltip: 'Back',
-                    // Goes through PopScope: refused while a session is open.
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                )
-              : null,
-          title: const BrandTitle(),
-          centerTitle: true,
-          actions: [
-            if (widget.syncthing case final syncthing?)
-              ListenableBuilder(
-                listenable: _controller,
-                // Only between sessions: the recording indicator (FR1) must
-                // stay on screen while a session is open.
-                builder: (context, _) => IconButton(
-                  key: RecordingScreen.settingsKey,
-                  tooltip: 'Connect to your PC',
-                  icon: const Icon(Icons.sync_rounded),
-                  onPressed: switch (_controller.state) {
-                    SessionState.idle ||
-                    SessionState.stopped => () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => SettingsScreen(
-                          syncthing: syncthing,
-                          appVersion: widget.appVersion,
+    return EmberScope(
+      child: PopScope(
+        canPop: !_sessionOpen,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _blockedLeave();
+        },
+        child: Scaffold(
+          backgroundColor: EvEmber.black,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            automaticallyImplyLeading: false,
+            leading: canLeave
+                ? Center(
+                    child: _GlassIconButton(
+                      icon: Icons.arrow_back_rounded,
+                      tooltip: 'Back',
+                      // Through PopScope: refused while a session is open.
+                      onPressed: () => Navigator.of(context).maybePop(),
+                    ),
+                  )
+                : null,
+            title: const BrandTitle(),
+            centerTitle: true,
+            actions: [
+              if (widget.syncthing case final syncthing?)
+                ListenableBuilder(
+                  listenable: _controller,
+                  // Only between sessions: the recording indicator (FR1)
+                  // must stay on screen while a session is open.
+                  builder: (context, _) => _GlassIconButton(
+                    buttonKey: RecordingScreen.settingsKey,
+                    tooltip: 'Connect to your PC',
+                    icon: Icons.sync_rounded,
+                    onPressed: switch (_controller.state) {
+                      SessionState.idle ||
+                      SessionState.stopped => () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => SettingsScreen(
+                            syncthing: syncthing,
+                            appVersion: widget.appVersion,
+                          ),
                         ),
                       ),
-                    ),
-                    _ => null,
-                  },
+                      _ => null,
+                    },
+                  ),
                 ),
-              ),
-            const SizedBox(width: EvSpace.xxs),
-          ],
-        ),
-        body: DecoratedBox(
-          // A soft teal glow towards the controls, on the navy background.
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                EvColors.navy,
-                EvColors.navy,
-                Color.alphaBlend(
-                  EvColors.teal.withValues(alpha: 0.09),
-                  EvColors.navy,
-                ),
-              ],
-              stops: const [0, 0.45, 1],
-            ),
+              const SizedBox(width: EvSpace.xs),
+            ],
           ),
-          child: SafeArea(
-            child: ListenableBuilder(
-              listenable: _controller,
-              builder: (context, _) => Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  EvSpace.lg,
-                  EvSpace.xs,
-                  EvSpace.lg,
-                  EvSpace.md,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Center(child: _MicSourceChip()),
-                    const SizedBox(height: EvSpace.md),
-                    Text(
-                      'Capture What Matters',
-                      textAlign: TextAlign.center,
-                      style: textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: EvSpace.xxs),
-                    Text(
-                      'Your conversations stay under your control.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: EvColors.textMuted,
-                      ),
-                    ),
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, box) => SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: box.maxHeight,
-                            ),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: EvSpace.md,
-                                ),
-                                child: _StatusView(
-                                  controller: _controller,
-                                  levels: _levels,
-                                  onDone: canLeave
-                                      ? () => Navigator.of(context).maybePop()
-                                      : null,
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              // The same photo, blur and glass layers as Home (no video).
+              const ImmersiveBackdrop(),
+              SafeArea(
+                child: ListenableBuilder(
+                  listenable: _controller,
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: EvSpace.xs),
+                      const _Heading(),
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, box) => SingleChildScrollView(
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minHeight: box.maxHeight,
+                              ),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: EvSpace.md,
+                                  ),
+                                  child: _StatusView(
+                                    controller: _controller,
+                                    levels: _levels,
+                                    onDone: canLeave
+                                        ? () => Navigator.of(context).maybePop()
+                                        : null,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    if (_controller.message case final message?) ...[
-                      _PermissionMessage(message: message),
-                      const SizedBox(height: EvSpace.sm),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          EvSpace.lg,
+                          0,
+                          EvSpace.lg,
+                          EvSpace.md,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (_controller.message case final message?) ...[
+                              _PermissionMessage(message: message),
+                              const SizedBox(height: EvSpace.md),
+                            ],
+                            _Controls(controller: _controller, onStop: _stop),
+                            const SizedBox(height: EvSpace.md),
+                            const _PrivacyFootnote(),
+                          ],
+                        ),
+                      ),
                     ],
-                    _Controls(controller: _controller, onStop: _stop),
-                    const SizedBox(height: EvSpace.sm),
-                    const _PrivacyFootnote(),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),
@@ -358,63 +343,62 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 }
 
-/// Small round icon button used in the app bar.
-class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({
+/// Round frosted-glass icon button for the app bar.
+class _GlassIconButton extends StatelessWidget {
+  const _GlassIconButton({
+    this.buttonKey,
     required this.icon,
     required this.tooltip,
     required this.onPressed,
   });
 
+  final Key? buttonKey;
   final IconData icon;
   final String tooltip;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      key: buttonKey,
       tooltip: tooltip,
       onPressed: onPressed,
       style: IconButton.styleFrom(
-        backgroundColor: EvColors.surfaceLow,
-        foregroundColor: EvColors.snow,
-        side: const BorderSide(color: EvColors.border),
+        backgroundColor: EvEmber.glass,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.transparent,
+        disabledForegroundColor: EvEmber.textFaint,
+        side: const BorderSide(color: EvEmber.glassBorder),
       ),
       icon: Icon(icon, size: 20),
     );
   }
 }
 
-/// Which input is used: the phone's own microphone (informational only).
-class _MicSourceChip extends StatelessWidget {
-  const _MicSourceChip();
+/// The screen's quiet title.
+class _Heading extends StatelessWidget {
+  const _Heading();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: EvColors.surfaceLow,
-        borderRadius: BorderRadius.circular(EvRadius.pill),
-        border: Border.all(color: EvColors.border),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    final textTheme = Theme.of(context).textTheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: EvSpace.lg),
+      child: Column(
         children: [
-          const Icon(
-            Icons.mic_none_rounded,
-            size: 16,
-            color: EvColors.textMuted,
-          ),
-          const SizedBox(width: 6),
-          Flexible(
-            child: Text(
-              'Phone microphone',
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(color: EvColors.textMuted),
+          Text(
+            'Capture What Matters',
+            textAlign: TextAlign.center,
+            style: textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
             ),
+          ),
+          const SizedBox(height: EvSpace.xxs),
+          Text(
+            'Your conversations stay under your control.',
+            textAlign: TextAlign.center,
+            style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
           ),
         ],
       ),
@@ -433,138 +417,175 @@ class _StatusView extends StatelessWidget {
   final List<double> levels;
   final VoidCallback? onDone;
 
+  static const double _waveHeight = 200;
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final muted = textTheme.bodyMedium?.copyWith(color: EvColors.textMuted);
+    final muted = textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft);
     final elapsed = formatElapsed(controller.elapsed);
     const gap = SizedBox(height: EvSpace.lg);
+    Widget padded(Widget child) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: EvSpace.lg),
+      child: child,
+    );
     return switch (controller.state) {
       SessionState.recording when controller.isStartingCapture => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          StartingIndicator(elapsed: elapsed),
+          const LiveWaveform(levels: [], active: false, height: _waveHeight),
           gap,
-          const LiveWaveform(
-            levels: [],
-            active: false,
-            height: 96,
-            bars: 44,
-          ),
+          padded(StartingIndicator(elapsed: elapsed)),
         ],
       ),
       SessionState.recording => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          RecordingIndicator(elapsed: elapsed),
-          gap,
+          // Edge to edge; its height follows the real input level.
           LiveWaveform(
             levels: levels,
-            height: 96,
-            bars: 44,
+            height: _waveHeight,
+            bars: 48,
             color: controller.isSpeechDetected
-                ? EvColors.teal
-                : EvColors.textMuted,
+                ? EvEmber.accentSoft
+                : const Color(0xFFFFC2B8),
           ),
+          gap,
+          padded(RecordingIndicator(elapsed: elapsed)),
           const SizedBox(height: EvSpace.md),
-          SpeechStatus(speech: controller.isSpeechDetected),
+          padded(SpeechStatus(speech: controller.isSpeechDetected)),
         ],
       ),
       SessionState.paused => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          PausedIndicator(elapsed: elapsed),
+          LiveWaveform(levels: levels, active: false, height: _waveHeight),
           gap,
-          LiveWaveform(levels: levels, active: false, height: 96, bars: 44),
+          padded(PausedIndicator(elapsed: elapsed)),
           if (controller.pauseReason == PauseReason.autoBackground) ...[
             gap,
-            const AutoPauseNotice(),
+            padded(const AutoPauseNotice()),
           ] else ...[
             const SizedBox(height: EvSpace.md),
+            padded(
+              Text(
+                'Nothing is being recorded while paused.',
+                style: muted,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ],
+      ),
+      SessionState.idle => padded(
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const _MicBadge(),
+            gap,
             Text(
-              'Nothing is being recorded while paused.',
+              controller.isRequestingPermission
+                  ? 'Requesting microphone access…'
+                  : 'Ready to record',
+              style: textTheme.headlineSmall?.copyWith(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: EvSpace.xs),
+            Text(
+              'Recording begins when you tap Start and ends when you tap Stop.',
               style: muted,
               textAlign: TextAlign.center,
             ),
           ],
-        ],
+        ),
       ),
-      SessionState.idle => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const _MicBadge(),
-          gap,
-          Text(
-            controller.isRequestingPermission
-                ? 'Requesting microphone access…'
-                : 'Ready to record',
-            style: textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: EvSpace.xs),
-          Text(
-            'Recording begins when you tap Start and ends when you tap Stop.',
-            style: muted,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-      SessionState.stopped => Column(
-        key: const Key('stopped-summary'),
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const StatusPill(label: 'Stopped', icon: Icons.stop_circle_outlined),
-          const SizedBox(height: EvSpace.md),
-          Text(
-            'Recorded $elapsed · ${controller.pauseCount} '
-            '${controller.pauseCount == 1 ? 'pause' : 'pauses'}',
-            style: textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-          if (controller.chunkPipeline case final pipeline?) ...[
+      SessionState.stopped => padded(
+        Column(
+          key: const Key('stopped-summary'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const StatusPill(
+              label: 'Stopped',
+              icon: Icons.stop_circle_outlined,
+            ),
             const SizedBox(height: EvSpace.md),
-            _SaveResult(
-              key: ValueKey(controller.sessionId),
-              manifest: pipeline.manifest,
+            Text(
+              'Recorded $elapsed · ${controller.pauseCount} '
+              '${controller.pauseCount == 1 ? 'pause' : 'pauses'}',
+              style: textTheme.titleMedium?.copyWith(color: Colors.white),
+              textAlign: TextAlign.center,
             ),
-          ],
-          if (onDone != null) ...[
-            gap,
-            OutlinedButton.icon(
-              key: RecordingScreen.doneKey,
-              onPressed: onDone,
-              style: OutlinedButton.styleFrom(
-                shape: const StadiumBorder(),
-                minimumSize: const Size(160, 48),
+            if (controller.chunkPipeline case final pipeline?) ...[
+              const SizedBox(height: EvSpace.md),
+              _SaveResult(
+                key: ValueKey(controller.sessionId),
+                manifest: pipeline.manifest,
               ),
-              icon: const Icon(Icons.check_rounded),
-              label: const Text('Done'),
-            ),
+            ],
+            if (onDone != null) ...[
+              gap,
+              OutlinedButton.icon(
+                key: RecordingScreen.doneKey,
+                onPressed: onDone,
+                style: OutlinedButton.styleFrom(
+                  shape: const StadiumBorder(),
+                  minimumSize: const Size(160, 48),
+                ),
+                icon: const Icon(Icons.check_rounded),
+                label: const Text('Done'),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     };
   }
 }
 
+/// Idle: a white microphone on a dark core inside deep-red rings (as on
+/// Home).
 class _MicBadge extends StatelessWidget {
   const _MicBadge();
 
   @override
   Widget build(BuildContext context) {
+    Widget ring(double size, Color fill, Color border, Widget child) =>
+        Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: fill,
+            border: Border.all(color: border),
+          ),
+          child: child,
+        );
     return ExcludeSemantics(
-      child: Container(
-        width: 112,
-        height: 112,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: EvColors.teal.withValues(alpha: 0.08),
-          border: Border.all(color: EvColors.teal.withValues(alpha: 0.35)),
-        ),
-        child: const Icon(
-          Icons.mic_none_rounded,
-          size: 44,
-          color: EvColors.teal,
+      child: ring(
+        132,
+        EvEmber.red.withValues(alpha: 0.10),
+        Colors.white.withValues(alpha: 0.06),
+        ring(
+          104,
+          EvEmber.wine.withValues(alpha: 0.55),
+          EvEmber.red.withValues(alpha: 0.35),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: EvEmber.black,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              boxShadow: [
+                BoxShadow(
+                  color: EvEmber.accent.withValues(alpha: 0.28),
+                  blurRadius: 26,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.mic_rounded, size: 32, color: Colors.white),
+          ),
         ),
       ),
     );
@@ -640,7 +661,7 @@ class StartingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    const color = EvColors.textMuted;
+    const color = EvEmber.textSoft;
     return Semantics(
       liveRegion: true,
       label: label,
@@ -665,12 +686,21 @@ class StartingIndicator extends StatelessWidget {
             ],
           ),
           const SizedBox(height: EvSpace.sm),
-          Text(elapsed, style: textTheme.displayLarge?.copyWith(color: color)),
+          Text(elapsed, style: _timerStyle(context, EvEmber.textFaint)),
         ],
       ),
     );
   }
 }
+
+/// The large, light elapsed-time figure.
+TextStyle? _timerStyle(BuildContext context, Color color) =>
+    Theme.of(context).textTheme.displayLarge?.copyWith(
+      color: color,
+      fontWeight: FontWeight.w200,
+      fontSize: 64,
+      letterSpacing: -1,
+    );
 
 /// While recording: whether speech is currently being heard.
 class SpeechStatus extends StatelessWidget {
@@ -684,7 +714,7 @@ class SpeechStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final color = speech ? EvColors.teal : EvColors.textMuted;
+    final color = speech ? EvEmber.accentSoft : EvEmber.textSoft;
     return Semantics(
       label: speech ? 'Speech detected' : 'Listening for speech',
       excludeSemantics: true,
@@ -694,7 +724,7 @@ class SpeechStatus extends StatelessWidget {
           Icon(
             speech ? Icons.record_voice_over_rounded : Icons.hearing_rounded,
             color: color,
-            size: 20,
+            size: 18,
           ),
           const SizedBox(width: EvSpace.xs),
           Flexible(
@@ -705,6 +735,30 @@ class SpeechStatus extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// A frosted-glass status chip (Recording / Paused).
+class _GlassChip extends StatelessWidget {
+  const _GlassChip({required this.leading, required this.label});
+
+  final Widget leading;
+  final Widget label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: EvEmber.glass,
+        borderRadius: BorderRadius.circular(EvRadius.pill),
+        border: Border.all(color: EvEmber.glassBorder),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [leading, const SizedBox(width: 8), label],
       ),
     );
   }
@@ -729,39 +783,23 @@ class RecordingIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: EvColors.recording.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(EvRadius.pill),
-              border: Border.all(
-                color: EvColors.recording.withValues(alpha: 0.35),
+          Text(key: timerKey, elapsed, style: _timerStyle(context, Colors.white)),
+          const SizedBox(height: EvSpace.xs),
+          _GlassChip(
+            leading: Container(
+              key: dotKey,
+              width: 10,
+              height: 10,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
               ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  key: dotKey,
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Recording',
-                  style: textTheme.titleSmall?.copyWith(
-                    color: EvColors.recording,
-                  ),
-                ),
-              ],
+            label: Text(
+              'Recording',
+              style: textTheme.titleSmall?.copyWith(color: Colors.white),
             ),
           ),
-          const SizedBox(height: EvSpace.sm),
-          Text(key: timerKey, elapsed, style: textTheme.displayLarge),
         ],
       ),
     );
@@ -786,38 +824,22 @@ class PausedIndicator extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: EvColors.warning.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(EvRadius.pill),
-              border: Border.all(
-                color: EvColors.warning.withValues(alpha: 0.30),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.pause_circle_filled,
-                  color: EvColors.warning,
-                  size: 18,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'Paused',
-                  style: textTheme.titleSmall?.copyWith(
-                    color: EvColors.warning,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: EvSpace.sm),
           Text(
             key: timerKey,
             elapsed,
-            style: textTheme.displayLarge?.copyWith(color: EvColors.textMuted),
+            style: _timerStyle(context, EvEmber.textSoft),
+          ),
+          const SizedBox(height: EvSpace.xs),
+          _GlassChip(
+            leading: const Icon(
+              Icons.pause_circle_filled,
+              color: EvColors.warning,
+              size: 18,
+            ),
+            label: Text(
+              'Paused',
+              style: textTheme.titleSmall?.copyWith(color: EvColors.warning),
+            ),
           ),
         ],
       ),
@@ -874,7 +896,7 @@ class _PrivacyFootnote extends StatelessWidget {
         const Icon(
           Icons.lock_outline_rounded,
           size: 14,
-          color: EvColors.textSubtle,
+          color: EvEmber.textFaint,
         ),
         const SizedBox(width: 6),
         Flexible(
@@ -883,7 +905,7 @@ class _PrivacyFootnote extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: EvColors.textSubtle),
+            ).textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
           ),
         ),
       ],
@@ -891,6 +913,8 @@ class _PrivacyFootnote extends StatelessWidget {
   }
 }
 
+/// Round controls: one large Start when no session is open; a small
+/// Pause/Resume and a large Stop while one is.
 class _Controls extends StatelessWidget {
   const _Controls({required this.controller, required this.onStop});
 
@@ -903,46 +927,53 @@ class _Controls extends StatelessWidget {
   static const pauseResumeKey = Key('pause-resume-button');
   static const stopKey = Key('stop-button');
 
+  static const double _large = 96;
+  static const double _small = 72;
+
   @override
   Widget build(BuildContext context) {
     final state = controller.state;
-    final open = state == SessionState.recording ||
-        state == SessionState.paused;
+    final open =
+        state == SessionState.recording || state == SessionState.paused;
     if (!open) {
       // No session open: one clear Start action (a new session after Stop).
-      return _ControlButton(
-        buttonKey: startKey,
-        kind: _ButtonKind.primary,
-        onPressed: controller.canStart ? controller.start : null,
-        icon: Icons.mic_rounded,
-        label: state == SessionState.stopped ? 'Record again' : 'Start',
+      return Center(
+        child: _ControlButton(
+          buttonKey: startKey,
+          kind: _ButtonKind.primary,
+          size: _large,
+          onPressed: controller.canStart ? controller.start : null,
+          icon: Icons.mic_rounded,
+          label: state == SessionState.stopped ? 'Record again' : 'Start',
+        ),
       );
     }
     final paused = state == SessionState.paused;
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          child: _ControlButton(
-            buttonKey: pauseResumeKey,
-            kind: _ButtonKind.secondary,
-            onPressed: paused
-                ? (controller.canResume ? controller.resume : null)
-                : (controller.canPause ? controller.pause : null),
-            icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
-            label: paused ? 'Resume' : 'Pause',
-          ),
+        _ControlButton(
+          buttonKey: pauseResumeKey,
+          kind: _ButtonKind.secondary,
+          size: _small,
+          onPressed: paused
+              ? (controller.canResume ? controller.resume : null)
+              : (controller.canPause ? controller.pause : null),
+          icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+          label: paused ? 'Resume' : 'Pause',
         ),
         // Generous gap so Stop is not pressed by mistake.
-        const SizedBox(width: EvSpace.md),
-        Expanded(
-          child: _ControlButton(
-            buttonKey: stopKey,
-            kind: _ButtonKind.danger,
-            onPressed: controller.canStop ? onStop : null,
-            icon: Icons.stop_rounded,
-            label: 'Stop',
-          ),
+        const SizedBox(width: EvSpace.lg),
+        _ControlButton(
+          buttonKey: stopKey,
+          kind: _ButtonKind.danger,
+          size: _large,
+          onPressed: controller.canStop ? onStop : null,
+          icon: Icons.stop_rounded,
+          label: 'Stop',
         ),
+        // Balances the row so Stop sits in the centre.
+        const SizedBox(width: EvSpace.lg + _small),
       ],
     );
   }
@@ -950,8 +981,9 @@ class _Controls extends StatelessWidget {
 
 enum _ButtonKind { primary, secondary, danger }
 
-/// Pill button with an icon and a label that never wraps: the label shrinks
-/// (rather than wraps) if it does not fit, e.g. at large text scales.
+/// Round glass button with an icon above a label that never wraps: the
+/// label shrinks (rather than wraps) if it does not fit, e.g. at large text
+/// scales.
 class _ControlButton extends StatelessWidget {
   const _ControlButton({
     required this.buttonKey,
@@ -959,6 +991,7 @@ class _ControlButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     required this.kind,
+    required this.size,
   });
 
   /// Key for the underlying [ButtonStyleButton] (used by tests).
@@ -967,69 +1000,54 @@ class _ControlButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final _ButtonKind kind;
-
-  static const _padding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
-  static const _minSize = Size(64, 60);
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    final content = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 24),
-        const SizedBox(width: EvSpace.xs),
-        Flexible(
-          child: FittedBox(
+    final (background, foreground, border) = switch (kind) {
+      _ButtonKind.primary => (Colors.white, EvEmber.black, Colors.white),
+      _ButtonKind.secondary => (
+        EvEmber.glassStrong,
+        Colors.white,
+        EvEmber.glassBorder,
+      ),
+      _ButtonKind.danger => (
+        EvEmber.accent,
+        Colors.white,
+        const Color(0x66FFFFFF),
+      ),
+    };
+    return FilledButton(
+      key: buttonKey,
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        fixedSize: Size.square(size),
+        minimumSize: Size.square(size),
+        padding: const EdgeInsets.all(EvSpace.xs),
+        shape: CircleBorder(side: BorderSide(color: border)),
+        backgroundColor: background,
+        foregroundColor: foreground,
+        disabledBackgroundColor: EvEmber.glass,
+        disabledForegroundColor: EvEmber.textFaint,
+        elevation: kind == _ButtonKind.danger ? 6 : 0,
+        shadowColor: EvEmber.accent.withValues(alpha: 0.6),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: size * 0.3),
+          const SizedBox(height: 2),
+          FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               label,
               maxLines: 1,
               softWrap: false,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
-    const shape = StadiumBorder();
-    return switch (kind) {
-      _ButtonKind.primary => FilledButton(
-        key: buttonKey,
-        style: FilledButton.styleFrom(
-          padding: _padding,
-          minimumSize: _minSize,
-          shape: shape,
-          backgroundColor: EvColors.teal,
-          foregroundColor: EvColors.navy,
-        ),
-        onPressed: onPressed,
-        child: content,
-      ),
-      _ButtonKind.secondary => OutlinedButton(
-        key: buttonKey,
-        style: OutlinedButton.styleFrom(
-          padding: _padding,
-          minimumSize: _minSize,
-          shape: shape,
-          backgroundColor: EvColors.surfaceLow,
-          foregroundColor: EvColors.snow,
-          side: const BorderSide(color: EvColors.borderStrong),
-        ),
-        onPressed: onPressed,
-        child: content,
-      ),
-      _ButtonKind.danger => FilledButton(
-        key: buttonKey,
-        style: FilledButton.styleFrom(
-          padding: _padding,
-          minimumSize: _minSize,
-          shape: shape,
-          backgroundColor: EvColors.recordingDeep,
-          foregroundColor: EvColors.snow,
-        ),
-        onPressed: onPressed,
-        child: content,
-      ),
-    };
   }
 }

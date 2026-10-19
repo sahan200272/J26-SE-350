@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'theme/ember_theme.dart';
 
-/// Brand kit files (assets/brand/, copied unchanged from the Echo Vault brand
-/// kit). Only the dark-UI variants are used: the app has one dark theme.
+/// Logo files (assets/brand/): the "Keyhole Wave" mark (a coral keyhole
+/// holding a voice waveform) and the mark with the Sora wordmark. Only
+/// dark-UI variants exist: the app has one dark theme.
 abstract final class EvBrand {
-  /// 02-symbol: the standalone mark, for dark backgrounds.
+  /// The standalone mark, for dark backgrounds (512 × 512).
   static const symbol = 'assets/brand/echo-vault-symbol-dark-ui_512.png';
 
-  /// 03-horizontal: symbol + wordmark, for dark backgrounds (2000×657 source,
-  /// 1000 px export).
+  /// Mark + white "Echo Vault" wordmark, for dark backgrounds (1000 × 289).
   static const horizontal =
       'assets/brand/echo-vault-horizontal-dark-bg_1000.png';
 
   /// Width / height of [horizontal].
-  static const horizontalAspect = 2000 / 657;
+  static const horizontalAspect = 1000 / 289;
 
   static const tagline = 'Your voice. Your knowledge. Your privacy.';
 }

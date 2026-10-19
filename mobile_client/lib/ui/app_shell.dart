@@ -91,6 +91,7 @@ class _AppShellState extends State<AppShell> {
       onOpenSessions: widget.sessions == null
           ? null
           : () => _select(_Tab.sessions),
+      isVisible: _tab == _Tab.home,
     ),
     _Tab.sessions => SessionsScreen(
       source: widget.sessions!,

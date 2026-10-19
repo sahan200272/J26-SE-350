@@ -6,8 +6,8 @@ import 'components.dart';
 import 'theme/app_theme.dart';
 import 'theme/ember_theme.dart';
 
-/// Short branded launch screen on the Ember background (the native launch
-/// window before it is still navy), then calls [onFinished]. A tap
+/// Short branded launch screen on the Ember background, continuing the
+/// near-black native launch window, then calls [onFinished]. A tap
 /// skips it; with reduced motion it shows without animation.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({

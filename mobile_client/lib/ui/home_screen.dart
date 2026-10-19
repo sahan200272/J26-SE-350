@@ -8,6 +8,7 @@ import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'display_format.dart';
+import 'immersive_backdrop.dart';
 import 'processing_privacy_screen.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
@@ -15,9 +16,10 @@ import 'theme/app_theme.dart';
 /// Home: a compact greeting, the microphone button that opens the recording
 /// screen, and the three most recent recordings with a way to see them all.
 ///
-/// Visual layers, back to front: the background photo
-/// ([HomeScreen.backgroundAsset]), a blurred dark "glass" layer that blends
-/// it into black and deep red, then the content on frosted-glass cards.
+/// Visual layers, back to front: the background video
+/// ([kBackgroundVideo], when present) or photo ([kBackgroundImage]), a
+/// blurred dark "glass" layer that blends it into black and deep red, then
+/// the content on frosted-glass cards ([ImmersiveBackdrop]).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
@@ -27,6 +29,7 @@ class HomeScreen extends StatefulWidget {
     this.onStartRecording,
     this.onOpenSessions,
     this.now = DateTime.now,
+    this.isVisible = true,
   });
 
   /// Recent recordings; the section is hidden when null.
@@ -39,17 +42,20 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback? onOpenSessions;
   final DateTime Function() now;
 
+  /// Home is the selected tab: the background video plays only then.
+  final bool isVisible;
+
   static const startKey = Key('home-start-recording');
   static const recentKey = Key('home-recent');
   static const privacyKey = Key('home-privacy');
-  static const backgroundKey = Key('home-background');
+  static const backgroundKey = ImmersiveBackdrop.imageKey;
 
   /// How many recent recordings Home shows.
   static const recentCount = 3;
 
   /// The background photo. Replace this file to change it (portrait,
   /// about 1080 × 1920 or larger works best).
-  static const backgroundAsset = 'assets/backgrounds/home_background.jpg';
+  static const backgroundAsset = kBackgroundImage;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -138,7 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const _HomeBackdrop(),
+          ImmersiveBackdrop(
+            videoAsset: kBackgroundVideo,
+            playing: widget.isVisible,
+          ),
           SafeArea(
             bottom: false,
             child: LayoutBuilder(
@@ -333,88 +342,6 @@ class _HomeScreenState extends State<HomeScreen> {
         for (final s in recent)
           _RecentTile(session: s, now: now, onTap: () => _open(s)),
       ],
-    );
-  }
-}
-
-/// The back layers: the photo, softened and blurred, under a dark glass
-/// tint that fades to black at the top and bottom so the content and the
-/// navigation bar stay readable. Drawn once and cached (no live blur of
-/// the content above it).
-class _HomeBackdrop extends StatelessWidget {
-  const _HomeBackdrop();
-
-  /// Blur of the glass layer over the photo (logical pixels).
-  static const double blur = 10;
-
-  @override
-  Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      child: RepaintBoundary(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Fallback colour if the photo is missing or still loading.
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(0, -0.2),
-                  radius: 1.1,
-                  colors: [_Ember.wine, _Ember.deep, _Ember.black],
-                  stops: [0, 0.55, 1],
-                ),
-              ),
-            ),
-            // 1. The photo, far back.
-            ImageFiltered(
-              imageFilter: ui.ImageFilter.blur(
-                sigmaX: blur,
-                sigmaY: blur,
-                tileMode: TileMode.decal,
-              ),
-              child: Image.asset(
-                HomeScreen.backgroundAsset,
-                key: HomeScreen.backgroundKey,
-                fit: BoxFit.cover,
-                alignment: const Alignment(0, -0.1),
-                filterQuality: FilterQuality.medium,
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              ),
-            ),
-            // 2. The glass: a translucent dark-red tint over the blur.
-            const ColoredBox(color: Color(0x40160606)),
-            // 3. Depth: black at the top (status bar, header) and bottom
-            //    (recent recordings, navigation), the photo glowing through
-            //    in the middle.
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xB3070304),
-                    Color(0x10070304),
-                    Color(0x26070304),
-                    Color(0xE6070304),
-                  ],
-                  stops: [0, 0.3, 0.62, 1],
-                ),
-              ),
-            ),
-            // 4. Vignette towards the edges.
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(0, -0.1),
-                  radius: 1.15,
-                  colors: [Color(0x00000000), Color(0x99000000)],
-                  stops: [0.55, 1],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
