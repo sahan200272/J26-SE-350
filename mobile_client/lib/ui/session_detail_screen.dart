@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -9,11 +10,13 @@ import 'display_format.dart';
 import 'session_dialogs.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
-/// One recording: when and how long, its status, the transcript area (an
-/// honest "not available yet" state, because transcripts are produced on
-/// the PC and are not sent back to the phone), speech activity, and a
-/// collapsed technical section for researchers.
+/// One recording, in the dark Ember look: when and how long, its status, a
+/// speech-activity strip drawn from the real speech parts, key figures, the
+/// transcript area (an honest "not available yet" state, because
+/// transcripts are produced on the PC and are not sent back to the phone),
+/// and a collapsed technical section for researchers.
 ///
 /// The overflow menu renames or deletes the recording through [source].
 /// Pops with `true` after a successful deletion.
@@ -134,9 +137,27 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     return PopScope(
       canPop: !_busy,
       child: Scaffold(
+        backgroundColor: EvEmber.black,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: const Text('Recording'),
-          centerTitle: false,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+          leading: Center(
+            child: IconButton(
+              tooltip: 'Back',
+              onPressed: _busy ? null : () => Navigator.of(context).maybePop(),
+              style: _glassIconStyle,
+              icon: const Icon(Icons.arrow_back_rounded, size: 20),
+            ),
+          ),
+          title: Text(
+            'Recording',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: EvEmber.textSoft,
+            ),
+          ),
+          centerTitle: true,
           bottom: _busy
               ? const PreferredSize(
                   preferredSize: Size.fromHeight(2),
@@ -152,8 +173,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 key: SessionDetailScreen.menuKey,
                 tooltip: 'More options',
                 enabled: !_busy,
-                icon: const Icon(Icons.more_vert_rounded),
-                color: EvColors.surfaceHigh,
+                style: _glassIconStyle,
+                icon: const Icon(Icons.more_horiz_rounded, size: 20),
+                color: const Color(0xFF241011),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(EvRadius.md),
                 ),
@@ -188,13 +210,52 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                   ),
                 ],
               ),
-            const SizedBox(width: EvSpace.xxs),
+            const SizedBox(width: EvSpace.xs),
           ],
         ),
-        body: SafeArea(
-          child: AbsorbPointer(
-            absorbing: _busy,
-            child: _SessionDetailBody(session: _session),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            const _DetailBackdrop(),
+            SafeArea(
+              bottom: false,
+              child: AbsorbPointer(
+                absorbing: _busy,
+                child: _SessionDetailBody(session: _session),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small round frosted-glass icon buttons in the app bar.
+final ButtonStyle _glassIconStyle = IconButton.styleFrom(
+  backgroundColor: EvEmber.glass,
+  foregroundColor: Colors.white,
+  disabledForegroundColor: EvEmber.textFaint,
+  side: const BorderSide(color: EvEmber.glassBorder),
+);
+
+/// Quiet background: near-black with one soft, low-saturation glow behind
+/// the header (no strong red).
+class _DetailBackdrop extends StatelessWidget {
+  const _DetailBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return const ExcludeSemantics(
+      child: RepaintBoundary(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0, -1.05),
+              radius: 1.25,
+              colors: [Color(0xFF2A0D0C), Color(0xFF110707), EvEmber.black],
+              stops: [0, 0.5, 1],
+            ),
           ),
         ),
       ),
@@ -212,122 +273,368 @@ class _SessionDetailBody extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final s = session;
     final length = s.recordedMs ?? s.sessionEndMs;
+    final hasSpeech = s.chunks.isNotEmpty && s.timelineMs > 0;
     return ListView(
-          padding: const EdgeInsets.fromLTRB(
-            EvSpace.md,
-            EvSpace.xs,
-            EvSpace.md,
-            EvSpace.xl,
-          ),
-          children: [
-            // Header.
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: EvSpace.xxs),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.fromLTRB(
+        EvSpace.md,
+        EvSpace.sm,
+        EvSpace.md,
+        EvSpace.xl + MediaQuery.paddingOf(context).bottom,
+      ),
+      children: [
+        // Header.
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: EvSpace.xxs),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  Text(
-                    s.start == null ? 'Unknown date' : formatDateTime(s.start!),
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: EvColors.textMuted,
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 14,
+                    color: EvEmber.textFaint,
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      s.start == null
+                          ? 'Unknown date'
+                          : formatDateTime(s.start!),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: EvEmber.textSoft,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: EvSpace.xxs),
-                  Text(
-                    key: SessionDetailScreen.titleKey,
-                    sessionTitle(s),
-                    style: textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: EvSpace.sm),
-                  Wrap(
-                    spacing: EvSpace.xs,
-                    runSpacing: EvSpace.xs,
-                    children: [
-                      SessionStatusPill(session: s),
-                      if (length != null)
-                        StatusPill(
-                          label: formatSpan(length),
-                          icon: Icons.timer_outlined,
-                        ),
-                      if (s.pauseCount > 0)
-                        StatusPill(
-                          label: plural(s.pauseCount, 'pause'),
-                          icon: Icons.pause_rounded,
-                        ),
-                    ],
                   ),
                 ],
               ),
-            ),
-            if (s.error != null) ...[
-              const SizedBox(height: EvSpace.md),
-              const NoticeCard(
-                icon: Icons.error_outline_rounded,
-                title: 'This recording can’t be opened',
-                message:
-                    'Its files on this phone could not be read. Details are '
-                    'under Technical details.',
-                tone: PillTone.danger,
+              const SizedBox(height: EvSpace.xs),
+              Text(
+                key: SessionDetailScreen.titleKey,
+                sessionTitle(s),
+                style: textTheme.headlineMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  height: 1.15,
+                ),
               ),
-            ] else if (!s.complete) ...[
-              const SizedBox(height: EvSpace.md),
-              const NoticeCard(
-                icon: Icons.hourglass_bottom_rounded,
-                title: 'Recording incomplete',
-                message:
-                    'It may still be saving, or the app closed before the '
-                    'recording was stopped. The parts already saved are kept.',
-                tone: PillTone.warning,
+              const SizedBox(height: EvSpace.sm),
+              Wrap(
+                spacing: EvSpace.xs,
+                runSpacing: EvSpace.xs,
+                children: [
+                  SessionStatusPill(session: s),
+                  if (length != null)
+                    _Chip(icon: Icons.schedule_rounded, label: formatSpan(length)),
+                  if (s.pauseCount > 0)
+                    _Chip(
+                      icon: Icons.pause_rounded,
+                      label: plural(s.pauseCount, 'pause'),
+                    ),
+                ],
               ),
             ],
+          ),
+        ),
+        if (s.error != null) ...[
+          const SizedBox(height: EvSpace.md),
+          const NoticeCard(
+            icon: Icons.error_outline_rounded,
+            title: 'This recording can’t be opened',
+            message:
+                'Its files on this phone could not be read. Details are '
+                'under Technical details.',
+            tone: PillTone.danger,
+          ),
+        ] else if (!s.complete) ...[
+          const SizedBox(height: EvSpace.md),
+          const NoticeCard(
+            icon: Icons.hourglass_bottom_rounded,
+            title: 'Recording incomplete',
+            message:
+                'It may still be saving, or the app closed before the '
+                'recording was stopped. The parts already saved are kept.',
+            tone: PillTone.warning,
+          ),
+        ],
 
-            // Transcript.
-            const SectionTitle('Transcript'),
-            const EvCard(
-              key: SessionDetailScreen.transcriptKey,
-              padding: EdgeInsets.all(EvSpace.lg),
-              child: _TranscriptUnavailable(),
-            ),
-
-            // Speech activity.
-            if (s.chunks.isNotEmpty && s.timelineMs > 0) ...[
-              const SectionTitle('Speech activity'),
-              EvCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SessionTimeline(session: s, height: 14),
-                    const SizedBox(height: EvSpace.xs),
-                    Row(
-                      children: [
-                        Text(formatOffset(0), style: textTheme.bodySmall),
-                        const Spacer(),
-                        Text(
-                          formatOffset(s.timelineMs),
-                          style: textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: EvSpace.sm),
+        // Speech activity: the recording's timeline, with the parts where
+        // speech was heard raised.
+        const SizedBox(height: EvSpace.lg),
+        LiquidGlass(
+          radius: 24,
+          shadow: false,
+          padding: const EdgeInsets.fromLTRB(
+            EvSpace.md,
+            EvSpace.md,
+            EvSpace.md,
+            EvSpace.sm,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    'Speech activity',
+                    style: textTheme.titleSmall?.copyWith(color: Colors.white),
+                  ),
+                  const Spacer(),
+                  if (hasSpeech)
                     Text(
-                      'Speech was heard in ${plural(s.chunkCount, 'part')} '
-                      'of this recording (${formatSpan(s.speechMs)} in '
-                      'total). Silence is not kept.',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: EvColors.textMuted,
+                      plural(s.chunkCount, 'part'),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: EvEmber.textFaint,
                       ),
                     ),
-                  ],
+                ],
+              ),
+              const SizedBox(height: EvSpace.md),
+              _SpeechBars(session: s, height: 56),
+              const SizedBox(height: EvSpace.xs),
+              Row(
+                children: [
+                  Text(
+                    formatOffset(0),
+                    style: _mono(textTheme, EvEmber.textFaint),
+                  ),
+                  const Spacer(),
+                  Text(
+                    formatOffset(s.timelineMs),
+                    style: _mono(textTheme, EvEmber.textFaint),
+                  ),
+                ],
+              ),
+              const SizedBox(height: EvSpace.sm),
+              Text(
+                hasSpeech
+                    ? 'Speech was heard in ${plural(s.chunkCount, 'part')} of '
+                          'this recording (${formatSpan(s.speechMs)} in '
+                          'total). Silence is not kept.'
+                    : 'No speech was detected in this recording.',
+                style: textTheme.bodySmall?.copyWith(color: EvEmber.textSoft),
+              ),
+            ],
+          ),
+        ),
+
+        // Key figures.
+        const SizedBox(height: EvSpace.sm),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _Stat(
+                  label: 'Recorded',
+                  value: length == null ? '–' : formatSpan(length),
+                ),
+              ),
+              const SizedBox(width: EvSpace.sm),
+              Expanded(
+                child: _Stat(
+                  label: 'Speech',
+                  value: hasSpeech ? formatSpan(s.speechMs) : '–',
+                ),
+              ),
+              const SizedBox(width: EvSpace.sm),
+              Expanded(
+                child: _Stat(
+                  label: 'Parts',
+                  value: '${s.chunkCount}',
                 ),
               ),
             ],
+          ),
+        ),
 
-            // Technical details (collapsed).
-            const SizedBox(height: EvSpace.lg),
-            _TechnicalDetails(session: s),
-          ],
+        // Transcript.
+        const SizedBox(height: EvSpace.lg),
+        const _SectionHeading('Transcript'),
+        const LiquidGlass(
+          key: SessionDetailScreen.transcriptKey,
+          radius: 20,
+          shadow: false,
+          child: _TranscriptUnavailable(),
+        ),
+
+        // Technical details (collapsed).
+        const SizedBox(height: EvSpace.lg),
+        _TechnicalDetails(session: s),
+      ],
     );
   }
+}
+
+TextStyle? _mono(TextTheme textTheme, Color color) => textTheme.bodySmall
+    ?.copyWith(
+      color: color,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+
+/// Small heading above a section.
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        EvSpace.xxs,
+        0,
+        EvSpace.xxs,
+        EvSpace.sm,
+      ),
+      child: Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(color: Colors.white),
+      ),
+    );
+  }
+}
+
+/// Compact glass chip: icon + short label.
+class _Chip extends StatelessWidget {
+  const _Chip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: EvEmber.glass,
+        borderRadius: BorderRadius.circular(EvRadius.pill),
+        border: Border.all(color: EvEmber.glassBorder),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: EvEmber.textSoft),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One key figure: a small label over a value.
+class _Stat extends StatelessWidget {
+  const _Stat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return LiquidGlass(
+      radius: 18,
+      shadow: false,
+      padding: const EdgeInsets.symmetric(
+        horizontal: EvSpace.sm,
+        vertical: EvSpace.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: textTheme.titleMedium?.copyWith(
+                color: Colors.white,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The recording as a row of bars across its timeline: bars where speech
+/// was heard are tall and bright, the rest stay low. Drawn only from the
+/// saved speech parts (no audio levels are stored, so this is not a fake
+/// waveform).
+class _SpeechBars extends StatelessWidget {
+  const _SpeechBars({required this.session, required this.height});
+
+  final SessionSummary session;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final total = session.timelineMs;
+    return Semantics(
+      label: 'Speech activity across ${formatSpan(total)}',
+      excludeSemantics: true,
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: CustomPaint(painter: _SpeechBarsPainter(session)),
+      ),
+    );
+  }
+}
+
+class _SpeechBarsPainter extends CustomPainter {
+  _SpeechBarsPainter(this.session);
+
+  final SessionSummary session;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0) return;
+    const slot = 6.0;
+    final count = math.max(1, (size.width / slot).floor());
+    const barWidth = 3.0;
+    final total = session.timelineMs;
+    final mid = size.height / 2;
+    final paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = barWidth;
+    for (var i = 0; i < count; i++) {
+      final x = slot * i + slot / 2;
+      final t0 = total <= 0 ? 0.0 : total * i / count;
+      final t1 = total <= 0 ? 0.0 : total * (i + 1) / count;
+      final speech = session.chunks.any((c) => c.startMs < t1 && c.endMs > t0);
+      // Speech bars vary gently in height so the strip reads as audio;
+      // the variation is fixed per position, not invented level data.
+      final shape = 0.55 + 0.45 * math.sin(i * 1.7).abs();
+      final half = speech
+          ? math.max(4.0, (size.height / 2 - 2) * shape)
+          : 1.5;
+      paint.color = speech
+          ? Color.lerp(Colors.white, EvEmber.accentSoft, (i / count) * 0.8)!
+          : Colors.white.withValues(alpha: 0.18);
+      canvas.drawLine(Offset(x, mid - half), Offset(x, mid + half), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SpeechBarsPainter old) => old.session != session;
 }
 
 class _TranscriptUnavailable extends StatelessWidget {
@@ -336,22 +643,41 @@ class _TranscriptUnavailable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const IconBadge(Icons.notes_rounded, color: EvColors.indigo, size: 52),
-        const SizedBox(height: EvSpace.md),
-        Text(
-          'Transcript not available on this phone yet',
-          style: textTheme.titleMedium,
-          textAlign: TextAlign.center,
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: EvEmber.glassStrong,
+            border: Border.all(color: EvEmber.glassBorder),
+          ),
+          child: const Icon(
+            Icons.notes_rounded,
+            size: 20,
+            color: Colors.white,
+          ),
         ),
-        const SizedBox(height: EvSpace.xs),
-        Text(
-          'Transcripts are created by Echo Vault on your PC. Showing them '
-          'here, with speaker names, times and highlights, is planned but '
-          'not built yet.',
-          style: textTheme.bodyMedium?.copyWith(color: EvColors.textMuted),
-          textAlign: TextAlign.center,
+        const SizedBox(width: EvSpace.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Transcript not available on this phone yet',
+                style: textTheme.titleSmall?.copyWith(color: Colors.white),
+              ),
+              const SizedBox(height: EvSpace.xxs),
+              Text(
+                'Transcripts are created by Echo Vault on your PC. Showing '
+                'them here, with speaker names, times and highlights, is '
+                'planned but not built yet.',
+                style: textTheme.bodySmall?.copyWith(color: EvEmber.textSoft),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -371,7 +697,7 @@ class _TechnicalDetails extends StatelessWidget {
     final s = session;
     final mono = textTheme.bodySmall?.copyWith(
       fontFamily: 'monospace',
-      color: EvColors.textMuted,
+      color: EvEmber.textSoft,
     );
     Widget row(String label, String value) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -380,14 +706,19 @@ class _TechnicalDetails extends StatelessWidget {
         children: [
           SizedBox(
             width: 128,
-            child: Text(label, style: textTheme.bodySmall),
+            child: Text(
+              label,
+              style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
+            ),
           ),
           Expanded(child: SelectableText(value, style: mono)),
         ],
       ),
     );
-    return EvCard(
+    return LiquidGlass(
       key: SessionDetailScreen.technicalKey,
+      radius: 20,
+      shadow: false,
       padding: EdgeInsets.zero,
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -399,11 +730,16 @@ class _TechnicalDetails extends StatelessWidget {
             EvSpace.md,
             EvSpace.md,
           ),
-          leading: const Icon(Icons.code_rounded, color: EvColors.textMuted),
-          title: Text('Technical details', style: textTheme.titleSmall),
+          iconColor: Colors.white,
+          collapsedIconColor: EvEmber.textSoft,
+          leading: const Icon(Icons.code_rounded, color: EvEmber.textSoft),
+          title: Text(
+            'Technical details',
+            style: textTheme.titleSmall?.copyWith(color: Colors.white),
+          ),
           subtitle: Text(
             'For research and troubleshooting',
-            style: textTheme.bodySmall,
+            style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
           ),
           expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -423,7 +759,7 @@ class _TechnicalDetails extends StatelessWidget {
               const SizedBox(height: EvSpace.sm),
               Text(
                 'Chunks (start – end, length, size)',
-                style: textTheme.bodySmall,
+                style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
               ),
               const SizedBox(height: EvSpace.xs),
               Column(

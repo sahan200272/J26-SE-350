@@ -439,10 +439,13 @@ Future<bool> openSessionDetail(
 }) async {
   final deleted = await Navigator.of(context).push<bool>(
     MaterialPageRoute<bool>(
-      builder: (_) => SessionDetailScreen(
-        session: session,
-        source: source,
-        syncthing: syncthing,
+      // EmberScope above the screen: its rename / delete dialogs match it.
+      builder: (_) => EmberScope(
+        child: SessionDetailScreen(
+          session: session,
+          source: source,
+          syncthing: syncthing,
+        ),
       ),
     ),
   );
