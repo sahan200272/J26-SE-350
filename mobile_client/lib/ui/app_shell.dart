@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -10,10 +11,8 @@ import 'sessions_screen.dart';
 import 'settings_home_screen.dart';
 import 'theme/app_theme.dart';
 
-/// Bottom navigation: Home, Sessions, Settings.
-///
-/// Knowledge and Assistant are not shown in the navigation; their screens
-/// (knowledge_screen.dart, assistant_screen.dart) are kept unchanged.
+/// Bottom navigation: Home, Sessions, Settings. The app focuses on
+/// recording; there are no Knowledge or Assistant screens.
 ///
 /// Recording happens on its own full-screen page, opened from Home (or the
 /// Sessions empty state). That page cannot be left while a session is open,
@@ -132,6 +131,8 @@ class _AppShellState extends State<AppShell> {
         if (!didPop) setState(() => _tab = _Tab.home);
       },
       child: Scaffold(
+        // Home's background photo runs behind the floating navigation bar.
+        extendBody: _tab == _Tab.home,
         body: IndexedStack(
           index: index,
           children: [
@@ -144,6 +145,7 @@ class _AppShellState extends State<AppShell> {
           ],
         ),
         bottomNavigationBar: _FloatingNavBar(
+          immersive: _tab == _Tab.home,
           child: NavigationBar(
             key: AppShell.navKey,
             selectedIndex: index,
@@ -160,14 +162,65 @@ class _AppShellState extends State<AppShell> {
 /// navigation area. The bar sits below the page content (not over it), so
 /// nothing is hidden behind it.
 class _FloatingNavBar extends StatelessWidget {
-  const _FloatingNavBar({required this.child});
+  const _FloatingNavBar({required this.child, this.immersive = false});
 
   final Widget child;
 
+  /// On Home: a dark frosted-glass bar over the background photo, with
+  /// neutral (white) selection instead of the teal accent.
+  final bool immersive;
+
   @override
   Widget build(BuildContext context) {
+    final base = NavigationBarTheme.of(context);
+    final theme = immersive
+        ? base.copyWith(
+            height: 64,
+            backgroundColor: const Color(0x8C120607),
+            indicatorShape: const StadiumBorder(),
+            indicatorColor: Colors.white.withValues(alpha: 0.14),
+            iconTheme: WidgetStateProperty.resolveWith(
+              (states) => IconThemeData(
+                size: 24,
+                color: states.contains(WidgetState.selected)
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.6),
+              ),
+            ),
+            labelTextStyle: WidgetStateProperty.resolveWith(
+              (states) => TextStyle(
+                fontSize: 12,
+                fontWeight: states.contains(WidgetState.selected)
+                    ? FontWeight.w600
+                    : FontWeight.w500,
+                color: states.contains(WidgetState.selected)
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.6),
+              ),
+            ),
+          )
+        : base.copyWith(
+            height: 64,
+            backgroundColor: EvColors.surface,
+            indicatorShape: const StadiumBorder(),
+          );
+    final borderColor = immersive
+        ? Colors.white.withValues(alpha: 0.10)
+        : EvColors.border;
+    Widget bar = MediaQuery.removePadding(
+      // The SafeArea below already keeps clear of the system bar.
+      context: context,
+      removeBottom: true,
+      child: NavigationBarTheme(data: theme, child: child),
+    );
+    if (immersive) {
+      bar = BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: bar,
+      );
+    }
     return ColoredBox(
-      color: EvColors.navy,
+      color: immersive ? Colors.transparent : EvColors.navy,
       child: SafeArea(
         top: false,
         minimum: const EdgeInsets.only(bottom: EvSpace.xs),
@@ -181,7 +234,7 @@ class _FloatingNavBar extends StatelessWidget {
           child: DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(EvRadius.pill),
-              border: Border.all(color: EvColors.border),
+              border: Border.all(color: borderColor),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x66000000),
@@ -192,19 +245,7 @@ class _FloatingNavBar extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(EvRadius.pill),
-              // The SafeArea above already keeps clear of the system bar.
-              child: MediaQuery.removePadding(
-                context: context,
-                removeBottom: true,
-                child: NavigationBarTheme(
-                  data: NavigationBarTheme.of(context).copyWith(
-                    height: 64,
-                    backgroundColor: EvColors.surface,
-                    indicatorShape: const StadiumBorder(),
-                  ),
-                  child: child,
-                ),
-              ),
+              child: bar,
             ),
           ),
         ),

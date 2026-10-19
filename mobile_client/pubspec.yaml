@@ -59,6 +59,8 @@ flutter:
     - assets/licenses/syncthing_LICENSE.txt
     # Echo Vault brand kit (symbol for dark UI, horizontal logo for dark backgrounds).
     - assets/brand/
+    # Home screen background photo (replace the file to change it).
+    - assets/backgrounds/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
