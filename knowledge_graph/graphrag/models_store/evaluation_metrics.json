@@ -1,0 +1,233 @@
+{
+  "model_name": "Hybrid TF-IDF N-Gram + L2 Softmax Logistic Regression & MNB Ensemble",
+  "task": "GraphRAG Query Intent Classification (6 Classes)",
+  "dataset_size": 360,
+  "classes_count": 6,
+  "samples_per_class": 60,
+  "vocabulary_size": 4220,
+  "training_time_ms": 5113.5,
+  "test_split_80_20": {
+    "accuracy": 0.9444,
+    "macro_precision": 0.9464,
+    "macro_recall": 0.9444,
+    "macro_f1": 0.9443,
+    "per_class": {
+      "blocker_chain": {
+        "precision": 0.9091,
+        "recall": 0.8333,
+        "f1_score": 0.8696,
+        "support": 12
+      },
+      "deadline_schedule": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 12
+      },
+      "task_status": {
+        "precision": 0.8462,
+        "recall": 0.9167,
+        "f1_score": 0.88,
+        "support": 12
+      },
+      "meeting_summary": {
+        "precision": 0.9231,
+        "recall": 1.0,
+        "f1_score": 0.96,
+        "support": 12
+      },
+      "person_context": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 12
+      },
+      "general": {
+        "precision": 1.0,
+        "recall": 0.9167,
+        "f1_score": 0.9565,
+        "support": 12
+      }
+    },
+    "confusion_matrix": [
+      [
+        10,
+        0,
+        1,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        12,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        11,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        12,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        12,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        11
+      ]
+    ],
+    "classes": [
+      "blocker_chain",
+      "deadline_schedule",
+      "task_status",
+      "meeting_summary",
+      "person_context",
+      "general"
+    ],
+    "sample_count": 72
+  },
+  "cross_validation_5fold": {
+    "mean_accuracy": 0.9694,
+    "mean_macro_f1": 0.9694,
+    "fold_accuracies": [
+      0.9583,
+      0.9861,
+      0.9722,
+      0.9861,
+      0.9444
+    ],
+    "fold_macro_f1s": [
+      0.9581,
+      0.9861,
+      0.9722,
+      0.9861,
+      0.9443
+    ],
+    "overall_cv_metrics": {
+      "accuracy": 0.9694,
+      "macro_precision": 0.9698,
+      "macro_recall": 0.9694,
+      "macro_f1": 0.9693,
+      "per_class": {
+        "blocker_chain": {
+          "precision": 0.9821,
+          "recall": 0.9167,
+          "f1_score": 0.9483,
+          "support": 60
+        },
+        "deadline_schedule": {
+          "precision": 0.9833,
+          "recall": 0.9833,
+          "f1_score": 0.9833,
+          "support": 60
+        },
+        "task_status": {
+          "precision": 0.9365,
+          "recall": 0.9833,
+          "f1_score": 0.9593,
+          "support": 60
+        },
+        "meeting_summary": {
+          "precision": 0.9836,
+          "recall": 1.0,
+          "f1_score": 0.9917,
+          "support": 60
+        },
+        "person_context": {
+          "precision": 0.9833,
+          "recall": 0.9833,
+          "f1_score": 0.9833,
+          "support": 60
+        },
+        "general": {
+          "precision": 0.95,
+          "recall": 0.95,
+          "f1_score": 0.95,
+          "support": 60
+        }
+      },
+      "confusion_matrix": [
+        [
+          55,
+          0,
+          2,
+          1,
+          0,
+          2
+        ],
+        [
+          0,
+          59,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          59,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          60,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          59,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          0,
+          1,
+          57
+        ]
+      ],
+      "classes": [
+        "blocker_chain",
+        "deadline_schedule",
+        "task_status",
+        "meeting_summary",
+        "person_context",
+        "general"
+      ],
+      "sample_count": 360
+    }
+  }
+}

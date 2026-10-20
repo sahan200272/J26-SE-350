@@ -10,6 +10,7 @@ from neo4j import Driver, Session
 from graph_schema.models import normalize_key
 from graph_schema.schema import get_driver
 from graphrag.anchor_resolver import (
+    classify_query_intent_ml,
     detect_query_intent,
     get_relationship_intent_salience,
     resolve_seed_anchors,
@@ -87,6 +88,7 @@ def score_path(
     path_nodes: List[Dict[str, Any]],
     path_hops: List[PathHop],
     intent: str,
+    query: Optional[str] = None,
 ) -> ScoredPath:
     """Compute mathematical composite score for a multi-hop relational path.
 
@@ -103,9 +105,9 @@ def score_path(
     confidences = [h.confidence for h in path_hops]
     confidence_score = sum(confidences) / len(confidences) if confidences else 1.0
 
-    # 3. Intent salience: mean of intent-aligned edge weights
+    # 3. Intent salience: mean of intent-aligned edge weights (query-aware)
     saliences = [
-        get_relationship_intent_salience(h.relationship_type, intent)  # type: ignore[arg-type]
+        get_relationship_intent_salience(h.relationship_type, intent, query=query)  # type: ignore[arg-type]
         for h in path_hops
     ]
     intent_salience = sum(saliences) / len(saliences) if saliences else 0.5
@@ -280,7 +282,10 @@ def retrieve_subgraph(
         driver = get_driver()
         close_driver = True
 
-    intent = request.intent or detect_query_intent(request.query)
+    ml_intent, intent_conf, intent_probs = classify_query_intent_ml(request.query)
+    intent = request.intent or ml_intent
+    if request.intent:
+        intent_conf = 1.0
     max_hops = max(1, min(3, int(request.max_hops)))
 
     try:
@@ -302,6 +307,8 @@ def retrieve_subgraph(
                 empty_result = RetrievalResult(
                     query=request.query,
                     detected_intent=intent,
+                    intent_confidence=intent_conf,
+                    intent_probabilities=intent_probs,
                     anchors=[],
                     nodes=[],
                     edges=[],
@@ -395,7 +402,7 @@ def retrieve_subgraph(
                     continue
                 seen_signatures.add(sig)
 
-                scored = score_path(p_nodes, hops, intent)
+                scored = score_path(p_nodes, hops, intent, query=request.query)
                 raw_paths.append(scored)
 
             # Sort paths by final_score descending
@@ -464,6 +471,8 @@ def retrieve_subgraph(
             result = RetrievalResult(
                 query=request.query,
                 detected_intent=intent,
+                intent_confidence=intent_conf,
+                intent_probabilities=intent_probs,
                 anchors=anchors,
                 nodes=list(subgraph_nodes_dict.values()),
                 edges=subgraph_edges,

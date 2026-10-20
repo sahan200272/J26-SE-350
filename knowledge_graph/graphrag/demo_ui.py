@@ -31,8 +31,7 @@ def get_graph_snapshot(
     if clean_keys:
         nodes_query = """
         MATCH (n)
-        WHERE NOT n:Conversation
-          AND n.key IN $keys
+        WHERE n.key IN $keys
           AND ($include_private OR coalesce(n['sensitivity'], 'normal') <> 'private')
         RETURN n.key AS key,
                coalesce(n.name, n.key) AS name,
@@ -42,8 +41,7 @@ def get_graph_snapshot(
         """
         edges_query = """
         MATCH (a)-[r]->(b)
-        WHERE NOT a:Conversation AND NOT b:Conversation
-          AND a.key IN $keys AND b.key IN $keys
+        WHERE a.key IN $keys AND b.key IN $keys
           AND ($include_private OR (coalesce(a['sensitivity'], 'normal') <> 'private' AND coalesce(b['sensitivity'], 'normal') <> 'private'))
         RETURN a.key AS from_key,
                coalesce(a.name, a.key) AS from_name,
@@ -527,6 +525,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
     <span class="badge ok" id="dbStatusBadge">● Neo4j 5 Connected</span>
     <span class="badge info">🔒 Localhost 127.0.0.1 Only</span>
     <span class="badge purple">🧠 Ollama LLaMA 3 (8B)</span>
+    <span class="badge" style="background:#065f46; color:#6ee7b7; border-color:#059669;" id="mlBadge">🤖 ML Intent Model (96.9% CV)</span>
     <span class="badge" id="graphCountBadge">Nodes: 0 | Edges: 0</span>
   </div>
 </header>
@@ -640,6 +639,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
       <div class="tabs">
         <button class="tab-btn active" id="tabBtnStored" onclick="switchTab('tabStored', this)">🗄️ Stored Graph (Nodes & Edges)</button>
         <button class="tab-btn" id="tabBtnPaths" onclick="switchTab('tabPaths', this)">📐 Mathematical Scored Paths</button>
+        <button class="tab-btn" id="tabBtnModel" onclick="switchTab('tabModel', this)">🤖 Trained ML Model (Accuracy & F1)</button>
         <button class="tab-btn" id="tabBtnCompare" onclick="switchTab('tabCompare', this)">📊 Baseline Comparison (SE-P04 Proof)</button>
         <button class="tab-btn" id="tabBtnPending" onclick="switchTab('tabPending', this)">🔔 Pending Tasks & Blockers (C4)</button>
         <button class="tab-btn" id="tabBtnContext" onclick="switchTab('tabContext', this)">📄 Raw LLM Prompt Context</button>
@@ -689,6 +689,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
           Composite Formula: <code>S(P) = 0.35 * (0.75^(d-1)) + 0.25 * Confidence + 0.25 * IntentSalience + 0.15 * Recency</code>
           <span id="intentBadge" style="margin-left:10px; color:var(--accent); font-weight:700;"></span>
         </div>
+        <div id="liveIntentProbsBar" style="display:none; font-size:0.72rem; margin-bottom:8px; padding:6px 10px; background:var(--panel-alt); border:1px solid var(--border); border-radius:6px;"></div>
         <div style="overflow-x:auto; max-height:250px;">
           <table>
             <thead>
@@ -707,6 +708,49 @@ DEMO_HTML: str = """<!DOCTYPE html>
               <tr><td colspan="8" style="color:var(--muted);">Run a GraphRAG query above to view ranked multi-hop paths.</td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- TAB 1B: TRAINED ML INTENT CLASSIFIER METRICS -->
+      <div class="tab-content" id="tabModel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="font-size:0.78rem; color:var(--text);">
+            <strong>Architecture:</strong> <span id="mlModelName" style="color:var(--accent);">Hybrid TF-IDF N-Gram + L2 Softmax Logistic Regression & Multinomial NB Ensemble</span>
+          </div>
+          <button onclick="retrainModel()" id="btnRetrainModel" style="border-color:var(--accent); color:var(--accent);">🔄 Re-Train Model (5-Fold CV)</button>
+        </div>
+        <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:10px;">
+          <div class="stat-box"><div class="num" style="color:var(--success);" id="mlCvAcc">96.9%</div><div class="lbl">5-Fold CV Accuracy</div></div>
+          <div class="stat-box"><div class="num" style="color:var(--success);" id="mlCvF1">0.9694</div><div class="lbl">5-Fold Macro F1</div></div>
+          <div class="stat-box"><div class="num" id="mlTestAcc">94.4%</div><div class="lbl">80/20 Holdout Test Acc</div></div>
+          <div class="stat-box"><div class="num" id="mlDatasetInfo">360 / 4,220</div><div class="lbl">Samples / TF-IDF Vocab</div></div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1.05fr 1fr; gap:12px;">
+          <div style="overflow-x:auto; max-height:230px;">
+            <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px; font-weight:600;">Per-Class Evaluation Metrics (5-Fold Stratified CV):</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Intent Class</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-Score</th>
+                  <th>Support</th>
+                </tr>
+              </thead>
+              <tbody id="mlPerClassBody">
+                <tr><td colspan="5" style="color:var(--muted);">Loading model metrics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="overflow-x:auto; max-height:230px;">
+            <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px; font-weight:600;">6×6 Confusion Matrix (Rows = True, Cols = Predicted):</div>
+            <table id="mlConfusionTable">
+              <tbody id="mlConfusionBody">
+                <tr><td style="color:var(--muted);">Loading confusion matrix...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -741,6 +785,27 @@ DEMO_HTML: str = """<!DOCTYPE html>
 let lastTouchedKeys = [];
 
 const PRESETS = {
+  security: {
+    source: "voice_memo_20261020_security_review",
+    schema_version: "1.0",
+    timestamp: "2026-10-20T09:30:00Z",
+    entities: [
+      { type: "Person", name: "Kavindu Jayasinghe", op: "add", props: { title: "Mobile Security Engineer", aliases: ["Kavindu"] } },
+      { type: "Task", name: "Encrypt local SQLite voice cache", op: "add", props: { status: "blocked", priority: "urgent", description: "Add AES-256 encryption to offline voice transcript cache" } },
+      { type: "Deadline", name: "2026-10-24", op: "add", props: { date: "2026-10-24" } },
+      { type: "Issue", name: "Android Keystore biometric timeout crash", op: "add", props: { severity: "critical", status: "open" } },
+      { type: "Decision", name: "Use background session key caching", op: "add", props: { status: "agreed" } },
+      { type: "Meeting", name: "Security Architecture Standup", op: "add", props: { date: "2026-10-20", time: "09:30" } }
+    ],
+    relationships: [
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "ASSIGNED_TO", to: { type: "Person", name: "Kavindu Jayasinghe" }, props: { confidence: 0.98 } },
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "DUE_ON", to: { type: "Deadline", name: "2026-10-24" }, props: { confidence: 0.95 } },
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "BLOCKED_BY", to: { type: "Issue", name: "Android Keystore biometric timeout crash" }, props: { confidence: 0.96 } },
+      { from: { type: "Decision", name: "Use background session key caching" }, type: "RESOLVES", to: { type: "Issue", name: "Android Keystore biometric timeout crash" }, props: { confidence: 0.94 } },
+      { from: { type: "Decision", name: "Use background session key caching" }, type: "CREATED_IN", to: { type: "Meeting", name: "Security Architecture Standup" }, props: { confidence: 0.95 } },
+      { from: { type: "Person", name: "Kavindu Jayasinghe" }, type: "ATTENDED", to: { type: "Meeting", name: "Security Architecture Standup" }, props: { confidence: 0.99 } }
+    ]
+  },
   whisperx: {
     source: "demo_convo_20261019_whisperx",
     schema_version: "1.0",
@@ -926,7 +991,12 @@ async function runIngest() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Ingestion failed");
+    if (!res.ok) {
+      const errDetail = Array.isArray(data.detail)
+        ? data.detail.map(d => (d.msg || JSON.stringify(d))).join(" | ")
+        : (typeof data.detail === "object" ? JSON.stringify(data.detail) : (data.detail || "Ingestion failed"));
+      throw new Error(errDetail);
+    }
 
     document.getElementById("stNodesCreated").textContent = data.nodes_created;
     document.getElementById("stNodesMerged").textContent = data.nodes_merged;
@@ -1004,8 +1074,22 @@ async function runRetrieve() {
       document.getElementById("answerText").textContent = data.synthesized_answer;
     }
 
-    // Update Scored Paths Table
-    document.getElementById("intentBadge").textContent = `Detected Intent: ${data.detected_intent} (${data.latency_ms} ms)`;
+    // Update Scored Paths Table & ML Intent Confidence
+    const confPct = ((data.intent_confidence || 1.0) * 100).toFixed(1);
+    document.getElementById("intentBadge").innerHTML = `Detected Intent: <strong>${data.detected_intent}</strong> <span style="color:var(--success); font-weight:700;">[ML Confidence: ${confPct}%]</span> (${data.latency_ms} ms)`;
+
+    const probsBar = document.getElementById("liveIntentProbsBar");
+    if (data.intent_probabilities && Object.keys(data.intent_probabilities).length > 0) {
+      probsBar.style.display = "block";
+      const chips = Object.entries(data.intent_probabilities)
+        .sort((a,b) => b[1] - a[1])
+        .map(([c, p]) => `<span style="margin-right:12px; ${c === data.detected_intent ? 'color:var(--accent); font-weight:700;' : 'color:var(--muted);'}">${c}: ${(p*100).toFixed(1)}%</span>`)
+        .join("");
+      probsBar.innerHTML = `<strong>🤖 ML Intent Probabilities:</strong> ` + chips;
+    } else {
+      probsBar.style.display = "none";
+    }
+
     const tbody = document.getElementById("pathsTableBody");
     tbody.innerHTML = "";
     if (!data.ranked_paths || data.ranked_paths.length === 0) {
@@ -1386,11 +1470,89 @@ function showNodeInspector(n) {
   `;
 }
 
+async function loadModelMetrics() {
+  try {
+    const res = await fetch("/model/metrics");
+    const m = await res.json();
+    if (!res.ok) return;
+    const cv = m.cross_validation_5fold || {};
+    const overall = cv.overall_cv_metrics || {};
+    document.getElementById("mlCvAcc").textContent = ((cv.mean_accuracy || 0) * 100).toFixed(1) + "%";
+    document.getElementById("mlCvF1").textContent = (cv.mean_macro_f1 || 0).toFixed(4);
+    if (m.test_split_80_20) {
+      document.getElementById("mlTestAcc").textContent = ((m.test_split_80_20.accuracy || 0) * 100).toFixed(1) + "%";
+    }
+    document.getElementById("mlDatasetInfo").textContent = `${m.dataset_size} / ${m.vocabulary_size}`;
+    if (m.model_name) document.getElementById("mlModelName").textContent = m.model_name;
+
+    // Per-class metrics table
+    const perClass = overall.per_class || {};
+    const perClassBody = document.getElementById("mlPerClassBody");
+    perClassBody.innerHTML = "";
+    Object.entries(perClass).forEach(([c, stats]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><strong>${c}</strong></td>
+        <td>${(stats.precision || 0).toFixed(4)}</td>
+        <td>${(stats.recall || 0).toFixed(4)}</td>
+        <td><span class="score-pill">${(stats.f1_score || 0).toFixed(4)}</span></td>
+        <td>${stats.support || 0}</td>
+      `;
+      perClassBody.appendChild(tr);
+    });
+
+    // 6x6 Confusion Matrix
+    const matrix = overall.confusion_matrix || [];
+    const classes = overall.classes || [];
+    const confBody = document.getElementById("mlConfusionBody");
+    confBody.innerHTML = "";
+    if (classes.length > 0 && matrix.length > 0) {
+      const headerTr = document.createElement("tr");
+      headerTr.innerHTML = `<th>True \\ Pred</th>` + classes.map(c => `<th style="font-size:0.68rem;">${c.slice(0,4)}</th>`).join("");
+      confBody.appendChild(headerTr);
+
+      matrix.forEach((row, rIdx) => {
+        const rowTr = document.createElement("tr");
+        let cells = `<td style="font-size:0.7rem; font-weight:700;">${classes[rIdx]}</td>`;
+        row.forEach((cnt, cIdx) => {
+          const isDiag = rIdx === cIdx;
+          const bg = isDiag ? "background:rgba(34,197,94,0.18); font-weight:700; color:#4ade80;" : (cnt > 0 ? "background:rgba(239,68,68,0.18); color:#f87171;" : "color:var(--muted);");
+          cells += `<td style="text-align:center; ${bg}">${cnt}</td>`;
+        });
+        rowTr.innerHTML = cells;
+        confBody.appendChild(rowTr);
+      });
+    }
+  } catch (e) {
+    console.error("Error loading model metrics:", e);
+  }
+}
+
+async function retrainModel() {
+  const btn = document.getElementById("btnRetrainModel");
+  const origText = btn.textContent;
+  btn.textContent = "⏳ Training 5 Folds...";
+  btn.disabled = true;
+  try {
+    const res = await fetch("/model/train", { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Training failed");
+    await loadModelMetrics();
+    alert("✅ Model trained successfully! 5-Fold CV Accuracy: " + ((data.cross_validation_5fold.mean_accuracy || 0) * 100).toFixed(1) + "%");
+  } catch (e) {
+    alert("Training error: " + e.message);
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
 // Initialize on load
 window.addEventListener("DOMContentLoaded", () => {
   loadPreset("whisperx");
   loadFullGraph();
   loadPending();
+  loadModelMetrics();
   requestAnimationFrame(drawGraph);
 });
 </script>

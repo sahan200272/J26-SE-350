@@ -474,3 +474,91 @@ def test_llm_synthesizer_with_mocked_ollama_and_fallback() -> None:
         assert "deterministic_fallback" in syn_fb["model_used"]
         assert "Test payment flow (Task) --[BLOCKED_BY]--> Payment API not available (Issue)" in syn_fb["answer"]
 
+
+def test_location_query_intent_salience_and_path_ranking() -> None:
+    """Verify that location-seeking queries prioritize LOCATED_AT and demote non-spatial edges."""
+    query = "where is the dilini's party?"
+
+    # Baseline intent salience
+    assert get_relationship_intent_salience("LOCATED_AT", "person_context") == 1.0
+    assert get_relationship_intent_salience("LOCATED_AT", "deadline_schedule") == 0.95
+
+    # Query-aware contextual salience
+    assert get_relationship_intent_salience("LOCATED_AT", "person_context", query=query) == 1.0
+    assert get_relationship_intent_salience("LIVES_IN", "person_context", query=query) == 1.0
+    assert get_relationship_intent_salience("FAMILY_OF", "person_context", query=query) == 0.60
+    assert get_relationship_intent_salience("FRIEND_OF", "person_context", query=query) == 0.60
+
+    # Score Path 1: Dilini surprise party -[LOCATED_AT]-> Kandy
+    party_path = score_path(
+        path_nodes=[
+            {"key": "dilini surprise party", "name": "Dilini surprise party", "type": "Event"},
+            {"key": "kandy", "name": "Kandy", "type": "Location"},
+        ],
+        path_hops=[
+            PathHop(
+                from_node={"key": "dilini surprise party", "name": "Dilini surprise party", "type": "Event"},
+                relationship_type="LOCATED_AT",
+                to_node={"key": "kandy", "name": "Kandy", "type": "Location"},
+                confidence=1.0,
+            )
+        ],
+        intent="person_context",
+        query=query,
+    )
+
+    # Score Path 2: Dilini -[FAMILY_OF]-> Ruwan
+    family_path = score_path(
+        path_nodes=[
+            {"key": "dilini", "name": "Dilini", "type": "Person"},
+            {"key": "ruwan", "name": "Ruwan", "type": "Person"},
+        ],
+        path_hops=[
+            PathHop(
+                from_node={"key": "dilini", "name": "Dilini", "type": "Person"},
+                relationship_type="FAMILY_OF",
+                to_node={"key": "ruwan", "name": "Ruwan", "type": "Person"},
+                confidence=1.0,
+            )
+        ],
+        intent="person_context",
+        query=query,
+    )
+
+    # The location path must decisively outrank the family path
+    assert party_path.intent_salience == 1.0
+    assert family_path.intent_salience == 0.60
+    assert party_path.final_score > family_path.final_score
+    assert party_path.final_score == pytest.approx(0.94, abs=0.01)
+    assert family_path.final_score == pytest.approx(0.84, abs=0.01)
+
+
+def test_multi_token_anchor_resolution() -> None:
+    """Verify that multi-word query phrases match multi-word entities (e.g. 'dilini surprise party')."""
+    mock_session = MagicMock()
+    mock_records = [
+        {
+            "key": "dilini",
+            "name": "Dilini",
+            "type": "Person",
+            "aliases": [],
+            "sensitivity": "normal",
+        },
+        {
+            "key": "dilini surprise party",
+            "name": "Dilini surprise party",
+            "type": "Event",
+            "aliases": ["dilini party"],
+            "sensitivity": "normal",
+        },
+    ]
+    mock_session.run.return_value = mock_records
+
+    anchors = resolve_seed_anchors(mock_session, query="where is the dilini's party?")
+    anchor_keys = [a.key for a in anchors]
+
+    assert "dilini surprise party" in anchor_keys
+    party_anchor = next(a for a in anchors if a.key == "dilini surprise party")
+    assert party_anchor.score >= 0.92
+    assert party_anchor.match_type in ("multi_token_match", "exact_alias", "fuzzy_name")
+

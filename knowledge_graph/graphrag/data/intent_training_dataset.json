@@ -1,0 +1,1442 @@
+[
+  {
+    "query": "What is blocking the benchmark task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Are there any issues or obstacles on whisper transcription?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the payment flow task stuck?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is preventing Sarah Chen from finishing WhisperX optimization?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which critical bug is holding up the mobile release?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is blocking Kavindu's SQLite voice cache task and how is it resolved?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Show me all current blockers and impediments in the project",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why can't we deploy the voice gateway cluster yet?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What problem did David Miller raise about memory consumption?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which issue is causing the CUDA out of memory crash on 8GB VRAM?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "How was the Whisper memory limit exceeded issue resolved?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What decision resolves the Android Keystore biometric timeout crash?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Is anything blocking the local SQLite encryption task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the audio pipeline optimization task delayed or blocked?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Tell me the root cause issue behind the failing transcription task",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What obstacles are stopping the team from completing the sprint?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which tasks are currently blocked by open issues?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What bug did Sarah report during the architecture sync?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the backend integration failing right now?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is the bottleneck in the Ollama 8B inference pipeline?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Identify the blocker chain for the mobile app release",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which high severity issues are still unresolved?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What fix or decision addresses the GPU memory overflow bug?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the Whisper FP16 task marked as blocked?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What technical problem is holding back the security patch?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Are there any critical bugs preventing deployment?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Who raised the payment API unavailability issue and what blocks it?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is the main impediment to finishing the benchmark?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Explain why the encryption task cannot proceed",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which issue blocks the voice cache task and how did we solve it?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What trouble are we having with the upstream library?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "List the bugs and blockers raised in recent conversations",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why did the Whisper transcription crash on 8GB machines?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is stopping David from completing his assigned task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Show the resolution path for the memory fragmentation blocker",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which open issues are impacting our urgent tasks?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What obstacle did the engineering team encounter with Docker?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "How are we resolving the critical blocker on the payment flow?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is causing the bottleneck in embedding computation?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Are any tasks stuck waiting on an unresolved bug?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What issue is blocking zz test Audio pipeline optimization?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the release candidate blocked right now?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What problem is preventing the QA team from testing?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which decision fixes the blocker on Sarah's task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Tell me what is holding up the database migration work",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What bugs were raised that still need a resolution?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the voice assistant response latency task blocked?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is the blocker on Test payment flow?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which issue is obstructing the authentication module?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "How did the team resolve the CUDA memory crash?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What is blocking the WhisperX GPU memory task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Are there any severe issues blocking our current work items?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why is the security review task stuck in blocked state?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What technical hurdle is delaying the API integration?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which blocker was raised by David Miller?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What issue prevents the mobile client from syncing?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Show me the chain of blockers and their resolutions",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Why are we unable to close the benchmark task?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "What bug is blocking the sprint deliverable?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "Which critical issue is holding up the release?",
+    "intent": "blocker_chain"
+  },
+  {
+    "query": "When is the deployment deadline?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is on the calendar schedule for Friday?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the benchmark task due?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the target date for the mobile app release?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "By when does Sarah need to finish optimizing WhisperX?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What are the upcoming deadlines for this sprint?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the due date for encrypting the local SQLite voice cache?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the timeline for the cloud migration project?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the release cutoff scheduled?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Show me all tasks that are due on 2026-10-25",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the ETA for the voice gateway Docker cluster?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When must the urgent security patch be completed?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Did the deadline for WhisperX optimization change?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the new target date after rescheduling?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the Friday security cutoff date?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "List all upcoming due dates and milestones on the calendar",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "By what date does Tharindu have to finish the Docker deployment?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the surprise party event scheduled to happen?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What deadlines do we have coming up in October?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the final submission date for the architecture deliverable?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the scheduled date for the beta release demo?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When does the payment flow testing need to be done by?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Tell me the due date for David Miller's benchmark task",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is our schedule timeline for next week?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the deadline for fixing the memory leak?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Which tasks have a deadline this Friday?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the target milestone for sub-500ms latency?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What date is the Dilini surprise party planned for?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "By when should the design file be shared?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the cutoff date for the sprint 15 deliverables?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the due date for the QA extension task?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Show the calendar schedule and target dates for all tasks",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the deadline for the SQLite encryption work item?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What date was set as the deadline for the benchmark?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "How much time do we have until the release deadline?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the scheduled date for the product launch?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the due date assigned to Kavindu's task?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When are the project deliverables due?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Tell me the exact deadline date for the WhisperX task",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is on the schedule for 2026-11-05?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the target completion date for the security review?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Which deadline applies to the Ollama 8B benchmark?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When do we need to finish the cake and balloons task?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the updated due date for the GPU memory optimization?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Show me the timeline and due dates for open tasks",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "By when is the team expected to deliver the prototype?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the next milestone deadline on our roadmap?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the exact date for the release cutoff?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the due date for the tasks assigned to Sarah?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Check the calendar for any deadlines due this week",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the target date for completing the voice pipeline?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What date is the task due on?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the scheduled deadline for the deployment?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "By what day must the critical patch be delivered?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What are the due dates for our high priority tasks?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the planned date for the Kandy trip event?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "Tell me when the sprint tasks are due",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is the deadline for the payment integration?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "When is the cutoff schedule for the current sprint?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What date is the deadline for this task?",
+    "intent": "deadline_schedule"
+  },
+  {
+    "query": "What is David working on?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Show me all in progress tasks and action items",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is assigned to the Test payment flow task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the current status of the Ollama 8B benchmark task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which tasks are assigned to Sarah Chen?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What work items are currently open in the backlog?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is responsible for encrypting the local SQLite voice cache?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the priority and status of the Docker cluster task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "List all action items assigned to Ruwan Fernando",
+    "intent": "task_status"
+  },
+  {
+    "query": "What deliverables is the Core AI Pipeline Team working on?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Is the benchmark task done or still in progress?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is working on the local voice AI assistant project?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What tasks does Kavindu Jayasinghe have assigned to him?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Show the progress and status of all urgent tasks",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who requested the WhisperX GPU memory optimization task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What todo items are left for the mobile app release?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which action items are marked as high priority?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is Tharindu Bandara currently working on?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is assigned to buy cake and balloons?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Give me a status update on the pending tasks",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which tasks are in progress versus open?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is handling the QA time extension task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What work item is assigned to zz test Alice?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Check the status of the design file sharing task",
+    "intent": "task_status"
+  },
+  {
+    "query": "What are the active tasks and their assignees?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is responsible for the urgent security patch?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the progress on the audio pipeline optimization task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which tasks belong to the Local Voice AI Assistant project?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Show me the todo list and assigned owners",
+    "intent": "task_status"
+  },
+  {
+    "query": "What action items were created for David Miller?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Is the payment flow task completed or still open?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the priority level of the SQLite voice cache task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is assigned to fix the memory leak task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "List all deliverables and their current lifecycle status",
+    "intent": "task_status"
+  },
+  {
+    "query": "What work is Nimal doing on the mobile release?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which tasks are currently in the doing or wip state?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who owns the task to deploy the Docker cluster?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the status of the tasks in our current sprint?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Show me the action items that are still pending",
+    "intent": "task_status"
+  },
+  {
+    "query": "What task is assigned to Tharindu and what is its status?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is working on the benchmark core deliverable?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Are there any urgent tasks assigned to Sarah?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the current progress of our engineering tasks?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which work items have been completed so far?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Tell me the status and priority of the WhisperX task",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is assigned to zz test Implement feature?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What tasks are open in the knowledge graph?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Show the assignee and status for the encryption task",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is Priya working on right now?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which todo items need immediate attention?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What task is Kavindu working on?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is assigned to the benchmark task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the status of all assigned action items?",
+    "intent": "task_status"
+  },
+  {
+    "query": "List the open tasks and who is working on them",
+    "intent": "task_status"
+  },
+  {
+    "query": "What high priority deliverables are in progress?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Who is responsible for the voice gateway deployment task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "What tasks are currently active in the project?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Tell me what work items David is assigned to",
+    "intent": "task_status"
+  },
+  {
+    "query": "What is the status of the party planning task?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Which tasks are assigned and in progress?",
+    "intent": "task_status"
+  },
+  {
+    "query": "Summarize the Sprint 14 Architecture Sync meeting",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who attended the discussion call yesterday?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When is the Weekly sync meeting and who was absent?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What was discussed in the Sprint 15 Architecture Sync?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who was absent from the weekly sync call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When is the Security Architecture Standup meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What decisions were made during the architecture sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who attended the Infrastructure Review Call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Where was the architecture sync meeting located?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Give me the minutes and notes from the standup call",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Was Kamal absent from the Weekly sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What agenda topics were discussed in the conference call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who led the Sprint 14 Architecture Sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When did the Security Architecture Standup take place?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which decisions originated in the architecture sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Tell me who attended and who missed the weekly sync",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What was the duration and date of the Sprint 15 Architecture Sync?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Summarize the key takeaways from the standup discussion",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Did David Miller attend the Sprint 15 Architecture Sync?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When is the Infrastructure Review Call scheduled and who attended?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What notes were recorded during the retrospective meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which meeting discussed Ollama memory consumption?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who participated in the morning standup call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What was decided in the security standup meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When was the weekly engineering alignment meeting held?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Show me the attendance list for the architecture sync",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who missed the weekly sync call on 2026-03-29?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What topics were covered in the design discussion?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Did Kavindu attend the Security Architecture Standup?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Give me a summary of the recent voice sync session",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What time and date is the Security Architecture Standup?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which meeting created the decision to use background key caching?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who was present at the infrastructure review meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Were there any absentees from the sprint sync call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What did the team discuss during the standup?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Tell me the details of the Weekly sync meeting",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which conference room was the meeting located at?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Summarize the decisions and discussions from the sync call",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who attended the party planning discussion?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When is the next standup or sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What happened in the Sprint 15 Architecture Sync?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who attended the meeting on 2026-10-20?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Give me the meeting minutes for the architecture call",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which people attended the review call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who was absent from the meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What time is the standup meeting scheduled?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Did Tharindu attend the Infrastructure Review Call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What was agreed upon in the architecture sync meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Show me the summary and attendees of the sync meeting",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When was the Sprint 15 Architecture Sync held?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who attended the Security Architecture Standup?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What topics were discussed in the meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Tell me when the Weekly sync meeting happened",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who was present and who was absent at the meeting?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What decisions came out of the standup call?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Summarize the meeting attendance and agenda",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "When is the meeting and who attended it?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "What call did Tharindu Bandara attend?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Which meeting did David Miller attend?",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Give me the date and attendees of the sync meeting",
+    "intent": "meeting_summary"
+  },
+  {
+    "query": "Who is Sarah Chen?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Elena live and who are her friends?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is friend of Kamal?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Tharindu work and where does he live?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are Kamal Perera's friends?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What organization does Ruwan work at?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about David Miller and his role",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is in Kamal's family?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Sarah live and what team is she a member of?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What is Kavindu Jayasinghe's job title?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who does David report to in the organization?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Which company does Kamal work at?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are the members of the Mobile Team?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What food does Kamal like or dislike?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Ruwan live and who is his family?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who collaborates with Sarah Chen on the AI team?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me the profile and contact details for Sarah",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is Dilini and how is she related to Ruwan?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What is Tharindu Bandara's title at Dialog Axiata?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Which city does Tharindu live in?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are the coworkers working at ABC Software?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What are Kamal's personal preferences and hobbies?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is Dr. Chen and what is her role?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about Ruwan Fernando and his friends",
+    "intent": "person_context"
+  },
+  {
+    "query": "Which team is Kamal a member of?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is the Staff AI Engineer on the team?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Priya work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "How is Kamal Perera connected to Ruwan Silva?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are the colleagues in the Core AI Pipeline Team?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What does Kamal dislike eating?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who likes cricket in the personal graph?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about Kavindu and his engineering role",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is Nimal and where does he work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What organization employs Tharindu Bandara?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is the Senior Backend Engineer?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Kamal's friend work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is the DevOps Lead living in Galle?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about the people working at ABC Software",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is Ruwan's friend and family member?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What is Sarah Chen's title and alias?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are the friends of Kamal in the knowledge graph?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does the Mobile Security Engineer work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about Elena Rostova",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is connected to Kamal via friendship or family?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Which people belong to the engineering team?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What do we know about Ruwan Silva?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Kamal work and what team is he in?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is the person with alias Sarah?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about Tharindu's workplace and hometown",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are the coworkers and friends of Kamal?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is friend of Kamal and where do they work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is Kavindu Jayasinghe?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Ruwan work?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who lives in Colombo and works at ABC Software?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Tell me about Sarah's background and team",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who are Kamal's friends?",
+    "intent": "person_context"
+  },
+  {
+    "query": "What is David Miller's title?",
+    "intent": "person_context"
+  },
+  {
+    "query": "How are Ruwan and Dilini related?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Where does Tharindu Bandara live?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Who is the person working at Dialog Axiata?",
+    "intent": "person_context"
+  },
+  {
+    "query": "Ollama quantization details",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about Neo4j 5 graph database architecture",
+    "intent": "general"
+  },
+  {
+    "query": "What tools are used by the AI Core Team?",
+    "intent": "general"
+  },
+  {
+    "query": "Explain the 4-bit quantization rationale for LLaMA 3",
+    "intent": "general"
+  },
+  {
+    "query": "What is the Cloud GPU Invoice #402 value?",
+    "intent": "general"
+  },
+  {
+    "query": "Describe the RFC-204 Local Graph Storage Architecture document",
+    "intent": "general"
+  },
+  {
+    "query": "What metrics are tracked for P99 response latency?",
+    "intent": "general"
+  },
+  {
+    "query": "How does SQLite acoustic embedding caching work?",
+    "intent": "general"
+  },
+  {
+    "query": "What is the goal for sub-500ms voice response latency?",
+    "intent": "general"
+  },
+  {
+    "query": "Show me details about the Kandy hill country venue",
+    "intent": "general"
+  },
+  {
+    "query": "What is Docker Desktop used for in this project?",
+    "intent": "general"
+  },
+  {
+    "query": "Explain the zero-knowledge proofs concept",
+    "intent": "general"
+  },
+  {
+    "query": "What is the rationale behind adopting Ollama 8B?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the Sony WH-1000XM5 headphones item",
+    "intent": "general"
+  },
+  {
+    "query": "What software tools does the project rely on?",
+    "intent": "general"
+  },
+  {
+    "query": "Describe the memory optimization and quantization topic",
+    "intent": "general"
+  },
+  {
+    "query": "What is the resident memory footprint of the 4-bit model?",
+    "intent": "general"
+  },
+  {
+    "query": "Show information about the Local Voice AI Assistant project",
+    "intent": "general"
+  },
+  {
+    "query": "What documents or specifications are referenced?",
+    "intent": "general"
+  },
+  {
+    "query": "How much VRAM does INT8 quantization save?",
+    "intent": "general"
+  },
+  {
+    "query": "What is the description of Dialog Axiata?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the Southern Province location Galle",
+    "intent": "general"
+  },
+  {
+    "query": "What is the AES-256 encryption specification?",
+    "intent": "general"
+  },
+  {
+    "query": "Show me the details of the Cloud GPU Invoice payment",
+    "intent": "general"
+  },
+  {
+    "query": "What tools are linked to the zz test AI Core Team?",
+    "intent": "general"
+  },
+  {
+    "query": "Explain the background session key caching decision rationale",
+    "intent": "general"
+  },
+  {
+    "query": "What is the target metric for inference latency?",
+    "intent": "general"
+  },
+  {
+    "query": "Describe the architecture of the local voice pipeline",
+    "intent": "general"
+  },
+  {
+    "query": "What items or hardware devices are mentioned in the graph?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the design file document",
+    "intent": "general"
+  },
+  {
+    "query": "What is PyTorch used for in the pipeline?",
+    "intent": "general"
+  },
+  {
+    "query": "Give me an overview of the Neo4j Engine tool",
+    "intent": "general"
+  },
+  {
+    "query": "What is the rationale for adopting Neo4j 5 as single source of truth?",
+    "intent": "general"
+  },
+  {
+    "query": "Show details about the MacBook Pro item",
+    "intent": "general"
+  },
+  {
+    "query": "What concepts are stored in the knowledge graph?",
+    "intent": "general"
+  },
+  {
+    "query": "Explain the quantization parameters and memory savings",
+    "intent": "general"
+  },
+  {
+    "query": "What is the unit and value of Invoice #402?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the hill country venue in Kandy",
+    "intent": "general"
+  },
+  {
+    "query": "What strategic goals does the project support?",
+    "intent": "general"
+  },
+  {
+    "query": "Describe the technical stack and tools in the graph",
+    "intent": "general"
+  },
+  {
+    "query": "What is the WhisperX model architecture?",
+    "intent": "general"
+  },
+  {
+    "query": "Show me the general notes and ideas in memory",
+    "intent": "general"
+  },
+  {
+    "query": "What ideas were proposed for caching embeddings?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the Oat milk grocery item",
+    "intent": "general"
+  },
+  {
+    "query": "What is the rationale for INT8 quantization?",
+    "intent": "general"
+  },
+  {
+    "query": "Describe the Telecom Enterprise Partner organization",
+    "intent": "general"
+  },
+  {
+    "query": "What is the target VRAM usage for local inference?",
+    "intent": "general"
+  },
+  {
+    "query": "Show me the details of the architecture RFC document",
+    "intent": "general"
+  },
+  {
+    "query": "What general topics are stored in the database?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the system tools and benchmarks",
+    "intent": "general"
+  },
+  {
+    "query": "What is the memory footprint of Ollama 8B?",
+    "intent": "general"
+  },
+  {
+    "query": "Show the technical details of the quantization decision",
+    "intent": "general"
+  },
+  {
+    "query": "What tools and frameworks are in the graph?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the payment invoice details",
+    "intent": "general"
+  },
+  {
+    "query": "What is the rationale for the database decision?",
+    "intent": "general"
+  },
+  {
+    "query": "Explain the general concept of graph memory",
+    "intent": "general"
+  },
+  {
+    "query": "What hardware and software items are recorded?",
+    "intent": "general"
+  },
+  {
+    "query": "Show the benchmark metric values and units",
+    "intent": "general"
+  },
+  {
+    "query": "What is the description of the Kandy location?",
+    "intent": "general"
+  },
+  {
+    "query": "Tell me about the technical concepts in the graph",
+    "intent": "general"
+  }
+]

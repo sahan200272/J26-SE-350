@@ -126,6 +126,32 @@ def retrieve_pending_endpoint(
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@app.get("/model/metrics", tags=["Trained ML Model"])
+def model_metrics_endpoint() -> Dict[str, Any]:
+    """Return evaluation metrics, per-class F1 scores, and 6x6 confusion matrix of the trained ML Intent Classifier."""
+    try:
+        from graphrag.intent_classifier import get_intent_classifier
+
+        clf = get_intent_classifier()
+        if not clf.metrics:
+            clf.train_and_evaluate()
+        return clf.metrics
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/model/train", tags=["Trained ML Model"])
+def model_train_endpoint() -> Dict[str, Any]:
+    """Re-train the supervised ML Intent Classifier and run 80/20 split + 5-Fold Stratified Cross-Validation."""
+    try:
+        from graphrag.intent_classifier import get_intent_classifier
+
+        clf = get_intent_classifier()
+        return clf.train_and_evaluate()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
 if __name__ == "__main__":
     import uvicorn
 
