@@ -1,8 +1,31 @@
 import 'package:echo_vault/sessions/session_store.dart';
+import 'package:echo_vault/ui/home_screen.dart';
 import 'package:echo_vault/ui/session_detail_screen.dart';
 import 'package:echo_vault/ui/settings_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../helpers/fake_syncthing_client.dart';
+
+/// Lists [sessions], or throws [error] when set.
+class _Source implements SessionSource {
+  _Source(this.sessions);
+
+  List<SessionSummary> sessions;
+  Object? error;
+
+  @override
+  Future<List<SessionSummary>> list() async {
+    if (error case final e?) throw e;
+    return sessions;
+  }
+
+  @override
+  Future<void> rename(String id, String title) async {}
+
+  @override
+  Future<void> delete(String id) async {}
+}
 
 void main() {
   SessionSummary session({int failedChunks = 0}) => SessionSummary(
@@ -92,6 +115,51 @@ void main() {
         find.text('Version 1.0.0+1 · open-source licences'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('Home', () {
+    testWidgets('recent recordings that failed to load can be retried', (
+      tester,
+    ) async {
+      final source = _Source([session()])..error = Exception('disk');
+      await tester.pumpWidget(MaterialApp(home: HomeScreen(sessions: source)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(HomeScreen.retryKey), findsOneWidget);
+
+      source.error = null;
+      await tester.ensureVisible(find.byKey(HomeScreen.retryKey));
+      await tester.tap(find.byKey(HomeScreen.retryKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(HomeScreen.retryKey), findsNothing);
+      expect(find.text('Recording at 01:39'), findsOneWidget);
+    });
+  });
+
+  group('Recording detail: is it on the PC?', () {
+    Future<void> pumpDetail(WidgetTester tester, int? pending) async {
+      final client = FakeSyncthingClient()..pendingForSession = pending;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: SessionDetailScreen(session: session(), syncthing: client),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('every file sent: "On your PC"', (tester) async {
+      await pumpDetail(tester, 0);
+      expect(find.text('On your PC'), findsOneWidget);
+    });
+
+    testWidgets('files waiting: "Waiting to send to your PC"', (tester) async {
+      await pumpDetail(tester, 3);
+      expect(find.text('Waiting to send to your PC'), findsOneWidget);
+    });
+
+    testWidgets('unknown: no chip', (tester) async {
+      await pumpDetail(tester, null);
+      expect(find.byKey(SessionDetailScreen.pcCopyKey), findsNothing);
     });
   });
 }

@@ -50,6 +50,7 @@ class SessionDetailScreen extends StatefulWidget {
   static const titleKey = Key('session-title');
   static const busyKey = Key('session-busy');
   static const gapsKey = Key('session-gaps');
+  static const pcCopyKey = Key('session-pc-copy');
   static const statsHelpKey = Key('session-stats-help');
 
   static const deletedMessage = 'Recording deleted from this phone';
@@ -64,6 +65,22 @@ enum _MenuAction { rename, delete }
 class _SessionDetailScreenState extends State<SessionDetailScreen> {
   late SessionSummary _session = widget.session;
   bool _busy = false;
+
+  /// Whether the PC already has this recording (shown as a chip; nothing
+  /// when it cannot be told).
+  PcCopyState _pcCopy = PcCopyState.unknown;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadPcCopy());
+  }
+
+  Future<void> _loadPcCopy() async {
+    if (widget.syncthing == null) return;
+    final state = await _pcCopyState();
+    if (mounted) setState(() => _pcCopy = state);
+  }
 
   void _snack(String message) {
     ScaffoldMessenger.of(context)
@@ -230,6 +247,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 child: _SessionDetailBody(
                   session: _session,
                   now: widget.now(),
+                  pcCopy: _pcCopy,
                 ),
               ),
             ),
@@ -265,10 +283,15 @@ class _DetailBackdrop extends StatelessWidget {
 }
 
 class _SessionDetailBody extends StatelessWidget {
-  const _SessionDetailBody({required this.session, required this.now});
+  const _SessionDetailBody({
+    required this.session,
+    required this.now,
+    this.pcCopy = PcCopyState.unknown,
+  });
 
   final SessionSummary session;
   final DateTime now;
+  final PcCopyState pcCopy;
 
   @override
   Widget build(BuildContext context) {
@@ -335,6 +358,19 @@ class _SessionDetailBody extends StatelessWidget {
                     GlassChip(
                       icon: Icons.pause_rounded,
                       label: plural(s.pauseCount, 'pause'),
+                    ),
+                  if (pcCopy == PcCopyState.sent)
+                    const GlassChip(
+                      key: SessionDetailScreen.pcCopyKey,
+                      icon: Icons.computer_rounded,
+                      label: 'On your PC',
+                      color: EvEmber.success,
+                    )
+                  else if (pcCopy == PcCopyState.partlySent)
+                    const GlassChip(
+                      key: SessionDetailScreen.pcCopyKey,
+                      icon: Icons.upload_rounded,
+                      label: 'Waiting to send to your PC',
                     ),
                 ],
               ),

@@ -51,6 +51,7 @@ class HomeScreen extends StatefulWidget {
   static const startKey = Key('home-start-recording');
   static const recentKey = Key('home-recent');
   static const privacyKey = Key('home-privacy');
+  static const retryKey = Key('home-recent-retry');
   static const backgroundKey = ImmersiveBackdrop.imageKey;
 
   /// How many recent recordings Home shows.
@@ -281,10 +282,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final textTheme = Theme.of(context).textTheme;
     final recent = _recent;
     if (_failed && recent == null) {
-      return Text(
+      return Row(
         key: HomeScreen.recentKey,
-        'Recent recordings could not be loaded.',
-        style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
+        children: [
+          Expanded(
+            child: Text(
+              'Recent recordings could not be loaded.',
+              style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
+            ),
+          ),
+          TextButton(
+            key: HomeScreen.retryKey,
+            onPressed: _load,
+            style: TextButton.styleFrom(foregroundColor: EvEmber.accentSoft),
+            child: const Text('Try again'),
+          ),
+        ],
       );
     }
     if (recent == null) {

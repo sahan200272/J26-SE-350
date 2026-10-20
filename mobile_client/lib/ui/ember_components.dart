@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'theme/ember_theme.dart';
 
-/// Shared building blocks of the Ember look (black / deep red, liquid
-/// glass). Cards themselves are [LiquidGlass] (ember_theme.dart).
+// Shared building blocks of the Ember look (black / deep red, liquid
+// glass). Cards themselves are LiquidGlass (ember_theme.dart).
 
 /// Round frosted-glass icon button (app bars, headers). [buttonKey] goes on
 /// the underlying [IconButton].

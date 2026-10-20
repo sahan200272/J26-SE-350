@@ -64,7 +64,7 @@ class _ImmersiveBackdropState extends State<ImmersiveBackdrop> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // False while another page covers this one.
-    final onScreen = TickerMode.of(context);
+    final onScreen = TickerMode.valuesOf(context).enabled;
     if (onScreen != _onScreen) {
       _onScreen = onScreen;
       _syncPlayback();
