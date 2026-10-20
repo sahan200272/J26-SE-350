@@ -31,8 +31,7 @@ def get_graph_snapshot(
     if clean_keys:
         nodes_query = """
         MATCH (n)
-        WHERE NOT n:Conversation
-          AND n.key IN $keys
+        WHERE n.key IN $keys
           AND ($include_private OR coalesce(n['sensitivity'], 'normal') <> 'private')
         RETURN n.key AS key,
                coalesce(n.name, n.key) AS name,
@@ -42,8 +41,7 @@ def get_graph_snapshot(
         """
         edges_query = """
         MATCH (a)-[r]->(b)
-        WHERE NOT a:Conversation AND NOT b:Conversation
-          AND a.key IN $keys AND b.key IN $keys
+        WHERE a.key IN $keys AND b.key IN $keys
           AND ($include_private OR (coalesce(a['sensitivity'], 'normal') <> 'private' AND coalesce(b['sensitivity'], 'normal') <> 'private'))
         RETURN a.key AS from_key,
                coalesce(a.name, a.key) AS from_name,
@@ -741,6 +739,27 @@ DEMO_HTML: str = """<!DOCTYPE html>
 let lastTouchedKeys = [];
 
 const PRESETS = {
+  security: {
+    source: "voice_memo_20261020_security_review",
+    schema_version: "1.0",
+    timestamp: "2026-10-20T09:30:00Z",
+    entities: [
+      { type: "Person", name: "Kavindu Jayasinghe", op: "add", props: { title: "Mobile Security Engineer", aliases: ["Kavindu"] } },
+      { type: "Task", name: "Encrypt local SQLite voice cache", op: "add", props: { status: "blocked", priority: "urgent", description: "Add AES-256 encryption to offline voice transcript cache" } },
+      { type: "Deadline", name: "2026-10-24", op: "add", props: { date: "2026-10-24" } },
+      { type: "Issue", name: "Android Keystore biometric timeout crash", op: "add", props: { severity: "critical", status: "open" } },
+      { type: "Decision", name: "Use background session key caching", op: "add", props: { status: "agreed" } },
+      { type: "Meeting", name: "Security Architecture Standup", op: "add", props: { date: "2026-10-20", time: "09:30" } }
+    ],
+    relationships: [
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "ASSIGNED_TO", to: { type: "Person", name: "Kavindu Jayasinghe" }, props: { confidence: 0.98 } },
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "DUE_ON", to: { type: "Deadline", name: "2026-10-24" }, props: { confidence: 0.95 } },
+      { from: { type: "Task", name: "Encrypt local SQLite voice cache" }, type: "BLOCKED_BY", to: { type: "Issue", name: "Android Keystore biometric timeout crash" }, props: { confidence: 0.96 } },
+      { from: { type: "Decision", name: "Use background session key caching" }, type: "RESOLVES", to: { type: "Issue", name: "Android Keystore biometric timeout crash" }, props: { confidence: 0.94 } },
+      { from: { type: "Decision", name: "Use background session key caching" }, type: "CREATED_IN", to: { type: "Meeting", name: "Security Architecture Standup" }, props: { confidence: 0.95 } },
+      { from: { type: "Person", name: "Kavindu Jayasinghe" }, type: "ATTENDED", to: { type: "Meeting", name: "Security Architecture Standup" }, props: { confidence: 0.99 } }
+    ]
+  },
   whisperx: {
     source: "demo_convo_20261019_whisperx",
     schema_version: "1.0",
@@ -926,7 +945,12 @@ async function runIngest() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Ingestion failed");
+    if (!res.ok) {
+      const errDetail = Array.isArray(data.detail)
+        ? data.detail.map(d => (d.msg || JSON.stringify(d))).join(" | ")
+        : (typeof data.detail === "object" ? JSON.stringify(data.detail) : (data.detail || "Ingestion failed"));
+      throw new Error(errDetail);
+    }
 
     document.getElementById("stNodesCreated").textContent = data.nodes_created;
     document.getElementById("stNodesMerged").textContent = data.nodes_merged;
