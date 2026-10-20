@@ -1,6 +1,8 @@
 /// Small display formatters (no intl dependency).
 library;
 
+import 'elapsed_format.dart';
+
 const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const _months = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', //
@@ -24,6 +26,29 @@ String formatDay(DateTime t, DateTime now) {
   return '${_weekdays[t.weekday - 1]} ${t.day} ${_months[t.month - 1]} '
       '${t.year}';
 }
+
+/// When something happened, relative to [now]: `Today, 14:05`,
+/// `Yesterday, 14:05`, `Sat 18 Oct, 14:05` (this year) or
+/// `18 Oct 2025, 14:05` (another year). The one date style for cards and
+/// headers.
+String formatWhen(DateTime t, DateTime now) {
+  final day = DateTime(t.year, t.month, t.day);
+  final today = DateTime(now.year, now.month, now.day);
+  final diff = today.difference(day).inDays;
+  final clock = formatClock(t);
+  if (diff == 0) return 'Today, $clock';
+  if (diff == 1) return 'Yesterday, $clock';
+  if (t.year == now.year) {
+    return '${_weekdays[t.weekday - 1]} ${t.day} ${_months[t.month - 1]}, '
+        '$clock';
+  }
+  return '${t.day} ${_months[t.month - 1]} ${t.year}, $clock';
+}
+
+/// A recording's length in milliseconds as a clock, `04:12` or `1:02:07`
+/// (the same style as the recording timer).
+String formatLength(double ms) =>
+    formatElapsed(Duration(milliseconds: ms.round()));
 
 /// `14:05`
 String formatClock(DateTime t) => '${_two(t.hour)}:${_two(t.minute)}';

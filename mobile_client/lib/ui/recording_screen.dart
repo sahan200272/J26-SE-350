@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../capture/audio_capture.dart';
 import '../permissions/microphone_permission.dart';
@@ -11,6 +13,7 @@ import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'display_format.dart';
 import 'elapsed_format.dart';
+import 'ember_components.dart';
 import 'immersive_backdrop.dart';
 import 'input_level_meter.dart';
 import 'lifecycle_source.dart';
@@ -28,7 +31,7 @@ import 'theme/ember_theme.dart';
 /// Home, which opens this screen with [autoStart]).
 ///
 /// After the user taps Stop, and when [renameRecording] is set, the
-/// "Name This Recording" sheet is offered. The recording is saved by Stop
+/// "Name this recording" sheet is offered. The recording is saved by Stop
 /// as before; the sheet only names it.
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({
@@ -49,6 +52,8 @@ class RecordingScreen extends StatefulWidget {
     this.onSessionOpenChanged,
     this.autoStart = false,
     this.renameRecording,
+    this.openSettings = openAppSettings,
+    this.doubleTapGuard = const Duration(milliseconds: 600),
   });
 
   /// Opens the PC connection settings from the app bar; no button when null.
@@ -57,6 +62,12 @@ class RecordingScreen extends StatefulWidget {
 
   static const settingsKey = Key('sync-settings-button');
   static const doneKey = Key('recording-done');
+  static const openSettingsKey = Key('open-app-settings');
+
+  /// Shown when Android Settings could not be opened.
+  static const openSettingsFailedMessage =
+      'Settings could not be opened. Open Settings › Apps › Echo Vault › '
+      'Permissions › Microphone and allow it.';
 
   /// Shown when the user tries to leave while a session is open.
   static const leaveBlockedMessage =
@@ -85,6 +96,16 @@ class RecordingScreen extends StatefulWidget {
   /// Gives a stored recording a title (the existing session rename). When
   /// set, the naming sheet is shown after Stop; when null it is not.
   final Future<void> Function(String sessionId, String title)? renameRecording;
+
+  /// Opens this app's page in Android Settings (for a blocked
+  /// microphone); false when it could not be opened.
+  final Future<bool> Function() openSettings;
+
+  /// Right after Start, Stop is ignored for this long, and right after
+  /// Stop, Start ("Record again") is: Start and Stop sit in the same place,
+  /// so a double tap must not start and stop (or stop and restart) a
+  /// recording. No confirmation step. [Duration.zero] turns it off.
+  final Duration doubleTapGuard;
 
   @override
   State<RecordingScreen> createState() => _RecordingScreenState();
@@ -161,13 +182,50 @@ class _RecordingScreenState extends State<RecordingScreen> {
     }
   }
 
-  void _stop() {
-    if (!_controller.canStop) return;
-    _stopPressed = true;
-    _controller.stop();
+  /// Set for [RecordingScreen.doubleTapGuard] after Start and after Stop.
+  bool _guarded = false;
+  Timer? _guardTimer;
+
+  void _armGuard() {
+    final guard = widget.doubleTapGuard;
+    if (guard <= Duration.zero) return;
+    _guarded = true;
+    _guardTimer?.cancel();
+    _guardTimer = Timer(guard, () => _guarded = false);
   }
 
-  /// After Stop: the "Name This Recording" sheet. Saving the audio is not
+  /// A short haptic tick for each control (no permission needed).
+  static void _haptic(Future<void> Function() feedback) =>
+      unawaited(feedback().catchError((Object _) {}));
+
+  void _start() {
+    if (_guarded || !_controller.canStart) return;
+    _haptic(HapticFeedback.mediumImpact);
+    _controller.start();
+    _armGuard();
+  }
+
+  void _pauseOrResume() {
+    if (_controller.state == SessionState.paused) {
+      if (!_controller.canResume) return;
+      _haptic(HapticFeedback.selectionClick);
+      _controller.resume();
+    } else {
+      if (!_controller.canPause) return;
+      _haptic(HapticFeedback.selectionClick);
+      _controller.pause();
+    }
+  }
+
+  void _stop() {
+    if (_guarded || !_controller.canStop) return;
+    _haptic(HapticFeedback.heavyImpact);
+    _stopPressed = true;
+    _controller.stop();
+    _armGuard();
+  }
+
+  /// After Stop: the "Name this recording" sheet. Saving the audio is not
   /// part of it (Stop already saves); Save only renames, Cancel keeps the
   /// automatic name.
   void _offerNaming() {
@@ -204,6 +262,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
 
   @override
   void dispose() {
+    _guardTimer?.cancel();
     _controller.removeListener(_onControllerChanged);
     _controller.dispose();
     super.dispose();
@@ -214,6 +273,20 @@ class _RecordingScreenState extends State<RecordingScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         const SnackBar(content: Text(RecordingScreen.leaveBlockedMessage)),
+      );
+  }
+
+  /// Microphone blocked: open this app's page in Android Settings, or say
+  /// where to find it when that is not possible.
+  Future<void> _openSettings() async {
+    final opened = await widget.openSettings();
+    if (opened || !mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text(RecordingScreen.openSettingsFailedMessage),
+        ),
       );
   }
 
@@ -236,7 +309,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
             automaticallyImplyLeading: false,
             leading: canLeave
                 ? Center(
-                    child: _GlassIconButton(
+                    child: GlassIconButton(
                       icon: Icons.arrow_back_rounded,
                       tooltip: 'Back',
                       // Through PopScope: refused while a session is open.
@@ -252,7 +325,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   listenable: _controller,
                   // Only between sessions: the recording indicator (FR1)
                   // must stay on screen while a session is open.
-                  builder: (context, _) => _GlassIconButton(
+                  builder: (context, _) => GlassIconButton(
                     buttonKey: RecordingScreen.settingsKey,
                     tooltip: 'Connect to your PC',
                     icon: Icons.sync_rounded,
@@ -322,10 +395,23 @@ class _RecordingScreenState extends State<RecordingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             if (_controller.message case final message?) ...[
-                              _PermissionMessage(message: message),
+                              _PermissionMessage(
+                                message: message,
+                                onOpenSettings:
+                                    message ==
+                                        RecordingController
+                                            .permanentlyDeniedMessage
+                                    ? () => unawaited(_openSettings())
+                                    : null,
+                              ),
                               const SizedBox(height: EvSpace.md),
                             ],
-                            _Controls(controller: _controller, onStop: _stop),
+                            _Controls(
+                              controller: _controller,
+                              onStart: _start,
+                              onPauseResume: _pauseOrResume,
+                              onStop: _stop,
+                            ),
                             const SizedBox(height: EvSpace.md),
                             const _PrivacyFootnote(),
                           ],
@@ -343,38 +429,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
   }
 }
 
-/// Round frosted-glass icon button for the app bar.
-class _GlassIconButton extends StatelessWidget {
-  const _GlassIconButton({
-    this.buttonKey,
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  final Key? buttonKey;
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      key: buttonKey,
-      tooltip: tooltip,
-      onPressed: onPressed,
-      style: IconButton.styleFrom(
-        backgroundColor: EvEmber.glass,
-        foregroundColor: Colors.white,
-        disabledBackgroundColor: Colors.transparent,
-        disabledForegroundColor: EvEmber.textFaint,
-        side: const BorderSide(color: EvEmber.glassBorder),
-      ),
-      icon: Icon(icon, size: 20),
-    );
-  }
-}
-
 /// The screen's quiet title.
 class _Heading extends StatelessWidget {
   const _Heading();
@@ -387,7 +441,7 @@ class _Heading extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Capture What Matters',
+            'Capture what matters',
             textAlign: TextAlign.center,
             style: textTheme.titleLarge?.copyWith(
               color: Colors.white,
@@ -429,7 +483,7 @@ class _StatusView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: EvSpace.lg),
       child: child,
     );
-    return switch (controller.state) {
+    final view = switch (controller.state) {
       SessionState.recording when controller.isStartingCapture => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -539,6 +593,30 @@ class _StatusView extends StatelessWidget {
         ),
       ),
     };
+    // A short fade when the state changes (none with reduced motion).
+    return _FadeIn(
+      key: ValueKey((controller.state, controller.isStartingCapture)),
+      child: view,
+    );
+  }
+}
+
+/// Fades its child in once, when it first appears (≤ 220 ms).
+class _FadeIn extends StatelessWidget {
+  const _FadeIn({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (EvMotion.reduced(context)) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 220),
+      curve: EvMotion.curve,
+      builder: (context, t, child) => Opacity(opacity: t, child: child),
+      child: child,
+    );
   }
 }
 
@@ -740,30 +818,6 @@ class SpeechStatus extends StatelessWidget {
   }
 }
 
-/// A frosted-glass status chip (Recording / Paused).
-class _GlassChip extends StatelessWidget {
-  const _GlassChip({required this.leading, required this.label});
-
-  final Widget leading;
-  final Widget label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-      decoration: BoxDecoration(
-        color: EvEmber.glass,
-        borderRadius: BorderRadius.circular(EvRadius.pill),
-        border: Border.all(color: EvEmber.glassBorder),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [leading, const SizedBox(width: 8), label],
-      ),
-    );
-  }
-}
-
 /// Shown only while recording (FR1): red dot, "Recording", elapsed timer.
 class RecordingIndicator extends StatelessWidget {
   const RecordingIndicator({super.key, required this.elapsed});
@@ -775,17 +829,27 @@ class RecordingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Semantics(
-      liveRegion: true,
-      label: 'Recording, $elapsed',
-      excludeSemantics: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(key: timerKey, elapsed, style: _timerStyle(context, Colors.white)),
-          const SizedBox(height: EvSpace.xs),
-          _GlassChip(
+    // Two nodes: the state is a live region (announced once when recording
+    // starts or resumes); the timer is read on request, not every second.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          label: 'Recorded time $elapsed',
+          excludeSemantics: true,
+          child: Text(
+            key: timerKey,
+            elapsed,
+            style: _timerStyle(context, Colors.white),
+          ),
+        ),
+        const SizedBox(height: EvSpace.xs),
+        Semantics(
+          liveRegion: true,
+          label: 'Recording',
+          excludeSemantics: true,
+          child: GlassChip(
+            large: true,
             leading: Container(
               key: dotKey,
               width: 10,
@@ -795,13 +859,10 @@ class RecordingIndicator extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            label: Text(
-              'Recording',
-              style: textTheme.titleSmall?.copyWith(color: Colors.white),
-            ),
+            label: 'Recording',
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -816,33 +877,35 @@ class PausedIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Semantics(
-      liveRegion: true,
-      label: 'Paused, $elapsed recorded',
-      excludeSemantics: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Semantics(
+          label: 'Recorded time $elapsed',
+          excludeSemantics: true,
+          child: Text(
             key: timerKey,
             elapsed,
             style: _timerStyle(context, EvEmber.textSoft),
           ),
-          const SizedBox(height: EvSpace.xs),
-          _GlassChip(
-            leading: const Icon(
+        ),
+        const SizedBox(height: EvSpace.xs),
+        Semantics(
+          liveRegion: true,
+          label: 'Paused. Nothing is being recorded.',
+          excludeSemantics: true,
+          child: const GlassChip(
+            large: true,
+            leading: Icon(
               Icons.pause_circle_filled,
               color: EvColors.warning,
               size: 18,
             ),
-            label: Text(
-              'Paused',
-              style: textTheme.titleSmall?.copyWith(color: EvColors.warning),
-            ),
+            label: 'Paused',
+            color: EvColors.warning,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -870,9 +933,12 @@ class AutoPauseNotice extends StatelessWidget {
 }
 
 class _PermissionMessage extends StatelessWidget {
-  const _PermissionMessage({required this.message});
+  const _PermissionMessage({required this.message, this.onOpenSettings});
 
   final String message;
+
+  /// Microphone blocked: a button to this app's page in Android Settings.
+  final VoidCallback? onOpenSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -881,6 +947,22 @@ class _PermissionMessage extends StatelessWidget {
       icon: Icons.mic_off_rounded,
       message: message,
       tone: PillTone.danger,
+      action: onOpenSettings == null
+          ? null
+          : Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: OutlinedButton.icon(
+                key: RecordingScreen.openSettingsKey,
+                onPressed: onOpenSettings,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: EvEmber.glassBorder),
+                  minimumSize: const Size(0, 48),
+                ),
+                icon: const Icon(Icons.settings_outlined, size: 18),
+                label: const Text('Open app settings'),
+              ),
+            ),
     );
   }
 }
@@ -916,11 +998,19 @@ class _PrivacyFootnote extends StatelessWidget {
 /// Round controls: one large Start when no session is open; a small
 /// Pause/Resume and a large Stop while one is.
 class _Controls extends StatelessWidget {
-  const _Controls({required this.controller, required this.onStop});
+  const _Controls({
+    required this.controller,
+    required this.onStart,
+    required this.onPauseResume,
+    required this.onStop,
+  });
 
   final RecordingController controller;
 
-  /// Stops the session (the screen's wrapper around [controller.stop]).
+  /// The screen's wrappers around [controller]'s actions (haptics and the
+  /// double-tap guard).
+  final VoidCallback onStart;
+  final VoidCallback onPauseResume;
   final VoidCallback onStop;
 
   static const startKey = Key('start-button');
@@ -942,7 +1032,7 @@ class _Controls extends StatelessWidget {
           buttonKey: startKey,
           kind: _ButtonKind.primary,
           size: _large,
-          onPressed: controller.canStart ? controller.start : null,
+          onPressed: controller.canStart ? onStart : null,
           icon: Icons.mic_rounded,
           label: state == SessionState.stopped ? 'Record again' : 'Start',
         ),
@@ -956,9 +1046,9 @@ class _Controls extends StatelessWidget {
           buttonKey: pauseResumeKey,
           kind: _ButtonKind.secondary,
           size: _small,
-          onPressed: paused
-              ? (controller.canResume ? controller.resume : null)
-              : (controller.canPause ? controller.pause : null),
+          onPressed: (paused ? controller.canResume : controller.canPause)
+              ? onPauseResume
+              : null,
           icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
           label: paused ? 'Resume' : 'Pause',
         ),
@@ -1012,7 +1102,7 @@ class _ControlButton extends StatelessWidget {
         EvEmber.glassBorder,
       ),
       _ButtonKind.danger => (
-        EvEmber.accent,
+        EvEmber.stop,
         Colors.white,
         const Color(0x66FFFFFF),
       ),

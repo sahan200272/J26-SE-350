@@ -31,6 +31,7 @@ void main() {
             wallClock: () => DateTime(2026, 10, 18, 10),
             random: FakeRandom(0xa1b2),
             syncthing: withSyncthing ? FakeSyncthingClient() : null,
+            doubleTapGuard: Duration.zero,
           ),
         ),
       );

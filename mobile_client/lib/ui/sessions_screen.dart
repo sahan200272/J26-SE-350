@@ -44,6 +44,8 @@ class SessionsScreen extends StatefulWidget {
   static const searchKey = Key('sessions-search');
   static const noMatchKey = Key('sessions-no-match');
   static const filterKey = Key('sessions-filter');
+  static const recordKey = Key('sessions-record');
+  static const clearSearchKey = Key('sessions-clear-search');
 
   @override
   State<SessionsScreen> createState() => _SessionsScreenState();
@@ -138,9 +140,10 @@ class _SessionsScreenState extends State<SessionsScreen> {
               color: EvEmber.accent,
               backgroundColor: EvEmber.deep,
               onRefresh: _load,
-              child: ListView(
+              // Built lazily: only the cards on screen are laid out, so a
+              // long list (hundreds of recordings) stays smooth.
+              child: _LazyList(
                 key: SessionsScreen.listKey,
-                physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.fromLTRB(
                   EvSpace.md,
                   EvSpace.xs,
@@ -331,6 +334,15 @@ class _SessionsScreenState extends State<SessionsScreen> {
     ];
   }
 
+  /// "Clear search": back to every recording.
+  void _clearSearch() {
+    _search.clear();
+    setState(() {
+      _query = '';
+      _dayFilter = _DayFilter.all;
+    });
+  }
+
   List<Widget> _grouped(List<SessionSummary> all) {
     final now = widget.now();
     final widgets = <Widget>[
@@ -349,11 +361,25 @@ class _SessionsScreenState extends State<SessionsScreen> {
     final sessions = _filter(all);
     if (sessions.isEmpty) {
       widgets.add(
-        const EmptyState(
+        EmptyState(
           key: SessionsScreen.noMatchKey,
           icon: Icons.search_off_rounded,
           title: 'No matching recordings',
-          message: 'Try a different name, day or filter.',
+          message: _dayFilter == _DayFilter.all
+              ? 'Nothing matches “${_query.trim()}”. Try another name or day.'
+              : 'Nothing matches this search and filter.',
+          action: OutlinedButton.icon(
+            key: SessionsScreen.clearSearchKey,
+            onPressed: _clearSearch,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: const BorderSide(color: EvEmber.glassBorder),
+              shape: const StadiumBorder(),
+              minimumSize: const Size(0, 48),
+            ),
+            icon: const Icon(Icons.close_rounded),
+            label: const Text('Clear search'),
+          ),
         ),
       );
       return widgets;
@@ -377,6 +403,25 @@ class _SessionsScreenState extends State<SessionsScreen> {
       );
     }
     return widgets;
+  }
+}
+
+/// A [ListView] that builds its [children] only when they scroll into
+/// view (pull-to-refresh works even when the list is short).
+class _LazyList extends StatelessWidget {
+  const _LazyList({super.key, required this.padding, required this.children});
+
+  final EdgeInsetsGeometry padding;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: padding,
+      itemCount: children.length,
+      itemBuilder: (context, i) => children[i],
+    );
   }
 }
 
@@ -439,10 +484,13 @@ Future<bool> openSessionDetail(
 }) async {
   final deleted = await Navigator.of(context).push<bool>(
     MaterialPageRoute<bool>(
-      builder: (_) => SessionDetailScreen(
-        session: session,
-        source: source,
-        syncthing: syncthing,
+      // EmberScope above the screen: its rename / delete dialogs match it.
+      builder: (_) => EmberScope(
+        child: SessionDetailScreen(
+          session: session,
+          source: source,
+          syncthing: syncthing,
+        ),
       ),
     ),
   );
@@ -527,11 +575,12 @@ class SessionTile extends StatelessWidget {
                       spacing: EvSpace.sm,
                       runSpacing: 2,
                       children: [
+                        // The day is in the list's day heading.
                         _Meta(
-                          icon: Icons.calendar_today_outlined,
+                          icon: Icons.access_time_rounded,
                           text: s.start == null
-                              ? 'Unknown date'
-                              : formatDateTime(s.start!),
+                              ? 'Unknown time'
+                              : formatClock(s.start!),
                         ),
                         if (s.pauseCount > 0)
                           _Meta(
@@ -559,13 +608,13 @@ class SessionTile extends StatelessWidget {
             child: Row(
               children: [
                 const Icon(
-                  Icons.schedule_rounded,
+                  Icons.timer_outlined,
                   size: 15,
                   color: EvEmber.textSoft,
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  length == null ? '–' : formatSpan(length),
+                  length == null ? '–' : formatLength(length),
                   style: textTheme.labelLarge?.copyWith(
                     color: Colors.white,
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -864,8 +913,8 @@ class SessionTimeline extends StatelessWidget {
   }
 }
 
-/// "Your Recordings", the count, and a glass "+" that starts a new
-/// recording (the same action as the microphone on Home).
+/// "Your recordings", the count, and a glass "Record" button that starts a
+/// new recording (the same action as the microphone on Home).
 class _SessionsHeader extends StatelessWidget {
   const _SessionsHeader({required this.subtitle, this.onNewRecording});
 
@@ -892,7 +941,7 @@ class _SessionsHeader extends StatelessWidget {
                 Semantics(
                   header: true,
                   child: Text(
-                    'Your Recordings',
+                    'Your recordings',
                     style: textTheme.headlineMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
@@ -912,16 +961,22 @@ class _SessionsHeader extends StatelessWidget {
             ),
           ),
           if (onNewRecording != null)
-            IconButton(
-              tooltip: 'New recording',
-              onPressed: onNewRecording,
-              style: IconButton.styleFrom(
-                backgroundColor: EvEmber.glassStrong,
-                foregroundColor: Colors.white,
-                side: const BorderSide(color: EvEmber.glassBorder),
-                minimumSize: const Size(48, 48),
+            Tooltip(
+              message: 'New recording',
+              child: FilledButton.icon(
+                key: SessionsScreen.recordKey,
+                onPressed: onNewRecording,
+                style: FilledButton.styleFrom(
+                  backgroundColor: EvEmber.glassStrong,
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: EvEmber.glassBorder),
+                  minimumSize: const Size(0, 48),
+                  padding: const EdgeInsets.symmetric(horizontal: EvSpace.md),
+                  shape: const StadiumBorder(),
+                ),
+                icon: const Icon(Icons.mic_rounded, size: 20),
+                label: const Text('Record'),
               ),
-              icon: const Icon(Icons.add_rounded),
             ),
         ],
       ),

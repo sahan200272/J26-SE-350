@@ -6,43 +6,59 @@ import 'theme/ember_theme.dart';
 
 /// First-run welcome: three short pages on what Echo Vault does, with Skip
 /// and Get started. Calls [onDone] when the user leaves it.
+///
+/// When [onConnectPc] is set, a fourth, optional page offers to pair the
+/// phone with the PC now ("Connect my PC") or later ("Not now", also
+/// possible from Settings and Home).
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key, required this.onDone});
+  const OnboardingScreen({super.key, required this.onDone, this.onConnectPc});
 
   final VoidCallback onDone;
 
+  /// Leaves the welcome screens and opens the pairing screen.
+  final VoidCallback? onConnectPc;
+
   static const skipKey = Key('onboarding-skip');
   static const nextKey = Key('onboarding-next');
+  static const laterKey = Key('onboarding-later');
 
   static const _pages = [
     _Benefit(
       icon: Icons.mic_none_rounded,
       color: EvEmber.accentSoft,
-      title: 'Capture naturally',
+      title: 'Record on your terms',
       body:
-          'Record a conversation only when you choose. You start, pause and '
-          'stop every session yourself; Echo Vault never listens in the '
-          'background.',
-    ),
-    _Benefit(
-      icon: Icons.hub_outlined,
-      color: Colors.white,
-      title: 'Connect knowledge',
-      body:
-          'Your recordings go to Echo Vault on your own PC, which turns '
-          'speech into text. Linking people, topics and dates is on the '
-          'way.',
+          'Echo Vault records only when you tap the microphone. Pause or '
+          'stop whenever you like. It never listens in the background.',
     ),
     _Benefit(
       icon: Icons.shield_outlined,
-      color: EvEmber.accentSoft,
-      title: 'Keep control',
+      color: Colors.white,
+      title: 'Private by design',
       body:
-          'Speech detection runs on this phone, and recordings travel only '
-          'over your local network to your own PC. No cloud services, no '
-          'analytics.',
+          'This phone keeps the parts where someone speaks and leaves out '
+          'the silence. Recordings travel only over your local network to '
+          'your own PC. No cloud services, no analytics.',
+    ),
+    _Benefit(
+      icon: Icons.computer_rounded,
+      color: EvEmber.accentSoft,
+      title: 'Your PC does the heavy lifting',
+      body:
+          'Echo Vault on your PC turns the recordings into text, so this '
+          'phone stays quick and your words stay on your own devices. '
+          'Transcripts on the phone are not available yet.',
     ),
   ];
+
+  static const _connectPage = _Benefit(
+    icon: Icons.sync_rounded,
+    color: Colors.white,
+    title: 'Connect your PC',
+    body:
+        'Pair this phone with Echo Vault on your PC in three short steps. '
+        'You can also do it later from Settings.',
+  );
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -52,7 +68,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pager = PageController();
   int _index = 0;
 
-  bool get _last => _index == OnboardingScreen._pages.length - 1;
+  List<_Benefit> get _pages => [
+    ...OnboardingScreen._pages,
+    if (widget.onConnectPc != null) OnboardingScreen._connectPage,
+  ];
+
+  bool get _last => _index == _pages.length - 1;
+
+  /// The optional "Connect your PC" page is showing.
+  bool get _onConnectPage => _last && widget.onConnectPc != null;
 
   @override
   void dispose() {
@@ -61,6 +85,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _next() {
+    if (_onConnectPage) {
+      widget.onConnectPc!();
+      return;
+    }
     if (_last) {
       widget.onDone();
       return;
@@ -115,8 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 controller: _pager,
                 onPageChanged: (i) => setState(() => _index = i),
                 children: [
-                  for (final page in OnboardingScreen._pages)
-                    _BenefitPage(benefit: page),
+                  for (final page in _pages) _BenefitPage(benefit: page),
                 ],
               ),
             ),
@@ -129,16 +156,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               child: Column(
                 children: [
-                  _Dots(count: OnboardingScreen._pages.length, index: _index),
+                  _Dots(count: _pages.length, index: _index),
                   const SizedBox(height: EvSpace.lg),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
                       key: OnboardingScreen.nextKey,
                       onPressed: _next,
-                      child: Text(_last ? 'Get started' : 'Continue'),
+                      child: Text(
+                        _onConnectPage
+                            ? 'Connect my PC'
+                            : (_last ? 'Get started' : 'Continue'),
+                      ),
                     ),
                   ),
+                  if (_onConnectPage) ...[
+                    const SizedBox(height: EvSpace.xs),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        key: OnboardingScreen.laterKey,
+                        onPressed: widget.onDone,
+                        style: TextButton.styleFrom(
+                          foregroundColor: EvEmber.textSoft,
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                        child: const Text('Not now'),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

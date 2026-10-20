@@ -22,6 +22,7 @@ import 'ui/onboarding_screen.dart';
 import 'ui/onboarding_store.dart';
 import 'ui/recording_controller.dart';
 import 'ui/recording_screen.dart';
+import 'ui/settings_screen.dart';
 import 'ui/splash_screen.dart';
 import 'ui/theme/app_theme.dart';
 import 'ui/theme/ember_theme.dart';
@@ -74,6 +75,7 @@ void main() {
       log: log,
       showSplash: true,
       onboardingStore: FileOnboardingStore(filesDir),
+      micExplainerStore: FileFlagStore(filesDir, 'mic_explained'),
       // Deleting a recording first makes Syncthing ignore it, so the PC
       // keeps its copy.
       sessions: OutboxSessionStore(
@@ -123,6 +125,7 @@ class EchoVaultApp extends StatelessWidget {
     this.log,
     this.showSplash = false,
     this.onboardingStore,
+    this.micExplainerStore,
     this.sessions,
   });
 
@@ -141,6 +144,9 @@ class EchoVaultApp extends StatelessWidget {
 
   /// First-run welcome screens; skipped when null.
   final OnboardingStore? onboardingStore;
+
+  /// The one-time microphone explainer; not shown when null.
+  final OnboardingStore? micExplainerStore;
 
   /// Sessions tab data; the tab is hidden when null.
   final SessionSource? sessions;
@@ -201,11 +207,43 @@ class _AppGateState extends State<_AppGate> {
     setState(() => _phase = _Phase.app);
   }
 
+  /// "Connect my PC" on the last welcome page: finish the welcome, then
+  /// open "Connect to your PC" over Home.
+  VoidCallback? get _finishAndConnect {
+    if (app.syncthing == null) return null;
+    return () {
+      _finishOnboarding();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openPairing();
+      });
+    };
+  }
+
+  void _openPairing() {
+    final syncthing = app.syncthing;
+    if (syncthing == null) return;
+    unawaited(
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) =>
+              SettingsScreen(syncthing: syncthing, appVersion: app.appVersion),
+        ),
+      ),
+    );
+  }
+
   void _showWelcomeAgain() => Navigator.of(context).push(
     MaterialPageRoute<void>(
       fullscreenDialog: true,
-      builder: (context) =>
-          OnboardingScreen(onDone: () => Navigator.of(context).pop()),
+      builder: (context) => OnboardingScreen(
+        onDone: () => Navigator.of(context).pop(),
+        onConnectPc: app.syncthing == null
+            ? null
+            : () {
+                Navigator.of(context).pop();
+                _openPairing();
+              },
+      ),
     ),
   );
 
@@ -214,6 +252,7 @@ class _AppGateState extends State<_AppGate> {
     syncthing: app.syncthing,
     appVersion: app.appVersion,
     onShowWelcome: _showWelcomeAgain,
+    micExplainerStore: app.micExplainerStore,
     // Opened only when the user taps Start recording; it starts at once.
     recordingBuilder: (_) => RecordingScreen(
       permission: app.permission,
@@ -245,6 +284,7 @@ class _AppGateState extends State<_AppGate> {
       _Phase.onboarding => OnboardingScreen(
         key: const ValueKey(_Phase.onboarding),
         onDone: _finishOnboarding,
+        onConnectPc: _finishAndConnect,
       ),
       _Phase.app => KeyedSubtree(
         key: const ValueKey(_Phase.app),
@@ -252,7 +292,7 @@ class _AppGateState extends State<_AppGate> {
       ),
     };
     return AnimatedSwitcher(
-      duration: EvMotion.reduced(context) ? Duration.zero : EvMotion.slow,
+      duration: EvMotion.reduced(context) ? Duration.zero : EvMotion.medium,
       switchInCurve: EvMotion.curve,
       switchOutCurve: Curves.easeIn,
       child: child,

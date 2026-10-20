@@ -155,4 +155,24 @@ void main() {
     await openSheet(tester);
     expect(find.text('Saved on this phone, with a few gaps.'), findsOneWidget);
   });
+
+  testWidgets('a quick name keeps the time and is saved', (tester) async {
+    saved.complete({'failed_chunks': <Object?>[]});
+    await openSheet(tester);
+    await tester.tap(find.text('Meeting'));
+    await tester.pump();
+    expect(find.text('Meeting at 14:05'), findsOneWidget);
+    await tester.tap(find.byKey(SaveRecordingSheet.saveKey));
+    await tester.pumpAndSettle();
+    expect(renamed, ['Meeting at 14:05']);
+    expect(result, 'Meeting at 14:05');
+  });
+
+  test('suggested names', () {
+    expect(
+      SaveRecordingSheet.suggestedName('Lecture', 'Recording at 9:05'),
+      'Lecture at 9:05',
+    );
+    expect(SaveRecordingSheet.suggestedName('Note', 'Recording'), 'Note');
+  });
 }

@@ -39,6 +39,37 @@ class FileOnboardingStore implements OnboardingStore {
   }
 }
 
+/// A one-time flag (e.g. "the microphone explainer was shown") stored like
+/// [FileOnboardingStore], as a marker file `files/prefs/<name>`.
+class FileFlagStore implements OnboardingStore {
+  FileFlagStore(this._filesDir, this.name);
+
+  final Future<String> _filesDir;
+  final String name;
+
+  Future<File> _file() async => File('${await _filesDir}/prefs/$name');
+
+  @override
+  Future<bool> isComplete() async {
+    try {
+      return await (await _file()).exists();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Future<void> markComplete() async {
+    try {
+      final file = await _file();
+      await file.parent.create(recursive: true);
+      await file.writeAsString('1', flush: true);
+    } catch (_) {
+      // Not critical: the flag is simply not remembered.
+    }
+  }
+}
+
 /// In-memory store (tests).
 class MemoryOnboardingStore implements OnboardingStore {
   MemoryOnboardingStore({this.complete = false});

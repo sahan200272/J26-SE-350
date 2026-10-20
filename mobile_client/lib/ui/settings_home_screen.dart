@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../platform/app_channel.dart';
 import '../sync/syncthing_client.dart';
 import 'about_screen.dart';
 import 'components.dart';
@@ -16,6 +19,7 @@ class SettingsHomeScreen extends StatelessWidget {
     this.syncthing,
     this.appVersion,
     this.onShowWelcome,
+    this.openSettings = openAppSettings,
   });
 
   final SyncthingClient? syncthing;
@@ -24,8 +28,28 @@ class SettingsHomeScreen extends StatelessWidget {
   /// Shows the welcome screens again; hidden when null.
   final VoidCallback? onShowWelcome;
 
+  /// Opens this app's page in Android Settings; false when it could not.
+  final Future<bool> Function() openSettings;
+
   static const syncRowKey = Key('settings-sync-row');
   static const privacyRowKey = Key('settings-privacy-row');
+  static const micRowKey = Key('settings-mic-row');
+  static const aboutRowKey = Key('settings-about-row');
+
+  /// Shown when Android Settings could not be opened.
+  static const openSettingsFailedMessage =
+      'Settings could not be opened. Open Settings › Apps › Echo Vault › '
+      'Permissions.';
+
+  Future<void> _openAndroidSettings(BuildContext context) async {
+    final opened = await openSettings();
+    if (opened || !context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(content: Text(openSettingsFailedMessage)),
+      );
+  }
 
   void _push(BuildContext context, Widget screen) => Navigator.of(
     context,
@@ -79,12 +103,14 @@ class SettingsHomeScreen extends StatelessWidget {
                   subtitle: 'How your recordings are handled',
                   onTap: () => _push(context, const ProcessingPrivacyScreen()),
                 ),
-                const InfoRow(
+                InfoRow(
+                  key: micRowKey,
                   icon: Icons.mic_none_rounded,
                   title: 'Microphone access',
                   subtitle:
-                      'Asked the first time you record. Change it in Android '
-                      'Settings › Apps › Echo Vault › Permissions.',
+                      'Used only while you record. Opens Android Settings to '
+                      'allow or block it.',
+                  onTap: () => unawaited(_openAndroidSettings(context)),
                 ),
                 const InfoRow(
                   icon: Icons.folder_outlined,
@@ -103,28 +129,22 @@ class SettingsHomeScreen extends StatelessWidget {
                     icon: Icons.waving_hand_outlined,
                     iconColor: EvEmber.textSoft,
                     title: 'Show welcome screens',
+                    subtitle: 'See the short introduction again',
                     onTap: onShowWelcome,
                   ),
-                InfoRow(
-                  icon: Icons.info_outline_rounded,
-                  iconColor: EvEmber.textSoft,
-                  title: 'About Echo Vault',
-                  subtitle: 'Version, licences and open source',
-                  onTap: () =>
-                      _push(context, AboutScreen(appVersion: appVersion)),
-                ),
-                InfoRow(
-                  icon: Icons.tag_rounded,
-                  iconColor: EvEmber.textSoft,
-                  title: 'Version',
-                  trailing: FutureBuilder<String>(
-                    future: appVersion,
-                    builder: (context, snapshot) => Text(
-                      snapshot.data ?? (appVersion == null ? '–' : '…'),
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: EvEmber.textSoft,
-                      ),
-                    ),
+                // Version and licences live in About.
+                FutureBuilder<String>(
+                  future: appVersion,
+                  builder: (context, snapshot) => InfoRow(
+                    key: aboutRowKey,
+                    icon: Icons.info_outline_rounded,
+                    iconColor: EvEmber.textSoft,
+                    title: 'About Echo Vault',
+                    subtitle: snapshot.data == null
+                        ? 'Version and open-source licences'
+                        : 'Version ${snapshot.data} · open-source licences',
+                    onTap: () =>
+                        _push(context, AboutScreen(appVersion: appVersion)),
                   ),
                 ),
               ],

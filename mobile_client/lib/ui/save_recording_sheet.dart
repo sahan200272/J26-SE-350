@@ -7,7 +7,7 @@ import 'live_waveform.dart';
 import 'theme/app_theme.dart';
 import 'theme/ember_theme.dart';
 
-/// Shows the "Name This Recording" sheet after Stop.
+/// Shows the "Name this recording" sheet after Stop.
 ///
 /// The recording is already being saved by the existing pipeline when this
 /// opens (Stop writes the manifest); the sheet only lets the user give it a
@@ -28,6 +28,10 @@ Future<String?> showSaveRecordingSheet(
   return showModalBottomSheet<String>(
     context: context,
     isScrollControlled: true,
+    // No slide-in with reduced motion.
+    sheetAnimationStyle: EvMotion.reduced(context)
+        ? AnimationStyle.noAnimation
+        : null,
     useSafeArea: true,
     backgroundColor: const Color(0xFF170707),
     barrierColor: Colors.black.withValues(alpha: 0.6),
@@ -81,7 +85,17 @@ class SaveRecordingSheet extends StatefulWidget {
   static const closeKey = Key('save-sheet-close');
   static const statusKey = Key('save-sheet-status');
 
-  static const title = 'Name This Recording';
+  static const title = 'Name this recording';
+
+  /// Quick names: tapping one turns `Recording at 14:05` into
+  /// `Meeting at 14:05` (the time is kept).
+  static const suggestions = ['Meeting', 'Lecture', 'Interview', 'Note'];
+
+  /// [suggestion] with the time from [defaultTitle], when it has one.
+  static String suggestedName(String suggestion, String defaultTitle) {
+    final time = RegExp(r' at (\d{1,2}:\d{2})$').firstMatch(defaultTitle);
+    return time == null ? suggestion : '$suggestion at ${time.group(1)}';
+  }
   static const emptyNameMessage = 'Enter a name for the recording.';
   static const renameFailedMessage =
       'The name could not be saved. The recording itself is kept on this '
@@ -107,6 +121,20 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
   }
 
   void _close() => Navigator.of(context).pop();
+
+  void _suggest(String suggestion) {
+    final name = SaveRecordingSheet.suggestedName(
+      suggestion,
+      widget.defaultTitle,
+    );
+    setState(() {
+      _text.value = TextEditingValue(
+        text: name,
+        selection: TextSelection.collapsed(offset: name.length),
+      );
+      _error = null;
+    });
+  }
 
   Future<void> _save() async {
     final title = normalizeSessionTitle(_text.text);
@@ -232,6 +260,24 @@ class _SaveRecordingSheetState extends State<SaveRecordingSheet> {
                   ),
                 ),
               ),
+              const SizedBox(height: EvSpace.sm),
+              Wrap(
+                spacing: EvSpace.xs,
+                runSpacing: EvSpace.xs,
+                children: [
+                  for (final word in SaveRecordingSheet.suggestions)
+                    ActionChip(
+                      label: Text(word),
+                      onPressed: _busy ? null : () => _suggest(word),
+                      backgroundColor: EvEmber.glass,
+                      side: const BorderSide(color: EvEmber.glassBorder),
+                      shape: const StadiumBorder(),
+                      labelStyle: textTheme.labelLarge?.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
               const SizedBox(height: EvSpace.lg),
               Row(
                 children: [
@@ -289,6 +335,7 @@ class _SaveStatus extends StatelessWidget {
         IconData icon = Icons.hourglass_top_rounded;
         Color color = EvEmber.textSoft;
         String text = 'Saving to this phone…';
+        String? detail;
         final data = snapshot.data;
         if (snapshot.hasError) {
           icon = Icons.warning_amber_rounded;
@@ -301,6 +348,9 @@ class _SaveStatus extends StatelessWidget {
             icon = Icons.warning_amber_rounded;
             color = EvColors.warning;
             text = 'Saved on this phone, with a few gaps.';
+            detail =
+                'A few short parts could not be stored, so those moments '
+                'are missing. Everything else is kept.';
           } else {
             icon = Icons.check_circle_outline_rounded;
             color = EvColors.success;
@@ -319,9 +369,17 @@ class _SaveStatus extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Expanded(
-                child: Text(
-                  text,
-                  style: style?.copyWith(color: EvEmber.textSoft),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(text, style: style?.copyWith(color: EvEmber.textSoft)),
+                    if (detail != null)
+                      Text(
+                        detail,
+                        style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(color: EvEmber.textFaint),
+                      ),
+                  ],
                 ),
               ),
             ],
