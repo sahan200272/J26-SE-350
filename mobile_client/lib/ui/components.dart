@@ -390,12 +390,16 @@ class NoticeCard extends StatelessWidget {
     required this.message,
     this.title,
     this.tone = PillTone.neutral,
+    this.action,
   });
 
   final IconData icon;
   final String? title;
   final String message;
   final PillTone tone;
+
+  /// One way forward under the message (e.g. a button), when there is one.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -435,6 +439,10 @@ class NoticeCard extends StatelessWidget {
                   message,
                   style: textTheme.bodyMedium?.copyWith(color: EvColors.snow),
                 ),
+                if (action != null) ...[
+                  const SizedBox(height: EvSpace.sm),
+                  action!,
+                ],
               ],
             ),
           ),

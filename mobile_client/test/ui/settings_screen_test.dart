@@ -157,6 +157,38 @@ void main() {
     expect(tester.widget<ButtonStyleButton>(save).onPressed, isNull);
   });
 
+  testWidgets('three numbered steps; step 2 done once a PC is saved', (
+    tester,
+  ) async {
+    await pumpSettings(tester);
+    expect(find.text('Add this phone on your PC'), findsOneWidget);
+    expect(find.text('Not connected to a PC yet'), findsOneWidget);
+    await scrollTo(tester, save);
+    expect(find.bySemanticsLabel('Step 2'), findsOneWidget);
+    await tester.enterText(pcIdField, pcId);
+    await tester.enterText(pcIpField, '192.168.1.20');
+    await tester.tap(save);
+    await tester.pump();
+    await tester.pump();
+    expect(find.bySemanticsLabel('Step 2, done'), findsOneWidget);
+  });
+
+  testWidgets('after a failed Save, errors update while typing', (
+    tester,
+  ) async {
+    await pumpSettings(tester);
+    await scrollTo(tester, save);
+    await tester.enterText(pcIpField, '8.8.8.8');
+    await tester.tap(save);
+    await tester.pump();
+    expect(find.textContaining('Not a LAN address'), findsOneWidget);
+
+    await tester.enterText(pcIpField, '192.168.1.20');
+    await tester.pump();
+    expect(find.textContaining('Not a LAN address'), findsNothing);
+    expect(syncthing.calls.where((c) => c.startsWith('setPeer')), isEmpty);
+  });
+
   testWidgets('the info button opens About', (tester) async {
     await pumpSettings(tester);
     await tester.tap(find.byTooltip('About'));

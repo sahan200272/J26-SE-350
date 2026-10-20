@@ -128,14 +128,19 @@ void main() {
 
       await tester.pump(const Duration(milliseconds: 1600));
       await tester.pumpAndSettle();
-      expect(find.text('Capture naturally'), findsOneWidget);
+      expect(find.text('Record on your terms'), findsOneWidget);
 
       await tester.tap(find.byKey(OnboardingScreen.nextKey));
       await tester.pumpAndSettle();
-      expect(find.text('Connect knowledge'), findsOneWidget);
+      expect(find.text('Private by design'), findsOneWidget);
       await tester.tap(find.byKey(OnboardingScreen.nextKey));
       await tester.pumpAndSettle();
-      expect(find.text('Keep control'), findsOneWidget);
+      expect(find.text('Your PC does the heavy lifting'), findsOneWidget);
+      expect(
+        find.byKey(OnboardingScreen.laterKey),
+        findsNothing,
+        reason: 'no Connect your PC page without a PC link',
+      );
       await tester.tap(find.byKey(OnboardingScreen.nextKey));
       await tester.pumpAndSettle();
 
@@ -249,6 +254,26 @@ void main() {
   });
 
   group('sessions', () {
+    testWidgets('header has a "Record" button with a microphone', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        app(sessions: FakeSessionSource([sampleSession])),
+      );
+      await openTab(tester, 'Sessions');
+      final record = find.byKey(SessionsScreen.recordKey);
+      expect(record, findsOneWidget);
+      expect(
+        find.descendant(of: record, matching: find.text('Record')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: record, matching: find.byIcon(Icons.mic_rounded)),
+        findsOneWidget,
+      );
+      expect(find.byTooltip('New recording'), findsOneWidget);
+    });
+
     testWidgets('loading, then empty state with a working Start action', (
       tester,
     ) async {
@@ -427,6 +452,12 @@ void main() {
       await tester.enterText(find.byKey(SessionsScreen.searchKey), 'zzz');
       await tester.pumpAndSettle();
       expect(find.byKey(SessionsScreen.noMatchKey), findsOneWidget);
+
+      await tester.tap(find.byKey(SessionsScreen.clearSearchKey));
+      await tester.pumpAndSettle();
+      expect(find.byKey(SessionsScreen.noMatchKey), findsNothing);
+      expect(find.text('Standup notes'), findsOneWidget);
+      expect(find.text('Recording at 01:39'), findsOneWidget);
     });
 
     testWidgets('Sessions row menu renames with the existing dialog', (

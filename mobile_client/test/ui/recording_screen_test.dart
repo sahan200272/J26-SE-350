@@ -90,6 +90,9 @@ void main() {
         clock: clock,
         wallClock: () => DateTime(2026, 10, 15, 14, 23, 0),
         random: FakeRandom(0xa1b2),
+        // Tests tap Start and Stop in quick succession; the guard has its
+        // own tests below.
+        doubleTapGuard: Duration.zero,
       ),
     ),
   );
@@ -239,6 +242,52 @@ void main() {
     expect(find.text('00:00'), findsOneWidget);
   });
 
+  group('double-tap guard (Start and Stop share a place)', () {
+    Future<void> pumpGuarded(WidgetTester tester) => tester.pumpWidget(
+      MaterialApp(
+        home: RecordingScreen(
+          permission: permission,
+          capture: capture,
+          screenAwake: screen,
+          lifecycle: lifecycle,
+          clock: clock,
+          wallClock: () => DateTime(2026, 10, 15, 14, 23, 0),
+          random: FakeRandom(0xa1b2),
+        ),
+      ),
+    );
+
+    testWidgets('a second tap right after Start does not stop', (
+      tester,
+    ) async {
+      await pumpGuarded(tester);
+      await tap(tester, startButton);
+      await tap(tester, stopButton);
+      expect(find.text('Stopped'), findsNothing, reason: 'still recording');
+      expect(capture.calls, ['start']);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, stopButton);
+      expect(find.text('Stopped'), findsOneWidget);
+    });
+
+    testWidgets('a second tap right after Stop does not record again', (
+      tester,
+    ) async {
+      await pumpGuarded(tester);
+      await tap(tester, startButton);
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, stopButton);
+      await tap(tester, startButton);
+      expect(find.text('Stopped'), findsOneWidget);
+      expect(permission.requestCount, 1);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, startButton);
+      expect(permission.requestCount, 2);
+    });
+  });
+
   group('permission not granted', () {
     testWidgets('denied: message shown, stays idle, no indicator', (
       tester,
@@ -268,6 +317,72 @@ void main() {
       );
       expectRecordingIndicatorVisible(false);
       expectButtons(tester, start: true, pauseResume: false, stop: false);
+    });
+
+    testWidgets('permanently denied: "Open app settings" opens Settings', (
+      tester,
+    ) async {
+      permission.status = MicPermissionStatus.permanentlyDenied;
+      var opened = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RecordingScreen(
+            permission: permission,
+            capture: capture,
+            screenAwake: screen,
+            lifecycle: lifecycle,
+            clock: clock,
+            doubleTapGuard: Duration.zero,
+            openSettings: () async {
+              opened++;
+              return true;
+            },
+          ),
+        ),
+      );
+      await tap(tester, startButton);
+      final button = find.byKey(RecordingScreen.openSettingsKey);
+      expect(button, findsOneWidget);
+      await tester.ensureVisible(button);
+      await tap(tester, button);
+      await tester.pump();
+      expect(opened, 1);
+      expect(find.text(RecordingScreen.openSettingsFailedMessage), findsNothing);
+      expect(capture.calls, isEmpty, reason: 'nothing recorded');
+    });
+
+    testWidgets('permanently denied: says where to go when Settings cannot '
+        'be opened', (tester) async {
+      permission.status = MicPermissionStatus.permanentlyDenied;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RecordingScreen(
+            permission: permission,
+            capture: capture,
+            screenAwake: screen,
+            lifecycle: lifecycle,
+            clock: clock,
+            doubleTapGuard: Duration.zero,
+            openSettings: () async => false,
+          ),
+        ),
+      );
+      await tap(tester, startButton);
+      final button = find.byKey(RecordingScreen.openSettingsKey);
+      await tester.ensureVisible(button);
+      await tap(tester, button);
+      await tester.pump();
+      expect(
+        find.text(RecordingScreen.openSettingsFailedMessage),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('denied (can ask again): no settings button', (tester) async {
+      permission.status = MicPermissionStatus.denied;
+      await pumpScreen(tester);
+      await tap(tester, startButton);
+      expect(find.byKey(RecordingScreen.openSettingsKey), findsNothing);
     });
 
     testWidgets('platform error is treated as denied', (tester) async {

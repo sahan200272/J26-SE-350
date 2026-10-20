@@ -7,6 +7,7 @@ import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'display_format.dart';
+import 'ember_components.dart';
 import 'session_dialogs.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
@@ -26,9 +27,13 @@ class SessionDetailScreen extends StatefulWidget {
     required this.session,
     this.source,
     this.syncthing,
+    this.now = DateTime.now,
   });
 
   final SessionSummary session;
+
+  /// For "Today" / "Yesterday" in the date line.
+  final DateTime Function() now;
 
   /// Rename and delete; the menu is hidden when null.
   final SessionSource? source;
@@ -44,6 +49,8 @@ class SessionDetailScreen extends StatefulWidget {
   static const deleteItemKey = Key('session-menu-delete');
   static const titleKey = Key('session-title');
   static const busyKey = Key('session-busy');
+  static const gapsKey = Key('session-gaps');
+  static const statsHelpKey = Key('session-stats-help');
 
   static const deletedMessage = 'Recording deleted from this phone';
   static const renamedMessage = 'Recording renamed';
@@ -144,11 +151,10 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
           surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0,
           leading: Center(
-            child: IconButton(
+            child: GlassIconButton(
               tooltip: 'Back',
               onPressed: _busy ? null : () => Navigator.of(context).maybePop(),
-              style: _glassIconStyle,
-              icon: const Icon(Icons.arrow_back_rounded, size: 20),
+              icon: Icons.arrow_back_rounded,
             ),
           ),
           title: Text(
@@ -173,7 +179,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 key: SessionDetailScreen.menuKey,
                 tooltip: 'More options',
                 enabled: !_busy,
-                style: _glassIconStyle,
+                style: GlassIconButton.style,
                 icon: const Icon(Icons.more_horiz_rounded, size: 20),
                 color: const Color(0xFF241011),
                 shape: RoundedRectangleBorder(
@@ -221,7 +227,10 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               bottom: false,
               child: AbsorbPointer(
                 absorbing: _busy,
-                child: _SessionDetailBody(session: _session),
+                child: _SessionDetailBody(
+                  session: _session,
+                  now: widget.now(),
+                ),
               ),
             ),
           ],
@@ -230,14 +239,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     );
   }
 }
-
-/// Small round frosted-glass icon buttons in the app bar.
-final ButtonStyle _glassIconStyle = IconButton.styleFrom(
-  backgroundColor: EvEmber.glass,
-  foregroundColor: Colors.white,
-  disabledForegroundColor: EvEmber.textFaint,
-  side: const BorderSide(color: EvEmber.glassBorder),
-);
 
 /// Quiet background: near-black with one soft, low-saturation glow behind
 /// the header (no strong red).
@@ -264,9 +265,10 @@ class _DetailBackdrop extends StatelessWidget {
 }
 
 class _SessionDetailBody extends StatelessWidget {
-  const _SessionDetailBody({required this.session});
+  const _SessionDetailBody({required this.session, required this.now});
 
   final SessionSummary session;
+  final DateTime now;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +302,7 @@ class _SessionDetailBody extends StatelessWidget {
                     child: Text(
                       s.start == null
                           ? 'Unknown date'
-                          : formatDateTime(s.start!),
+                          : formatWhen(s.start!, now),
                       style: textTheme.bodyMedium?.copyWith(
                         color: EvEmber.textSoft,
                       ),
@@ -325,9 +327,12 @@ class _SessionDetailBody extends StatelessWidget {
                 children: [
                   SessionStatusPill(session: s),
                   if (length != null)
-                    _Chip(icon: Icons.schedule_rounded, label: formatSpan(length)),
+                    GlassChip(
+                      icon: Icons.timer_outlined,
+                      label: formatLength(length),
+                    ),
                   if (s.pauseCount > 0)
-                    _Chip(
+                    GlassChip(
                       icon: Icons.pause_rounded,
                       label: plural(s.pauseCount, 'pause'),
                     ),
@@ -354,6 +359,18 @@ class _SessionDetailBody extends StatelessWidget {
             message:
                 'It may still be saving, or the app closed before the '
                 'recording was stopped. The parts already saved are kept.',
+            tone: PillTone.warning,
+          ),
+        ] else if (s.failedChunks > 0) ...[
+          const SizedBox(height: EvSpace.md),
+          NoticeCard(
+            key: SessionDetailScreen.gapsKey,
+            icon: Icons.warning_amber_rounded,
+            title: 'Saved with gaps',
+            message:
+                '${plural(s.failedChunks, 'short part')} could not be stored '
+                'on this phone, so those moments are missing. Everything '
+                'else is kept.',
             tone: PillTone.warning,
           ),
         ],
@@ -427,14 +444,14 @@ class _SessionDetailBody extends StatelessWidget {
               Expanded(
                 child: _Stat(
                   label: 'Recorded',
-                  value: length == null ? '–' : formatSpan(length),
+                  value: length == null ? '–' : formatLength(length),
                 ),
               ),
               const SizedBox(width: EvSpace.sm),
               Expanded(
                 child: _Stat(
                   label: 'Speech',
-                  value: hasSpeech ? formatSpan(s.speechMs) : '–',
+                  value: hasSpeech ? formatLength(s.speechMs) : '–',
                 ),
               ),
               const SizedBox(width: EvSpace.sm),
@@ -445,6 +462,19 @@ class _SessionDetailBody extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+
+        const SizedBox(height: EvSpace.xs),
+        Padding(
+          key: SessionDetailScreen.statsHelpKey,
+          padding: const EdgeInsets.symmetric(horizontal: EvSpace.xxs),
+          child: Text(
+            'Recorded is the time the microphone was on, without pauses. '
+            'Speech is the time someone was speaking. Parts are the '
+            'stretches of speech; each is saved and sent to your PC on its '
+            'own.',
+            style: textTheme.bodySmall?.copyWith(color: EvEmber.textFaint),
           ),
         ),
 
@@ -492,40 +522,6 @@ class _SectionHeading extends StatelessWidget {
         style: Theme.of(
           context,
         ).textTheme.titleSmall?.copyWith(color: Colors.white),
-      ),
-    );
-  }
-}
-
-/// Compact glass chip: icon + short label.
-class _Chip extends StatelessWidget {
-  const _Chip({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: EvEmber.glass,
-        borderRadius: BorderRadius.circular(EvRadius.pill),
-        border: Border.all(color: EvEmber.glassBorder),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: EvEmber.textSoft),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 /// - `listOpusEncoders` → Opus encoders in `MediaCodecList(REGULAR_CODECS)`
 /// - `encodeOpus` → Ogg Opus file (see `MethodChannelOpusEncoder`)
 /// - `getAppVersion` → `versionName+versionCode`, e.g. `1.0.0+1`
+/// - `openAppSettings` → opens this app's page in Android Settings
 ///
 /// The name dates from A1, when it only handled the permission.
 const appChannel = MethodChannel('lk.sliit.j26se350.echo_vault/permissions');
@@ -55,4 +56,19 @@ Future<String> appVersion() async {
     throw PlatformException(code: 'NO_VERSION', message: 'getAppVersion');
   }
   return version;
+}
+
+/// Opens this app's page in Android Settings, where a blocked microphone
+/// permission can be allowed again. Returns false when it could not be
+/// opened (also when this app version's `MainActivity.kt` does not handle
+/// the call yet).
+Future<bool> openAppSettings() async {
+  try {
+    await appChannel.invokeMethod<void>('openAppSettings');
+    return true;
+  } on MissingPluginException {
+    return false;
+  } on PlatformException {
+    return false;
+  }
 }

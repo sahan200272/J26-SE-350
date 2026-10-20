@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
@@ -12,6 +13,7 @@ import 'immersive_backdrop.dart';
 import 'processing_privacy_screen.dart';
 import 'sessions_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/ember_theme.dart';
 
 /// Home: a compact greeting, the microphone button that opens the recording
 /// screen, and the three most recent recordings with a way to see them all.
@@ -39,6 +41,7 @@ class HomeScreen extends StatefulWidget {
   final SyncthingClient? syncthing;
   final int refreshToken;
   final VoidCallback? onStartRecording;
+
   final VoidCallback? onOpenSessions;
   final DateTime Function() now;
 
@@ -59,21 +62,6 @@ class HomeScreen extends StatefulWidget {
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
-}
-
-/// Home's dark, deep-red palette.
-abstract final class _Ember {
-  static const black = Color(0xFF070304);
-  static const deep = Color(0xFF160606);
-  static const wine = Color(0xFF3A0D0D);
-  static const red = Color(0xFF8E1B16);
-  static const accent = Color(0xFFFF4A3D);
-  static const accentSoft = Color(0xFFFF8A7C);
-  static const textSoft = Color(0xB8FFFFFF); // 72 % white
-  static const textFaint = Color(0x85FFFFFF); // 52 % white
-  static const glass = Color(0x14FFFFFF); // 8 % white
-  static const glassStrong = Color(0x1FFFFFFF); // 12 % white
-  static const glassBorder = Color(0x26FFFFFF); // 15 % white
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -140,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
       EvSpace.md + MediaQuery.paddingOf(context).bottom,
     );
     return Scaffold(
-      backgroundColor: _Ember.black,
+      backgroundColor: EvEmber.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -175,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 _greeting(widget.now()),
                                 style: textTheme.bodyLarge?.copyWith(
-                                  color: _Ember.textSoft,
+                                  color: EvEmber.textSoft,
                                 ),
                               ),
                               const SizedBox(height: EvSpace.xxs),
@@ -186,9 +174,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     TextSpan(
                                       text: 'matters',
                                       style: TextStyle(
-                                        color: _Ember.accent,
+                                        color: EvEmber.accent,
                                         decoration: TextDecoration.underline,
-                                        decorationColor: _Ember.accent,
+                                        decorationColor: EvEmber.accent,
                                         decorationThickness: 2,
                                       ),
                                     ),
@@ -245,15 +233,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: openAll,
                     borderRadius: BorderRadius.circular(EvRadius.sm),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: EvSpace.sm,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Row(
                         children: [
                           const Icon(
                             Icons.graphic_eq_rounded,
                             size: 18,
-                            color: _Ember.accent,
+                            color: EvEmber.accent,
                           ),
                           const SizedBox(width: EvSpace.xs),
                           Flexible(
@@ -275,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextButton(
                   onPressed: openAll,
                   style: TextButton.styleFrom(
-                    foregroundColor: _Ember.accentSoft,
+                    foregroundColor: EvEmber.accentSoft,
                   ),
                   child: const Text('See all'),
                 ),
@@ -298,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return Text(
         key: HomeScreen.recentKey,
         'Recent recordings could not be loaded.',
-        style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
+        style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
       );
     }
     if (recent == null) {
@@ -316,12 +302,12 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 40,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: _Ember.glassStrong,
+              color: EvEmber.glassStrong,
             ),
             child: const Icon(
               Icons.mic_none_rounded,
               size: 20,
-              color: _Ember.textSoft,
+              color: EvEmber.textSoft,
             ),
           ),
           const SizedBox(width: EvSpace.sm),
@@ -329,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(
               'No recordings yet. Tap the microphone to capture your first '
               'conversation.',
-              style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
+              style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
             ),
           ),
         ],
@@ -367,10 +353,10 @@ class _Glass extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Material(
-          color: _Ember.glass,
+          color: EvEmber.glass,
           shape: RoundedRectangleBorder(
             borderRadius: shape,
-            side: const BorderSide(color: _Ember.glassBorder),
+            side: const BorderSide(color: EvEmber.glassBorder),
           ),
           child: Padding(padding: padding, child: child),
         ),
@@ -405,15 +391,16 @@ class _HomeHeader extends StatelessWidget {
           excludeSemantics: true,
           child: Material(
             key: HomeScreen.privacyKey,
-            color: _Ember.glass,
+            color: EvEmber.glass,
             shape: const StadiumBorder(
-              side: BorderSide(color: _Ember.glassBorder),
+              side: BorderSide(color: EvEmber.glassBorder),
             ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: onOpenPrivacy,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 40),
+                // 48 dp: a comfortable touch target.
+                constraints: const BoxConstraints(minHeight: 48),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: EvSpace.sm),
                   child: Row(
@@ -480,7 +467,7 @@ class _RecordHero extends StatelessWidget {
           enabled
               ? 'Your conversations, your control.'
               : 'Recording is not available right now.',
-          style: textTheme.bodyMedium?.copyWith(color: _Ember.textSoft),
+          style: textTheme.bodyMedium?.copyWith(color: EvEmber.textSoft),
           textAlign: TextAlign.center,
         ),
       ],
@@ -489,7 +476,9 @@ class _RecordHero extends StatelessWidget {
 }
 
 /// White microphone on a near-black core, inside dark and deep-red rings.
-class _MicButton extends StatelessWidget {
+/// Pressing it shrinks it slightly (not with reduced motion) and gives a
+/// light haptic tick.
+class _MicButton extends StatefulWidget {
   const _MicButton({required this.onTap});
 
   final VoidCallback? onTap;
@@ -498,8 +487,29 @@ class _MicButton extends StatelessWidget {
   static const double _core = 84;
 
   @override
+  State<_MicButton> createState() => _MicButtonState();
+}
+
+class _MicButtonState extends State<_MicButton> {
+  bool _pressed = false;
+
+  void _setPressed(bool pressed) {
+    if (pressed != _pressed) setState(() => _pressed = pressed);
+  }
+
+  void _tap() {
+    final onTap = widget.onTap;
+    if (onTap == null) return;
+    unawaited(HapticFeedback.lightImpact());
+    onTap();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final enabled = onTap != null;
+    const size = _MicButton.size;
+    const core = _MicButton._core;
+    final enabled = widget.onTap != null;
+    final reduced = EvMotion.reduced(context);
     Widget ring(double diameter, Color fill, Color border, Widget child) =>
         Container(
           width: diameter,
@@ -516,26 +526,31 @@ class _MicButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       label: 'Start recording',
+      hint: enabled ? 'Opens the recorder and starts recording' : null,
       excludeSemantics: true,
-      child: ring(
+      child: AnimatedScale(
+        scale: _pressed && !reduced ? 0.94 : 1,
+        duration: reduced ? Duration.zero : EvMotion.fast,
+        curve: EvMotion.curve,
+        child: ring(
         size,
-        _Ember.red.withValues(alpha: enabled ? 0.10 : 0.05),
+        EvEmber.red.withValues(alpha: enabled ? 0.10 : 0.05),
         Colors.white.withValues(alpha: 0.06),
         ring(
           138,
-          _Ember.wine.withValues(alpha: enabled ? 0.55 : 0.3),
-          _Ember.red.withValues(alpha: 0.35),
+          EvEmber.wine.withValues(alpha: enabled ? 0.55 : 0.3),
+          EvEmber.red.withValues(alpha: 0.35),
           ring(
             110,
-            _Ember.deep.withValues(alpha: 0.85),
-            _Ember.red.withValues(alpha: 0.45),
+            EvEmber.deep.withValues(alpha: 0.85),
+            EvEmber.red.withValues(alpha: 0.45),
             DecoratedBox(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: enabled
                     ? [
                         BoxShadow(
-                          color: _Ember.accent.withValues(alpha: 0.30),
+                          color: EvEmber.accent.withValues(alpha: 0.30),
                           blurRadius: 30,
                           spreadRadius: 2,
                         ),
@@ -550,16 +565,17 @@ class _MicButton extends StatelessWidget {
                   ),
                 ),
                 clipBehavior: Clip.antiAlias,
-                color: _Ember.black,
+                color: EvEmber.black,
                 child: InkWell(
-                  onTap: onTap,
-                  splashColor: _Ember.accent.withValues(alpha: 0.25),
+                  onTap: enabled ? _tap : null,
+                  onHighlightChanged: _setPressed,
+                  splashColor: EvEmber.accent.withValues(alpha: 0.25),
                   child: SizedBox.square(
-                    dimension: _core,
+                    dimension: core,
                     child: Icon(
                       Icons.mic_rounded,
                       size: 38,
-                      color: enabled ? Colors.white : _Ember.textFaint,
+                      color: enabled ? Colors.white : EvEmber.textFaint,
                     ),
                   ),
                 ),
@@ -567,6 +583,7 @@ class _MicButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -673,19 +690,19 @@ class _RecentTile extends StatelessWidget {
     final length = s.recordedMs ?? s.sessionEndMs;
     final meta = TextStyle(
       fontSize: textTheme.bodySmall?.fontSize,
-      color: _Ember.textFaint,
+      color: EvEmber.textFaint,
       height: 1.3,
     );
     return Material(
-      color: _Ember.glass,
+      color: EvEmber.glass,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(EvRadius.md),
-        side: const BorderSide(color: _Ember.glassBorder),
+        side: const BorderSide(color: EvEmber.glassBorder),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        splashColor: _Ember.accent.withValues(alpha: 0.18),
+        splashColor: EvEmber.accent.withValues(alpha: 0.18),
         child: Padding(
           padding: const EdgeInsets.all(EvSpace.sm),
           child: Column(
@@ -696,12 +713,12 @@ class _RecentTile extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _Ember.accent.withValues(alpha: 0.16),
+                  color: EvEmber.accent.withValues(alpha: 0.16),
                 ),
                 child: const Icon(
                   Icons.graphic_eq_rounded,
                   size: 16,
-                  color: _Ember.accentSoft,
+                  color: EvEmber.accentSoft,
                 ),
               ),
               const SizedBox(height: EvSpace.sm),
@@ -716,17 +733,17 @@ class _RecentTile extends StatelessWidget {
               ),
               const SizedBox(height: EvSpace.xxs),
               Text(
-                length == null ? '–' : formatSpan(length),
+                length == null ? '–' : formatLength(length),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: meta.copyWith(
-                  color: _Ember.accentSoft,
+                  color: EvEmber.accentSoft,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               if (s.start != null)
                 Text(
-                  formatDay(s.start!, now),
+                  formatWhen(s.start!, now),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: meta,
@@ -748,7 +765,7 @@ class _TileSkeleton extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: _Ember.glassStrong,
+        color: EvEmber.glassStrong,
         borderRadius: BorderRadius.circular(EvRadius.sm),
       ),
     );
@@ -756,9 +773,9 @@ class _TileSkeleton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(EvSpace.sm),
         decoration: BoxDecoration(
-          color: _Ember.glass,
+          color: EvEmber.glass,
           borderRadius: BorderRadius.circular(EvRadius.md),
-          border: Border.all(color: _Ember.glassBorder),
+          border: Border.all(color: EvEmber.glassBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

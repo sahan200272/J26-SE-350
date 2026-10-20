@@ -64,6 +64,32 @@ abstract final class EvMotion {
       MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 }
 
+/// The Material zoom page transition (300 ms), or no animation when the
+/// platform asks for reduced motion.
+class EvPageTransitionsBuilder extends PageTransitionsBuilder {
+  const EvPageTransitionsBuilder();
+
+  static const _zoom = ZoomPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (EvMotion.reduced(context)) return child;
+    return _zoom.buildTransitions(
+      route,
+      context,
+      animation,
+      secondaryAnimation,
+      child,
+    );
+  }
+}
+
 /// The single (dark) Echo Vault theme.
 ThemeData buildEchoVaultTheme() {
   const scheme = ColorScheme(
@@ -103,6 +129,10 @@ ThemeData buildEchoVaultTheme() {
 
   final base = ThemeData(
     useMaterial3: true,
+    // One page transition everywhere (300 ms), none with reduced motion.
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {TargetPlatform.android: EvPageTransitionsBuilder()},
+    ),
     colorScheme: scheme,
     scaffoldBackgroundColor: EvColors.navy,
     canvasColor: EvColors.navy,

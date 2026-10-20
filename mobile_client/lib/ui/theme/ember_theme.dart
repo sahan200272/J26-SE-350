@@ -4,8 +4,28 @@ import 'package:flutter/material.dart';
 
 import 'app_theme.dart';
 
-/// The dark black / deep-red look (Home, Sessions): colours and the
-/// "liquid glass" surface used for cards.
+// Echo Vault design tokens (one set for the whole app)
+//
+// Colour roles   EvEmber below: surfaces (black, deep, wine, backdropRed),
+//                accent (accent, accentSoft; red is an accent, never a fill),
+//                text (text, textSoft, textFaint), state (success, warning,
+//                danger, dangerText), stop (the Stop button), glass (glass, glassStrong, glassBorder, hairline).
+// Type scale     emberTheme's TextTheme (Material 3 roles): display (timer),
+//                headline (screen titles), title (cards, sections), body,
+//                label (chips, buttons). Numbers use tabular figures.
+// Spacing        EvSpace (4-pt grid: 4, 8, 12, 16, 24, 32, 48).
+// Radii          EvRadius (10, 14, 20, pill); glass cards 20–24.
+// Elevation      Flat. Depth comes from glass levels, not shadows:
+//                level 1 = glass (8 % white) for cards and chips,
+//                level 2 = glassStrong (12 %) for selected / raised items,
+//                edges = glassBorder (15 %), dividers = hairline (10 %).
+//                Live blur only outside lists (navigation bar, Home).
+// Motion         EvMotion: fast 160 ms, medium 280 ms (pages, sheets),
+//                slow 520 ms (backgrounds only), easeOutCubic; nothing
+//                moves when reduced motion is on, except real state.
+
+/// The dark black / deep-red look: colours and the "liquid glass" surface
+/// used for cards.
 abstract final class EvEmber {
   static const black = Color(0xFF070304);
   static const deep = Color(0xFF160606);
@@ -19,11 +39,23 @@ abstract final class EvEmber {
 
   static const text = Colors.white;
   static const textSoft = Color(0xB8FFFFFF); // 72 % white
-  static const textFaint = Color(0x85FFFFFF); // 52 % white
+  // 58 % white: at least 4.5 : 1 (WCAG AA) on glass over the deep red.
+  static const textFaint = Color(0x94FFFFFF);
   static const glass = Color(0x14FFFFFF); // 8 % white
   static const glassStrong = Color(0x1FFFFFFF); // 12 % white
   static const glassBorder = Color(0x26FFFFFF); // 15 % white
   static const hairline = Color(0x1AFFFFFF); // 10 % white
+
+  // State colours (the same as the rest of the app).
+  static const success = EvColors.success;
+  static const warning = EvColors.warning;
+  static const danger = EvColors.recording;
+
+  /// Error text on glass (5.6 : 1; [danger] is for icons).
+  static const dangerText = Color(0xFFFCA5A5);
+
+  /// The Stop button: white on it is 5.0 : 1 ([accent] is 3.3 : 1).
+  static const stop = Color(0xFFD7261C);
 }
 
 /// A "liquid glass" surface: a faint white fill that is brighter towards

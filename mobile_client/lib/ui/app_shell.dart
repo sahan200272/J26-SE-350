@@ -7,6 +7,8 @@ import '../sessions/session_store.dart';
 import '../sync/syncthing_client.dart';
 import 'components.dart';
 import 'home_screen.dart';
+import 'mic_explainer_sheet.dart';
+import 'onboarding_store.dart';
 import 'sessions_screen.dart';
 import 'settings_home_screen.dart';
 import 'theme/app_theme.dart';
@@ -26,6 +28,7 @@ class AppShell extends StatefulWidget {
     this.syncthing,
     this.appVersion,
     this.onShowWelcome,
+    this.micExplainerStore,
   });
 
   /// Builds the recording page; recording is unavailable when null.
@@ -36,6 +39,10 @@ class AppShell extends StatefulWidget {
   final SyncthingClient? syncthing;
   final Future<String>? appVersion;
   final VoidCallback? onShowWelcome;
+
+  /// Remembers that the microphone explainer was shown (once, on the
+  /// first tap on the microphone); no explainer when null.
+  final OnboardingStore? micExplainerStore;
 
   static const navKey = Key('app-navigation');
 
@@ -58,16 +65,32 @@ class _AppShellState extends State<AppShell> {
   VoidCallback? get _startRecording {
     final builder = widget.recordingBuilder;
     if (builder == null) return null;
-    return () => unawaited(
-      Navigator.of(context)
-          .push(
-            MaterialPageRoute<void>(fullscreenDialog: true, builder: builder),
-          )
-          // A recording may have been saved: refresh the lists.
-          .then((_) {
-            if (mounted) setState(() => _refresh++);
-          }),
-    );
+    return () => unawaited(_openRecording(builder));
+  }
+
+  bool _opening = false;
+
+  Future<void> _openRecording(WidgetBuilder builder) async {
+    if (_opening) return; // a second tap while the explainer opens
+    _opening = true;
+    try {
+      // First tap only: say when and why the microphone is used, before
+      // Android's permission dialog. Not now: nothing happens.
+      final explainer = widget.micExplainerStore;
+      if (explainer != null && !await explainer.isComplete()) {
+        if (!mounted) return;
+        if (!await showMicExplainerSheet(context)) return;
+        unawaited(explainer.markComplete());
+      }
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(fullscreenDialog: true, builder: builder),
+      );
+      // A recording may have been saved: refresh the lists.
+      if (mounted) setState(() => _refresh++);
+    } finally {
+      _opening = false;
+    }
   }
 
   /// Every tab now has the dark black / deep-red look, with its background
