@@ -68,7 +68,13 @@ class AnchorMatch(BaseModel):
     name: str = Field(..., description="Human readable entity name.")
     type: str = Field(..., description="Primary node label.")
     match_type: Literal[
-        "exact_key", "exact_alias", "fuzzy_alias", "fuzzy_name", "substring", "seed_explicit"
+        "exact_key",
+        "exact_alias",
+        "fuzzy_alias",
+        "fuzzy_name",
+        "substring",
+        "seed_explicit",
+        "multi_token_match",
     ] = Field(..., description="Technique used to match the anchor node.")
     score: float = Field(..., ge=0.0, le=1.0, description="Match confidence score [0.0..1.0].")
 
@@ -131,6 +137,14 @@ class RetrievalResult(BaseModel):
 
     query: str = Field(..., description="Original user query.")
     detected_intent: QueryIntent = Field(..., description="Detected or requested query intent.")
+    intent_confidence: float = Field(
+        default=1.0,
+        description="Calibrated confidence score from the trained ML Intent Classifier [0.0..1.0].",
+    )
+    intent_probabilities: Dict[str, float] = Field(
+        default_factory=dict,
+        description="Predicted probability distribution across all 6 GraphRAG intent classes.",
+    )
     anchors: List[AnchorMatch] = Field(
         default_factory=list, description="Resolved seed anchor nodes."
     )

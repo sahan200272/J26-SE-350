@@ -2,7 +2,7 @@
 
 import re
 from typing import Any, Dict, List, Optional, Set
-from rapidfuzz.fuzz import token_sort_ratio
+from rapidfuzz.fuzz import token_set_ratio, token_sort_ratio
 
 from graph_schema.definitions import TIER_1_RELATIONSHIPS
 from graph_schema.models import normalize_key
@@ -146,6 +146,7 @@ INTENT_RELATIONSHIP_BOOSTS: Dict[QueryIntent, Dict[str, float]] = {
     "deadline_schedule": {
         "DUE_ON": 1.0,
         "SCHEDULED_ON": 1.0,
+        "LOCATED_AT": 0.95,
         "PLANS": 0.90,
         "PART_OF": 0.75,
         "ASSIGNED_TO": 0.70,
@@ -161,11 +162,12 @@ INTENT_RELATIONSHIP_BOOSTS: Dict[QueryIntent, Dict[str, float]] = {
         "LEADS": 0.80,
     },
     "person_context": {
+        "LOCATED_AT": 1.0,
+        "LIVES_IN": 1.0,
         "FAMILY_OF": 1.0,
         "FRIEND_OF": 1.0,
         "PARTNER_OF": 1.0,
         "WORKS_AT": 1.0,
-        "LIVES_IN": 1.0,
         "MEMBER_OF": 0.95,
         "REPORTS_TO": 0.90,
         "COLLABORATES_WITH": 0.90,
@@ -179,8 +181,46 @@ INTENT_RELATIONSHIP_BOOSTS: Dict[QueryIntent, Dict[str, float]] = {
 }
 
 
+def classify_query_intent_ml(query: str) -> tuple[QueryIntent, float, Dict[str, float]]:
+    """Classify query intent using the trained ML Intent Classifier blended with lexical signals.
+
+    Returns:
+        Tuple of (predicted_intent, confidence_score, class_probabilities).
+    """
+    from graphrag.intent_classifier import get_intent_classifier
+
+    clean_query = query.strip().lower()
+    clf = get_intent_classifier()
+    ml_intent, ml_conf, ml_probs = clf.predict(query)
+
+    # Check high-precision lexical rule match
+    rule_intent: Optional[QueryIntent] = None
+    for intent, keywords in INTENT_KEYWORDS.items():
+        for kw in keywords:
+            pattern = rf"\b{re.escape(kw)}\b"
+            if re.search(pattern, clean_query):
+                rule_intent = intent
+                break
+        if rule_intent:
+            break
+
+    if rule_intent is not None:
+        # Boost probability of the aligned lexical intent and re-normalize
+        blended = dict(ml_probs)
+        blended[rule_intent] = blended.get(rule_intent, 0.0) + 0.45
+        total = sum(blended.values()) or 1.0
+        norm_probs = {k: round(v / total, 4) for k, v in blended.items()}
+        return rule_intent, round(norm_probs[rule_intent], 4), norm_probs
+
+    # When no explicit rule keyword triggers, use ML prediction if confidence >= 0.55
+    if ml_conf >= 0.55:
+        return ml_intent, ml_conf, ml_probs
+
+    return "general", round(max(ml_probs.get("general", 0.5), ml_conf), 4), ml_probs
+
+
 def detect_query_intent(query: str) -> QueryIntent:
-    """Detect the primary intent of a user query using rule/keyword matching.
+    """Detect the primary intent of a user query using the hybrid ML + rule classifier.
 
     Args:
         query: Raw query text.
@@ -188,26 +228,40 @@ def detect_query_intent(query: str) -> QueryIntent:
     Returns:
         Detected QueryIntent literal.
     """
-    clean_query = query.strip().lower()
-
-    # Priority check for intent triggers
-    for intent, keywords in INTENT_KEYWORDS.items():
-        for kw in keywords:
-            # Word boundary regex or direct phrase match
-            pattern = rf"\b{re.escape(kw)}\b"
-            if re.search(pattern, clean_query):
-                return intent
-
-    return "general"
+    intent, _, _ = classify_query_intent_ml(query)
+    return intent
 
 
-def get_relationship_intent_salience(rel_type: str, intent: QueryIntent) -> float:
+def get_relationship_intent_salience(
+    rel_type: str,
+    intent: QueryIntent,
+    query: Optional[str] = None,
+) -> float:
     """Calculate the salience score [0.0..1.0] of a relationship type for a given intent.
 
     Tier-1 edges are preferred over Tier-2 and generic RELATED_TO fallbacks.
+    When query text is provided, contextual cues (e.g. location or timing keywords)
+    adjust specific edge priorities so paths answering the exact question rank highest.
     """
     if rel_type == "ALIAS_OF":
         return 1.0
+
+    # Query-aware contextual override
+    if query:
+        clean_q = query.lower()
+        # Location queries ("where is", "where does", "location", "venue", "place", "held in")
+        if any(w in clean_q for w in ("where", "location", "venue", "place", "where is", "where does")):
+            if rel_type in ("LOCATED_AT", "LIVES_IN"):
+                return 1.0
+            if rel_type == "WORKS_AT" and any(w in clean_q for w in ("work", "job", "office", "company", "firm")):
+                return 1.0
+            # Non-spatial relations (family, friends, preferences) do not answer a location query
+            if rel_type in ("FAMILY_OF", "FRIEND_OF", "PARTNER_OF", "LIKES", "DISLIKES", "PREFERS"):
+                return 0.60
+        # Time / schedule queries ("when is", "what time", "schedule", "deadline", "due date")
+        elif any(w in clean_q for w in ("when", "time", "date", "due", "deadline", "schedule", "scheduled")):
+            if rel_type in ("DUE_ON", "SCHEDULED_ON"):
+                return 1.0
 
     # Explicit intent-boosted mapping
     boosts = INTENT_RELATIONSHIP_BOOSTS.get(intent, {})
@@ -255,12 +309,28 @@ def _extract_query_phrases(query: str) -> List[str]:
         if q.strip():
             phrases.append(q.strip())
 
+    # Stripped possessive variant (e.g. "dilini's party" -> "dilini party")
+    depossessive = re.sub(r"'s\b", "", clean)
+    if depossessive != clean and len(depossessive.strip()) >= 3:
+        phrases.append(depossessive.strip())
+
     # Token-based n-grams (1 to 4 grams) preserving original words
     raw_words = [w.strip() for w in re.split(r"[\s,?!;:]+", clean) if w.strip()]
     num_raw = len(raw_words)
     for n in range(1, min(5, num_raw + 1)):
         for i in range(num_raw - n + 1):
             ngram = " ".join(raw_words[i : i + n])
+            if n == 1 and ngram.lower() in ANCHOR_STOPWORDS:
+                continue
+            if len(ngram) >= 3:
+                phrases.append(ngram)
+
+    # Clean words and depossessive n-grams
+    deposs_words = [w.strip() for w in re.split(r"[\s,?!;:]+", depossessive) if w.strip()]
+    num_deposs = len(deposs_words)
+    for n in range(1, min(5, num_deposs + 1)):
+        for i in range(num_deposs - n + 1):
+            ngram = " ".join(deposs_words[i : i + n])
             if n == 1 and ngram.lower() in ANCHOR_STOPWORDS:
                 continue
             if len(ngram) >= 3:
@@ -417,6 +487,29 @@ def resolve_seed_anchors(
                     if score > best_score:
                         best_score = score
                         best_match_type = "exact_alias" if alias_ratio == 100.0 else "fuzzy_alias"
+
+            # 5. Multi-token / token_set_ratio match for multi-word entities
+            clean_p = _clean_text(re.sub(r"'s\b", "", norm_phrase))
+            clean_k = _clean_text(re.sub(r"'s\b", "", node_key))
+            clean_n = _clean_text(re.sub(r"'s\b", "", norm_name))
+            p_words = set(w for w in clean_p.split() if w not in ANCHOR_STOPWORDS and len(w) >= 3)
+            n_words = set(w for w in clean_n.split() if w not in ANCHOR_STOPWORDS and len(w) >= 3)
+            k_words = set(w for w in clean_k.split() if w not in ANCHOR_STOPWORDS and len(w) >= 3)
+
+            if len(p_words) >= 2 and (p_words.issubset(n_words) or p_words.issubset(k_words)):
+                if 0.95 > best_score:
+                    best_score = 0.95
+                    best_match_type = "multi_token_match"
+            elif len(p_words) >= 2:
+                ts_ratio = max(
+                    float(token_set_ratio(clean_p, clean_n)),
+                    float(token_set_ratio(clean_p, clean_k)),
+                )
+                if ts_ratio >= 90.0:
+                    score = min(0.92, round(ts_ratio / 100.0, 4))
+                    if score > best_score:
+                        best_score = score
+                        best_match_type = "fuzzy_name"
 
         if best_score > 0.0:
             matches_by_key[node_key] = AnchorMatch(
