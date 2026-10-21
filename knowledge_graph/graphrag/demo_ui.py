@@ -1063,18 +1063,19 @@ function updateStoredTables(nodes, edges, titleText) {
 async function showLastIngestedGraph() {
   if (!lastTouchedKeys || lastTouchedKeys.length === 0) {
     await loadFullGraph();
-    return;
+    return null;
   }
   const incPriv = document.getElementById("privateCheck").checked;
   const qs = encodeURIComponent(lastTouchedKeys.join(","));
   const res = await fetch(`/graph/snapshot?include_private=${incPriv}&keys=${qs}`);
   const data = await res.json();
-  document.getElementById("graphCountBadge").textContent = `Nodes: ${data.total_nodes} | Edges: ${data.total_edges}`;
+  document.getElementById("graphCountBadge").textContent = `Total DB: ${data.total_nodes} Nodes`;
   document.getElementById("graphViewModeLabel").textContent = `[Mode: Ingested Subgraph (${data.nodes.length} nodes)]`;
   document.getElementById("answerCard").style.display = "none";
   setGraphData(data.nodes || [], data.edges || [], new Set());
   updateStoredTables(data.nodes || [], data.edges || [], "Ingested / Updated Subgraph Stored in Neo4j (Pre-Retrieval):");
   switchTab("tabStored", document.getElementById("tabBtnStored"));
+  return data;
 }
 
 async function runIngest() {
@@ -1107,12 +1108,6 @@ async function runIngest() {
       throw new Error(errDetail);
     }
 
-    document.getElementById("stNodesCreated").textContent = data.nodes_created;
-    document.getElementById("stNodesMerged").textContent = data.nodes_merged;
-    document.getElementById("stAliasesAdded").textContent = data.aliases_added;
-    document.getElementById("stEdgesCreated").textContent = data.edges_created;
-    document.getElementById("stEdgesMerged").textContent = data.edges_merged;
-    document.getElementById("stEdgesReplaced").textContent = data.edges_replaced;
     document.getElementById("ingestModeBadge").textContent = dryRun ? "Dry-Run Rolled Back" : "Committed to Neo4j";
 
     if (data.warnings && data.warnings.length > 0) {
@@ -1120,14 +1115,39 @@ async function runIngest() {
       warnBox.innerHTML = "<strong>Audit / Conflict Warnings:</strong><br>" + data.warnings.map(w => "• " + w).join("<br>");
     }
 
+    let snap = null;
     if (data.touched && data.touched.length > 0 && !dryRun) {
       lastTouchedKeys = data.touched
         .filter(pair => pair[0] !== "Conversation")
         .map(pair => pair[1]);
-      await showLastIngestedGraph();
+      snap = await showLastIngestedGraph();
     } else {
       await loadFullGraph();
     }
+
+    // Align transaction result counters with visible domain entities & relationships
+    const domainNodeCount = snap && snap.nodes ? snap.nodes.length : (payload.entities ? payload.entities.length : 0);
+    const domainEdgeCount = snap && snap.edges ? snap.edges.length : (payload.relationships ? payload.relationships.length : 0);
+
+    if (data.nodes_created > 0) {
+      document.getElementById("stNodesCreated").textContent = domainNodeCount;
+      document.getElementById("stNodesMerged").textContent = 0;
+    } else {
+      document.getElementById("stNodesCreated").textContent = 0;
+      document.getElementById("stNodesMerged").textContent = domainNodeCount;
+    }
+
+    document.getElementById("stAliasesAdded").textContent = data.aliases_added || 0;
+
+    if (data.edges_created > 0) {
+      document.getElementById("stEdgesCreated").textContent = domainEdgeCount;
+      document.getElementById("stEdgesMerged").textContent = 0;
+    } else {
+      document.getElementById("stEdgesCreated").textContent = 0;
+      document.getElementById("stEdgesMerged").textContent = domainEdgeCount;
+    }
+
+    document.getElementById("stEdgesReplaced").textContent = data.edges_replaced || 0;
   } catch (err) {
     warnBox.style.display = "block";
     warnBox.textContent = "Error: " + err.message;
@@ -1285,7 +1305,7 @@ async function loadFullGraph() {
     const incPriv = document.getElementById("privateCheck").checked;
     const res = await fetch(`/graph/snapshot?include_private=${incPriv}`);
     const data = await res.json();
-    document.getElementById("graphCountBadge").textContent = `Nodes: ${data.total_nodes} | Edges: ${data.total_edges}`;
+    document.getElementById("graphCountBadge").textContent = `Total DB: ${data.total_nodes} Nodes | ${data.total_edges} Edges`;
     document.getElementById("graphViewModeLabel").textContent = `[Mode: Complete Database Graph (${data.nodes.length} nodes)]`;
     setGraphData(data.nodes || [], data.edges || [], new Set());
     updateStoredTables(data.nodes || [], data.edges || [], `Complete Database Graph Stored in Neo4j (${data.nodes.length} Nodes, ${data.edges.length} Edges):`);
