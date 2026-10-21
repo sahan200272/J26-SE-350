@@ -142,58 +142,81 @@ def get_graph_snapshot(
     }
 
 
-DEMO_HTML: str = """<!DOCTYPE html>
+DEMO_HTML: str = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>J26-SE-350 | Graph-Based Knowledge Engine & Multi-Hop GraphRAG Demo</title>
+<title>J26-SE-350 | Knowledge Graph & Multi-Hop GraphRAG Console</title>
 <style>
   :root {
-    --bg: #0b0f19;
-    --panel: #131b2e;
-    --panel-alt: #1a243d;
-    --border: #2a395c;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --accent: #38bdf8;
-    --accent-hover: #0284c7;
-    --success: #22c55e;
-    --warn: #f59e0b;
-    --danger: #ef4444;
-    --purple: #a855f7;
-    --gold: #facc15;
+    --bg: #f8fafc;
+    --panel: #ffffff;
+    --panel-alt: #f1f5f9;
+    --border: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-subtle: #eff6ff;
+    --success: #16a34a;
+    --success-subtle: #f0fdf4;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --purple: #7c3aed;
+    --purple-subtle: #faf5ff;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+    --card-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.45;
-    padding-bottom: 32px;
+    padding-bottom: 40px;
+    -webkit-font-smoothing: antialiased;
   }
   header {
-    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    background: #ffffff;
     border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
+    padding: 14px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   }
-  .brand h1 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #fff;
+  .brand-wrap {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+  }
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+  }
+  .brand h1 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.01em;
   }
   .brand p {
-    font-size: 0.8rem;
+    font-size: 0.77rem;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 1px;
   }
   .badges {
     display: flex;
@@ -202,52 +225,68 @@ DEMO_HTML: str = """<!DOCTYPE html>
     align-items: center;
   }
   .badge {
-    font-size: 0.75rem;
+    font-size: 0.74rem;
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: 6px;
     background: var(--panel-alt);
     border: 1px solid var(--border);
-    color: var(--text);
-    font-weight: 600;
+    color: #334155;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .badge.ok { border-color: #16a34a; color: #4ade80; background: rgba(34,197,94,0.12); }
-  .badge.info { border-color: #0284c7; color: #38bdf8; background: rgba(56,189,248,0.12); }
-  .badge.purple { border-color: #9333ea; color: #c084fc; background: rgba(168,85,247,0.12); }
+  .badge .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .badge.ok { border-color: #bbf7d0; color: #15803d; background: var(--success-subtle); }
+  .badge.ok .dot { background: #16a34a; }
+  .badge.info { border-color: #bfdbfe; color: #1d4ed8; background: var(--accent-subtle); }
+  .badge.info .dot { background: #2563eb; }
+  .badge.purple { border-color: #e9d5ff; color: #7e22ce; background: var(--purple-subtle); }
+  .badge.purple .dot { background: #9333ea; }
+  .badge.emerald { border-color: #a7f3d0; color: #047857; background: #ecfdf5; }
+  .badge.emerald .dot { background: #059669; }
 
   .layout {
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: 410px 1fr;
     gap: 16px;
-    padding: 16px 24px;
-    max-width: 1680px;
+    padding: 18px 28px;
+    max-width: 1720px;
     margin: 0 auto;
   }
   @media (max-width: 1150px) {
-    .layout { grid-template-columns: 1fr; }
+    .layout { grid-template-columns: 1fr; padding: 14px 16px; }
   }
   .panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    box-shadow: var(--card-shadow);
   }
   .panel-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #fff;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #0f172a;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border);
     padding-bottom: 8px;
+    letter-spacing: -0.01em;
   }
   .panel-title span.tag {
     font-size: 0.7rem;
-    background: rgba(56,189,248,0.15);
+    background: var(--accent-subtle);
     color: var(--accent);
+    border: 1px solid #bfdbfe;
     padding: 2px 8px;
     border-radius: 4px;
     font-weight: 600;
@@ -260,48 +299,70 @@ DEMO_HTML: str = """<!DOCTYPE html>
   button {
     cursor: pointer;
     border: 1px solid var(--border);
-    background: var(--panel-alt);
-    color: var(--text);
+    background: #ffffff;
+    color: #334155;
     padding: 6px 11px;
     border-radius: 6px;
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-size: 0.77rem;
+    font-weight: 500;
     transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   button:hover {
-    border-color: var(--accent);
-    background: #243252;
+    border-color: var(--border-hover);
+    background: var(--panel-alt);
+    color: #0f172a;
   }
   button.primary {
-    background: var(--accent);
-    color: #0f172a;
-    border-color: var(--accent);
-    font-weight: 700;
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    font-weight: 600;
   }
   button.primary:hover {
-    background: var(--accent-hover);
-    color: #fff;
+    background: #1e293b;
+    border-color: #1e293b;
+    color: #ffffff;
   }
   button.purple-btn {
-    background: rgba(168,85,247,0.2);
-    border-color: var(--purple);
-    color: #e9d5ff;
+    background: var(--purple-subtle);
+    border-color: #ddd6fe;
+    color: #6d28d9;
+    font-weight: 500;
   }
   button.purple-btn:hover {
-    background: var(--purple);
-    color: #fff;
+    background: #ede9fe;
+    border-color: #c4b5fd;
+    color: #5b21b6;
+  }
+  button.outline-accent {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+  button.outline-accent:hover {
+    background: var(--panel-alt);
+    border-color: #94a3b8;
   }
   textarea {
     width: 100%;
     height: 250px;
-    background: #090d16;
-    color: #a5f3fc;
+    background: #ffffff;
+    color: #0f172a;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 0.76rem;
     resize: vertical;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   }
   .controls-row {
     display: flex;
@@ -311,12 +372,13 @@ DEMO_HTML: str = """<!DOCTYPE html>
     flex-wrap: wrap;
   }
   label.checkbox {
-    font-size: 0.8rem;
-    color: var(--muted);
+    font-size: 0.78rem;
+    color: #475569;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     cursor: pointer;
+    font-weight: 500;
   }
   .stat-grid {
     display: grid;
@@ -324,7 +386,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
     gap: 8px;
   }
   .stat-box {
-    background: #090d16;
+    background: #f8fafc;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 8px 10px;
@@ -332,19 +394,22 @@ DEMO_HTML: str = """<!DOCTYPE html>
   }
   .stat-box .num {
     font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--accent);
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
   }
   .stat-box .lbl {
-    font-size: 0.7rem;
+    font-size: 0.69rem;
     color: var(--muted);
+    font-weight: 500;
+    margin-top: 2px;
   }
   .warning-box {
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid var(--warn);
-    color: #fcd34d;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
     font-size: 0.75rem;
-    padding: 8px;
+    padding: 8px 12px;
     border-radius: 6px;
     display: none;
   }
@@ -363,30 +428,41 @@ DEMO_HTML: str = """<!DOCTYPE html>
   .query-bar input[type="text"] {
     flex: 1;
     min-width: 260px;
-    background: #090d16;
+    background: #ffffff;
     border: 1px solid var(--border);
-    color: #fff;
-    padding: 9px 12px;
+    color: #0f172a;
+    padding: 8px 12px;
     border-radius: 6px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .query-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   }
   select {
-    background: #090d16;
-    color: var(--text);
+    background: #ffffff;
+    color: #0f172a;
     border: 1px solid var(--border);
     padding: 6px 10px;
     border-radius: 6px;
     font-size: 0.8rem;
+    outline: none;
+  }
+  select:focus {
+    border-color: var(--accent);
   }
 
   /* Canvas Graph */
   .canvas-wrap {
     position: relative;
-    background: radial-gradient(circle at center, #111827 0%, #070a12 100%);
+    background: #f8fafc;
     border: 1px solid var(--border);
     border-radius: 8px;
     height: 390px;
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
   }
   canvas#graphCanvas {
     width: 100%;
@@ -401,22 +477,26 @@ DEMO_HTML: str = """<!DOCTYPE html>
     left: 10px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    background: rgba(15, 23, 42, 0.85);
-    padding: 6px 10px;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 6px 12px;
     border-radius: 6px;
     border: 1px solid var(--border);
     font-size: 0.72rem;
+    color: #334155;
+    box-shadow: var(--card-shadow);
     pointer-events: none;
+    backdrop-filter: blur(4px);
   }
   .legend-item {
     display: flex;
     align-items: center;
     gap: 5px;
+    font-weight: 500;
   }
   .dot {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     display: inline-block;
   }
@@ -424,55 +504,80 @@ DEMO_HTML: str = """<!DOCTYPE html>
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background: rgba(15, 23, 42, 0.92);
+    background: rgba(255, 255, 255, 0.98);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 8px 12px;
-    font-size: 0.76rem;
-    max-width: 320px;
-    color: var(--text);
+    font-size: 0.75rem;
+    max-width: 340px;
+    color: #0f172a;
+    box-shadow: var(--card-shadow-md);
+    backdrop-filter: blur(4px);
   }
 
   /* Answer box */
   .answer-card {
-    background: linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(168,85,247,0.1) 100%);
-    border: 1px solid var(--accent);
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
     border-radius: 8px;
     padding: 12px 14px;
     display: none;
+    box-shadow: var(--card-shadow);
   }
   .answer-header {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--accent);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #15803d;
     margin-bottom: 6px;
     display: flex;
     justify-content: space-between;
   }
   .answer-text {
-    font-size: 0.9rem;
-    color: #f8fafc;
+    font-size: 0.88rem;
+    color: #0f172a;
+    line-height: 1.5;
   }
 
   /* Tabs */
   .tabs {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
+    padding-bottom: 0px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.79rem;
+    padding: 8px 12px;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover {
+    color: #0f172a;
+    background: transparent;
+    border-color: transparent;
   }
   .tab-btn.active {
-    background: var(--accent);
+    background: transparent;
     color: #0f172a;
-    border-color: var(--accent);
+    border-bottom: 2px solid #0f172a;
+    font-weight: 600;
   }
-  .tab-content { display: none; }
+  .tab-content { display: none; padding-top: 12px; }
   .tab-content.active { display: block; }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.78rem;
+    font-size: 0.77rem;
+    background: #ffffff;
   }
   th, td {
     padding: 8px 10px;
@@ -480,71 +585,84 @@ DEMO_HTML: str = """<!DOCTYPE html>
     text-align: left;
   }
   th {
-    background: #090d16;
-    color: var(--muted);
+    background: #f8fafc;
+    color: #475569;
     font-weight: 600;
+    font-size: 0.71rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  tr:hover td {
+    background: #f8fafc;
   }
   .score-pill {
-    background: rgba(34,197,94,0.18);
-    color: #4ade80;
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
     padding: 2px 7px;
     border-radius: 4px;
-    font-weight: 700;
+    font-weight: 600;
+    font-size: 0.74rem;
   }
   .gain-chip {
     display: inline-block;
-    background: rgba(34,197,94,0.15);
-    border: 1px solid #16a34a;
-    color: #86efac;
-    padding: 4px 9px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+    padding: 3px 8px;
     border-radius: 999px;
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     margin: 3px;
+    font-weight: 500;
   }
   pre.md-box {
-    background: #090d16;
+    background: #f8fafc;
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 12px;
     font-size: 0.76rem;
-    color: #cbd5e1;
+    color: #334155;
     overflow-x: auto;
     max-height: 280px;
     white-space: pre-wrap;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="brand">
-    <h1>🕸️ Privacy-Preserving Knowledge Graph & Multi-Hop GraphRAG Engine</h1>
-    <p>J26-SE-350 • Component 3 (Kumarage A.L.I — IT23264120) • 50% Progress Milestone Demo</p>
+  <div class="brand-wrap">
+    <div class="brand-icon">KG</div>
+    <div class="brand">
+      <h1>Knowledge Graph & Contextual Linking Engine</h1>
+      <p>J26-SE-350 &bull; Component 3 (Kumarage A.L.I &mdash; IT23264120) &bull; Evaluation Console</p>
+    </div>
   </div>
   <div class="badges">
-    <span class="badge ok" id="dbStatusBadge">● Neo4j 5 Connected</span>
-    <span class="badge info">🔒 Localhost 127.0.0.1 Only</span>
-    <span class="badge purple">🧠 Ollama LLaMA 3 (8B)</span>
-    <span class="badge" style="background:#065f46; color:#6ee7b7; border-color:#059669;" id="mlBadge">🤖 ML Intent Model (96.9% CV)</span>
+    <span class="badge ok" id="dbStatusBadge"><span class="dot"></span>Neo4j Connected</span>
+    <span class="badge info"><span class="dot"></span>127.0.0.1 (Local)</span>
+    <span class="badge purple"><span class="dot"></span>LLaMA 3 (8B)</span>
+    <span class="badge emerald" id="mlBadge"><span class="dot"></span>ML Intent Model (96.9% CV)</span>
     <span class="badge" id="graphCountBadge">Nodes: 0 | Edges: 0</span>
   </div>
 </header>
 
 <div class="layout">
-  <!-- LEFT COLUMN: RP-25 & RP-26 INGESTION -->
+  <!-- LEFT COLUMN: INGESTION -->
   <div class="panel">
     <div class="panel-title">
       <span>1. Live JSON Payload Ingestion</span>
       <span class="tag">RP-25 & RP-26</span>
     </div>
 
-    <div style="font-size:0.76rem; color:var(--muted);">Load a sample conversation payload or edit JSON below:</div>
+    <div style="font-size:0.76rem; color:var(--muted);">Load sample conversation payload or edit JSON directly:</div>
     <div class="preset-row">
-      <button onclick="loadPreset('whisperx')">⚡ WhisperX Blocker</button>
-      <button onclick="loadPreset('office')">🏢 Office Sync</button>
-      <button onclick="loadPreset('personal')">🎂 Personal & Aliases</button>
-      <button onclick="loadPreset('correction')">🔄 Deadline Change</button>
-      <button onclick="loadPreset('unknown')">🧩 Unknown Fallback</button>
+      <button onclick="loadPreset('whisperx')">WhisperX Blocker</button>
+      <button onclick="loadPreset('office')">Office Sync</button>
+      <button onclick="loadPreset('personal')">Personal & Aliases</button>
+      <button onclick="loadPreset('correction')">Deadline Reschedule</button>
+      <button onclick="loadPreset('unknown')">Unknown Intent</button>
     </div>
 
     <textarea id="jsonInput" spellcheck="false"></textarea>
@@ -553,11 +671,11 @@ DEMO_HTML: str = """<!DOCTYPE html>
       <label class="checkbox">
         <input type="checkbox" id="dryRunCheck"> Dry-Run (Rollback Transaction)
       </label>
-      <button class="primary" onclick="runIngest()">🚀 Ingest JSON to Neo4j</button>
+      <button class="primary" onclick="runIngest()">Ingest Payload to Neo4j</button>
     </div>
 
     <div class="panel-title" style="margin-top:4px;">
-      <span>Ingestion Transaction Result</span>
+      <span>Transaction Results</span>
       <span id="ingestModeBadge" style="font-size:0.72rem; color:var(--muted);">Ready</span>
     </div>
 
@@ -573,63 +691,63 @@ DEMO_HTML: str = """<!DOCTYPE html>
     <div class="warning-box" id="ingestWarnings"></div>
   </div>
 
-  <!-- RIGHT COLUMN: RP-27 GRAPHRAG & VISUALIZATION -->
+  <!-- RIGHT COLUMN: GRAPHRAG & VISUALIZATION -->
   <div class="right-col">
     <div class="panel">
       <div class="panel-title">
-        <span>2. Constrained Multi-Hop GraphRAG Traversal & Live Subgraph</span>
+        <span>2. Constrained Multi-Hop GraphRAG Traversal</span>
         <span class="tag">RP-27</span>
       </div>
 
       <div class="preset-row">
-        <span style="font-size:0.75rem; color:var(--muted); align-self:center;">Sample Queries:</span>
-        <button onclick="setQuery('When is the Weekly sync meeting and who was absent?')">📅 Meeting Date & Attendance</button>
-        <button onclick="setQuery('Who is friend of Kamal and where do they work?')">👥 Kamal's Friends & Workplace</button>
-        <button onclick="setQuery('What is blocking Sarah Chen\\'s WhisperX task and how is that issue resolved?')">🔍 Sarah's WhisperX Blocker (3-Hop)</button>
-        <button onclick="setQuery('Who is assigned to Test payment flow and what is blocking it?')">💳 Payment Flow Blocker</button>
+        <span style="font-size:0.75rem; color:var(--muted); align-self:center;">Presets:</span>
+        <button onclick="setQuery('When is the Weekly sync meeting and who was absent?')">Meeting Attendance</button>
+        <button onclick="setQuery('Who is friend of Kamal and where do they work?')">Personal Relationships</button>
+        <button onclick="setQuery('What is blocking Sarah Chen\'s WhisperX task and how is that issue resolved?')">Multi-Hop Blocker Chain</button>
+        <button onclick="setQuery('Who is assigned to Test payment flow and what is blocking it?')">Task Dependency</button>
       </div>
 
       <div class="query-bar">
-        <input type="text" id="queryInput" value="What is blocking Sarah Chen's WhisperX task and how is that issue resolved?" placeholder="Ask a multi-hop relational question...">
-        <select id="hopsSelect" title="Max Hops (d)">
+        <input type="text" id="queryInput" value="What is blocking Sarah Chen's WhisperX task and how is that issue resolved?" placeholder="Enter multi-hop relational search query...">
+        <select id="hopsSelect" title="Max Traversal Depth">
           <option value="1">1 Hop</option>
           <option value="2" selected>2 Hops</option>
           <option value="3">3 Hops</option>
         </select>
         <label class="checkbox">
-          <input type="checkbox" id="synthCheck" checked> 🧠 LLaMA 3 8B Answer
+          <input type="checkbox" id="synthCheck" checked> LLaMA 3 Synthesis
         </label>
         <label class="checkbox">
           <input type="checkbox" id="privateCheck"> Include Private
         </label>
-        <button class="primary" onclick="runRetrieve()">🔍 Run GraphRAG</button>
-        <button class="purple-btn" onclick="runCompare()">📊 Compare vs. Keyword Baseline</button>
-        <button onclick="showLastIngestedGraph()" id="btnLastIngested" style="border-color:#22c55e; color:#4ade80;">✨ Ingested Graph</button>
-        <button onclick="loadFullGraph()">🌐 Full DB Graph</button>
+        <button class="primary" onclick="runRetrieve()">Execute GraphRAG</button>
+        <button class="purple-btn" onclick="runCompare()">Compare Baseline</button>
+        <button onclick="showLastIngestedGraph()" id="btnLastIngested" style="border-color:#bbf7d0; color:#15803d; background:#f0fdf4;">View Ingested</button>
+        <button onclick="loadFullGraph()" class="outline-accent">View Complete Graph</button>
       </div>
 
       <!-- 2D Force-Directed Graph Canvas -->
       <div class="canvas-wrap">
         <canvas id="graphCanvas"></canvas>
         <div class="canvas-legend">
-          <span id="graphViewModeLabel" style="color:#4ade80; font-weight:700; margin-right:6px;">[Mode: Full DB Graph]</span>
-          <span class="legend-item"><span class="dot" style="background:#facc15; box-shadow:0 0 6px #facc15;"></span>Seed Anchor</span>
-          <span class="legend-item"><span class="dot" style="background:#38bdf8;"></span>Person</span>
-          <span class="legend-item"><span class="dot" style="background:#22c55e;"></span>Task</span>
-          <span class="legend-item"><span class="dot" style="background:#ef4444;"></span>Issue</span>
-          <span class="legend-item"><span class="dot" style="background:#a855f7;"></span>Decision</span>
-          <span class="legend-item"><span class="dot" style="background:#f97316;"></span>Deadline / Meeting</span>
-          <span class="legend-item"><span class="dot" style="background:#94a3b8;"></span>Other</span>
+          <span id="graphViewModeLabel" style="color:#0f172a; font-weight:700; margin-right:6px;">[Mode: Complete Graph]</span>
+          <span class="legend-item"><span class="dot" style="background:#f59e0b;"></span>Seed Anchor</span>
+          <span class="legend-item"><span class="dot" style="background:#0284c7;"></span>Person</span>
+          <span class="legend-item"><span class="dot" style="background:#16a34a;"></span>Task</span>
+          <span class="legend-item"><span class="dot" style="background:#dc2626;"></span>Issue</span>
+          <span class="legend-item"><span class="dot" style="background:#7c3aed;"></span>Decision</span>
+          <span class="legend-item"><span class="dot" style="background:#ea580c;"></span>Deadline / Meeting</span>
+          <span class="legend-item"><span class="dot" style="background:#64748b;"></span>Other</span>
         </div>
         <div class="node-inspector" id="nodeInspector">
-          Click or drag any node to inspect properties & relationships.
+          Click or drag nodes to inspect relational properties.
         </div>
       </div>
 
       <!-- LLaMA 3 8B Synthesized Answer Box -->
       <div class="answer-card" id="answerCard">
         <div class="answer-header">
-          <span id="answerModelLabel">🧠 LLaMA 3 (8B) Graph-Grounded Answer</span>
+          <span id="answerModelLabel">LLaMA 3 (8B) Grounded Answer</span>
           <span id="answerLatencyLabel"></span>
         </div>
         <div class="answer-text" id="answerText"></div>
@@ -637,28 +755,27 @@ DEMO_HTML: str = """<!DOCTYPE html>
 
       <!-- Evaluation & Mathematical Scoring Tabs -->
       <div class="tabs">
-        <button class="tab-btn active" id="tabBtnStored" onclick="switchTab('tabStored', this)">🗄️ Stored Graph (Nodes & Edges)</button>
-        <button class="tab-btn" id="tabBtnPaths" onclick="switchTab('tabPaths', this)">📐 Mathematical Scored Paths</button>
-        <button class="tab-btn" id="tabBtnModel" onclick="switchTab('tabModel', this)">🤖 Trained ML Model (Accuracy & F1)</button>
-        <button class="tab-btn" id="tabBtnCompare" onclick="switchTab('tabCompare', this)">📊 Baseline Comparison (SE-P04 Proof)</button>
-        <button class="tab-btn" id="tabBtnPending" onclick="switchTab('tabPending', this)">🔔 Pending Tasks & Blockers (C4)</button>
-        <button class="tab-btn" id="tabBtnContext" onclick="switchTab('tabContext', this)">📄 Raw LLM Prompt Context</button>
+        <button class="tab-btn active" id="tabBtnStored" onclick="switchTab('tabStored', this)">Stored Graph Entities</button>
+        <button class="tab-btn" id="tabBtnPaths" onclick="switchTab('tabPaths', this)">Ranked Traversal Paths</button>
+        <button class="tab-btn" id="tabBtnModel" onclick="switchTab('tabModel', this)">ML Intent Evaluation</button>
+        <button class="tab-btn" id="tabBtnCompare" onclick="switchTab('tabCompare', this)">Keyword Baseline Comparison</button>
+        <button class="tab-btn" id="tabBtnContext" onclick="switchTab('tabContext', this)">Retrieved Context</button>
       </div>
 
       <!-- TAB 0: STORED GRAPH EXPLORER (BEFORE GRAPHRAG) -->
       <div class="tab-content active" id="tabStored">
         <div style="font-size:0.76rem; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between;">
-          <span id="storedSubgraphTitle">Showing currently displayed nodes & relationships stored in Neo4j:</span>
+          <span id="storedSubgraphTitle">Currently displayed nodes and relationships in Neo4j:</span>
           <span id="storedSubgraphCounts" style="color:var(--accent); font-weight:700;"></span>
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-          <div style="overflow-x:auto; max-height:240px;">
+          <div style="overflow-x:auto; max-height:240px; border:1px solid var(--border); border-radius:6px;">
             <table>
               <thead>
                 <tr>
                   <th>Label</th>
                   <th>Entity Name</th>
-                  <th>Normalized Key & Properties</th>
+                  <th>Key & Properties</th>
                 </tr>
               </thead>
               <tbody id="storedNodesTableBody">
@@ -666,7 +783,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
               </tbody>
             </table>
           </div>
-          <div style="overflow-x:auto; max-height:240px;">
+          <div style="overflow-x:auto; max-height:240px; border:1px solid var(--border); border-radius:6px;">
             <table>
               <thead>
                 <tr>
@@ -690,7 +807,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
           <span id="intentBadge" style="margin-left:10px; color:var(--accent); font-weight:700;"></span>
         </div>
         <div id="liveIntentProbsBar" style="display:none; font-size:0.72rem; margin-bottom:8px; padding:6px 10px; background:var(--panel-alt); border:1px solid var(--border); border-radius:6px;"></div>
-        <div style="overflow-x:auto; max-height:250px;">
+        <div style="overflow-x:auto; max-height:250px; border:1px solid var(--border); border-radius:6px;">
           <table>
             <thead>
               <tr>
@@ -705,7 +822,7 @@ DEMO_HTML: str = """<!DOCTYPE html>
               </tr>
             </thead>
             <tbody id="pathsTableBody">
-              <tr><td colspan="8" style="color:var(--muted);">Run a GraphRAG query above to view ranked multi-hop paths.</td></tr>
+              <tr><td colspan="8" style="color:var(--muted);">Execute a GraphRAG query above to view ranked multi-hop paths.</td></tr>
             </tbody>
           </table>
         </div>
@@ -717,17 +834,17 @@ DEMO_HTML: str = """<!DOCTYPE html>
           <div style="font-size:0.78rem; color:var(--text);">
             <strong>Architecture:</strong> <span id="mlModelName" style="color:var(--accent);">Hybrid TF-IDF N-Gram + L2 Softmax Logistic Regression & Multinomial NB Ensemble</span>
           </div>
-          <button onclick="retrainModel()" id="btnRetrainModel" style="border-color:var(--accent); color:var(--accent);">🔄 Re-Train Model (5-Fold CV)</button>
+          <button onclick="retrainModel()" id="btnRetrainModel" class="outline-accent" style="border-color:var(--accent); color:var(--accent);">Re-Train Classifier (5-Fold CV)</button>
         </div>
         <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom:10px;">
           <div class="stat-box"><div class="num" style="color:var(--success);" id="mlCvAcc">96.9%</div><div class="lbl">5-Fold CV Accuracy</div></div>
           <div class="stat-box"><div class="num" style="color:var(--success);" id="mlCvF1">0.9694</div><div class="lbl">5-Fold Macro F1</div></div>
           <div class="stat-box"><div class="num" id="mlTestAcc">94.4%</div><div class="lbl">80/20 Holdout Test Acc</div></div>
-          <div class="stat-box"><div class="num" id="mlDatasetInfo">360 / 4,220</div><div class="lbl">Samples / TF-IDF Vocab</div></div>
+          <div class="stat-box"><div class="num" id="mlDatasetInfo">360 / 4,220</div><div class="lbl">Samples / Vocab Features</div></div>
         </div>
         <div style="display:grid; grid-template-columns: 1.05fr 1fr; gap:12px;">
-          <div style="overflow-x:auto; max-height:230px;">
-            <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px; font-weight:600;">Per-Class Evaluation Metrics (5-Fold Stratified CV):</div>
+          <div style="overflow-x:auto; max-height:230px; border:1px solid var(--border); border-radius:6px;">
+            <div style="font-size:0.73rem; color:var(--muted); padding:6px 10px; background:#f8fafc; border-bottom:1px solid var(--border); font-weight:600;">Per-Class Evaluation Metrics (5-Fold Stratified CV):</div>
             <table>
               <thead>
                 <tr>
@@ -743,8 +860,8 @@ DEMO_HTML: str = """<!DOCTYPE html>
               </tbody>
             </table>
           </div>
-          <div style="overflow-x:auto; max-height:230px;">
-            <div style="font-size:0.74rem; color:var(--muted); margin-bottom:4px; font-weight:600;">6×6 Confusion Matrix (Rows = True, Cols = Predicted):</div>
+          <div style="overflow-x:auto; max-height:230px; border:1px solid var(--border); border-radius:6px;">
+            <div style="font-size:0.73rem; color:var(--muted); padding:6px 10px; background:#f8fafc; border-bottom:1px solid var(--border); font-weight:600;">6x6 Confusion Matrix (Rows = True, Cols = Predicted):</div>
             <table id="mlConfusionTable">
               <tbody id="mlConfusionBody">
                 <tr><td style="color:var(--muted);">Loading confusion matrix...</td></tr>
@@ -763,19 +880,14 @@ DEMO_HTML: str = """<!DOCTYPE html>
           <div class="stat-box"><div class="num" id="cmpLatency">-</div><div class="lbl">GraphRAG Latency</div></div>
         </div>
         <div id="cmpSummary" style="font-size:0.82rem; margin-bottom:8px; color:var(--text);">
-          Click "📊 Compare vs. Keyword Baseline" to evaluate multi-hop entity recall gain.
+          Click "Compare Baseline" to evaluate multi-hop entity recall gain against flat search.
         </div>
         <div id="cmpGainList"></div>
       </div>
 
-      <!-- TAB 3: PENDING ITEMS -->
-      <div class="tab-content" id="tabPending">
-        <pre class="md-box" id="pendingBox">Loading pending tasks...</pre>
-      </div>
-
       <!-- TAB 4: FORMATTED CONTEXT -->
       <div class="tab-content" id="tabContext">
-        <pre class="md-box" id="contextBox">Run a GraphRAG query to inspect the formatted Markdown context sent to Component 2.</pre>
+        <pre class="md-box" id="contextBox">Execute a GraphRAG query to inspect the formatted Markdown context block sent to LLaMA 3.</pre>
       </div>
     </div>
   </div>
@@ -904,9 +1016,6 @@ function switchTab(tabId, btn) {
   document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
   document.getElementById(tabId).classList.add("active");
   btn.classList.add("active");
-  if (tabId === "tabPending") {
-    loadPending();
-  }
 }
 
 function updateStoredTables(nodes, edges, titleText) {
@@ -916,7 +1025,7 @@ function updateStoredTables(nodes, edges, titleText) {
   const nBody = document.getElementById("storedNodesTableBody");
   nBody.innerHTML = "";
   if (!nodes || nodes.length === 0) {
-    nBody.innerHTML = `<tr><td colspan="3" style="color:var(--muted);">No nodes to display.</td></tr>`;
+    nBody.innerHTML = `<tr><td colspan="3" style="color:var(--muted); text-align:center; padding:16px;">No nodes to display.</td></tr>`;
   } else {
     nodes.forEach(n => {
       const propStr = Object.entries(n.props || {})
@@ -925,7 +1034,7 @@ function updateStoredTables(nodes, edges, titleText) {
         .join(", ");
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><span class="badge">${n.type}</span></td>
+        <td><span class="badge" style="display:inline-block; font-size:0.71rem; padding:2px 7px;">${n.type}</span></td>
         <td><strong>${n.name}</strong></td>
         <td style="color:var(--muted); font-size:0.73rem;"><code>${n.key}</code>${propStr ? ' • ' + propStr : ''}</td>
       `;
@@ -936,15 +1045,15 @@ function updateStoredTables(nodes, edges, titleText) {
   const eBody = document.getElementById("storedEdgesTableBody");
   eBody.innerHTML = "";
   if (!edges || edges.length === 0) {
-    eBody.innerHTML = `<tr><td colspan="3" style="color:var(--muted);">No relationships to display.</td></tr>`;
+    eBody.innerHTML = `<tr><td colspan="3" style="color:var(--muted); text-align:center; padding:16px;">No relationships to display.</td></tr>`;
   } else {
     edges.forEach(e => {
       const orig = e.props && e.props.label ? ` (${e.props.label})` : "";
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><strong>${e.from_name || e.from}</strong> <span style="color:var(--muted);">(${e.from_type || ''})</span></td>
-        <td><span style="color:var(--accent); font-weight:700;">—[${e.type}${orig}]→</span></td>
-        <td><strong>${e.to_name || e.to}</strong> <span style="color:var(--muted);">(${e.to_type || ''})</span></td>
+        <td><strong>${e.from_name || e.from}</strong> <span style="color:var(--muted); font-size:0.72rem;">(${e.from_type || ''})</span></td>
+        <td><span style="color:var(--accent); font-weight:600;">—[${e.type}${orig}]→</span></td>
+        <td><strong>${e.to_name || e.to}</strong> <span style="color:var(--muted); font-size:0.72rem;">(${e.to_type || ''})</span></td>
       `;
       eBody.appendChild(tr);
     });
@@ -961,10 +1070,10 @@ async function showLastIngestedGraph() {
   const res = await fetch(`/graph/snapshot?include_private=${incPriv}&keys=${qs}`);
   const data = await res.json();
   document.getElementById("graphCountBadge").textContent = `Nodes: ${data.total_nodes} | Edges: ${data.total_edges}`;
-  document.getElementById("graphViewModeLabel").textContent = `[Mode: ✨ Ingested Payload Graph (${data.nodes.length} nodes)]`;
+  document.getElementById("graphViewModeLabel").textContent = `[Mode: Ingested Subgraph (${data.nodes.length} nodes)]`;
   document.getElementById("answerCard").style.display = "none";
   setGraphData(data.nodes || [], data.edges || [], new Set());
-  updateStoredTables(data.nodes || [], data.edges || [], "✨ Newly Ingested / Updated Graph Stored in Neo4j (Before GraphRAG):");
+  updateStoredTables(data.nodes || [], data.edges || [], "Ingested / Updated Subgraph Stored in Neo4j (Pre-Retrieval):");
   switchTab("tabStored", document.getElementById("tabBtnStored"));
 }
 
@@ -1004,14 +1113,13 @@ async function runIngest() {
     document.getElementById("stEdgesCreated").textContent = data.edges_created;
     document.getElementById("stEdgesMerged").textContent = data.edges_merged;
     document.getElementById("stEdgesReplaced").textContent = data.edges_replaced;
-    document.getElementById("ingestModeBadge").textContent = dryRun ? "Dry-Run Rolled Back" : "✅ Committed to Neo4j";
+    document.getElementById("ingestModeBadge").textContent = dryRun ? "Dry-Run Rolled Back" : "Committed to Neo4j";
 
     if (data.warnings && data.warnings.length > 0) {
       warnBox.style.display = "block";
       warnBox.innerHTML = "<strong>Audit / Conflict Warnings:</strong><br>" + data.warnings.map(w => "• " + w).join("<br>");
     }
 
-    // Extract touched entity keys (excluding Conversation node) and immediately display the stored subgraph!
     if (data.touched && data.touched.length > 0 && !dryRun) {
       lastTouchedKeys = data.touched
         .filter(pair => pair[0] !== "Conversation")
@@ -1020,7 +1128,6 @@ async function runIngest() {
     } else {
       await loadFullGraph();
     }
-    await loadPending();
   } catch (err) {
     warnBox.style.display = "block";
     warnBox.textContent = "Error: " + err.message;
@@ -1039,7 +1146,7 @@ async function runRetrieve() {
   const ansCard = document.getElementById("answerCard");
   if (synth) {
     ansCard.style.display = "block";
-    document.getElementById("answerText").textContent = "⏳ Traversing Neo4j subgraph and synthesizing grounded answer with local LLaMA 3 (8B)...";
+    document.getElementById("answerText").textContent = "Traversing Neo4j subgraph and synthesizing grounded answer with local LLaMA 3 (8B)...";
   } else {
     ansCard.style.display = "none";
   }
@@ -1062,30 +1169,30 @@ async function runRetrieve() {
 
     // Render subgraph on canvas
     const seedKeys = new Set((data.anchors || []).map(a => a.key));
-    document.getElementById("graphViewModeLabel").textContent = `[Mode: 🔍 GraphRAG ${maxHops}-Hop Subgraph]`;
+    document.getElementById("graphViewModeLabel").textContent = `[Mode: GraphRAG ${maxHops}-Hop Subgraph]`;
     setGraphData(data.nodes || [], data.edges || [], seedKeys);
-    updateStoredTables(data.nodes || [], data.edges || [], `🔍 Retrieved GraphRAG Subgraph for Query: "${query}"`);
+    updateStoredTables(data.nodes || [], data.edges || [], `Retrieved Subgraph for Query: "${query}"`);
 
     // Update Answer Card
     if (synth && data.synthesized_answer) {
       ansCard.style.display = "block";
-      document.getElementById("answerModelLabel").textContent = `🧠 LLaMA 3 8B Grounded Answer (${data.llm_model_used || 'llama3:8b'})`;
+      document.getElementById("answerModelLabel").textContent = `LLaMA 3 (8B) Grounded Answer (${data.llm_model_used || 'llama3:8b'})`;
       document.getElementById("answerLatencyLabel").textContent = `Retrieval: ${data.latency_ms} ms | Synthesis: ${data.synthesis_latency_ms || 0} ms`;
       document.getElementById("answerText").textContent = data.synthesized_answer;
     }
 
     // Update Scored Paths Table & ML Intent Confidence
     const confPct = ((data.intent_confidence || 1.0) * 100).toFixed(1);
-    document.getElementById("intentBadge").innerHTML = `Detected Intent: <strong>${data.detected_intent}</strong> <span style="color:var(--success); font-weight:700;">[ML Confidence: ${confPct}%]</span> (${data.latency_ms} ms)`;
+    document.getElementById("intentBadge").innerHTML = `Detected Intent: <strong>${data.detected_intent}</strong> <span style="color:var(--success); font-weight:600;">[ML Confidence: ${confPct}%]</span> (${data.latency_ms} ms)`;
 
     const probsBar = document.getElementById("liveIntentProbsBar");
     if (data.intent_probabilities && Object.keys(data.intent_probabilities).length > 0) {
       probsBar.style.display = "block";
       const chips = Object.entries(data.intent_probabilities)
         .sort((a,b) => b[1] - a[1])
-        .map(([c, p]) => `<span style="margin-right:12px; ${c === data.detected_intent ? 'color:var(--accent); font-weight:700;' : 'color:var(--muted);'}">${c}: ${(p*100).toFixed(1)}%</span>`)
+        .map(([c, p]) => `<span style="margin-right:12px; ${c === data.detected_intent ? 'color:var(--accent); font-weight:600;' : 'color:var(--muted);'}">${c}: ${(p*100).toFixed(1)}%</span>`)
         .join("");
-      probsBar.innerHTML = `<strong>🤖 ML Intent Probabilities:</strong> ` + chips;
+      probsBar.innerHTML = `<strong>ML Intent Probabilities:</strong> ` + chips;
     } else {
       probsBar.style.display = "none";
     }
@@ -1093,15 +1200,15 @@ async function runRetrieve() {
     const tbody = document.getElementById("pathsTableBody");
     tbody.innerHTML = "";
     if (!data.ranked_paths || data.ranked_paths.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted);">No paths found for query.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted); text-align:center; padding:16px;">No connected paths found for query.</td></tr>`;
     } else {
       data.ranked_paths.forEach((p, idx) => {
         const parts = [];
         if (p.hops && p.hops.length > 0) {
-          parts.push(`<strong>${p.hops[0].from_node.name}</strong> <span style="color:var(--muted);">(${p.hops[0].from_node.type})</span>`);
+          parts.push(`<strong>${p.hops[0].from_node.name}</strong> <span style="color:var(--muted); font-size:0.72rem;">(${p.hops[0].from_node.type})</span>`);
           p.hops.forEach(h => {
             const orig = h.props && h.props.label ? ` (${h.props.label})` : "";
-            parts.push(`<span style="color:var(--accent);">—[${h.relationship_type}${orig}]→</span> <strong>${h.to_node.name}</strong> <span style="color:var(--muted);">(${h.to_node.type})</span>`);
+            parts.push(`<span style="color:var(--accent); font-weight:600;">—[${h.relationship_type}${orig}]→</span> <strong>${h.to_node.name}</strong> <span style="color:var(--muted); font-size:0.72rem;">(${h.to_node.type})</span>`);
           });
         }
         const tr = document.createElement("tr");
@@ -1119,7 +1226,6 @@ async function runRetrieve() {
       });
     }
 
-    // Update Raw Context Box
     document.getElementById("contextBox").textContent = data.formatted_context || "";
   } catch (err) {
     ansCard.style.display = "block";
@@ -1133,7 +1239,6 @@ async function runCompare() {
   const maxHops = parseInt(document.getElementById("hopsSelect").value, 10);
   const incPriv = document.getElementById("privateCheck").checked;
 
-  // Switch to Compare tab
   switchTab("tabCompare", document.getElementById("tabBtnCompare"));
 
   try {
@@ -1159,7 +1264,7 @@ async function runCompare() {
 
     const gainDiv = document.getElementById("cmpGainList");
     if (data.multi_hop_entity_gain && data.multi_hop_entity_gain.length > 0) {
-      gainDiv.innerHTML = `<div style="font-size:0.76rem; color:var(--muted); margin-bottom:4px;">Entities Uncovered Exclusively via Multi-Hop Graph Traversal:</div>` +
+      gainDiv.innerHTML = `<div style="font-size:0.76rem; color:var(--muted); margin-bottom:6px; font-weight:500;">Entities Uncovered Exclusively via Multi-Hop Graph Traversal:</div>` +
         data.multi_hop_entity_gain.map(g => `<span class="gain-chip">+ [${g.type}] ${g.name}</span>`).join("");
     } else {
       gainDiv.innerHTML = "";
@@ -1167,22 +1272,11 @@ async function runCompare() {
 
     if (data.graphrag_result) {
       const seedKeys = new Set((data.graphrag_result.anchors || []).map(a => a.key));
-      document.getElementById("graphViewModeLabel").textContent = `[Mode: 📊 Baseline Comparison Subgraph]`;
+      document.getElementById("graphViewModeLabel").textContent = `[Mode: Baseline Comparison Subgraph]`;
       setGraphData(data.graphrag_result.nodes || [], data.graphrag_result.edges || [], seedKeys);
     }
   } catch (err) {
     document.getElementById("cmpSummary").textContent = "Error: " + err.message;
-  }
-}
-
-async function loadPending() {
-  try {
-    const incPriv = document.getElementById("privateCheck").checked;
-    const res = await fetch(`/retrieve/pending?include_private=${incPriv}`);
-    const data = await res.json();
-    document.getElementById("pendingBox").textContent = data.formatted_context || "No pending tasks.";
-  } catch (e) {
-    document.getElementById("pendingBox").textContent = "Error loading pending tasks.";
   }
 }
 
@@ -1192,9 +1286,9 @@ async function loadFullGraph() {
     const res = await fetch(`/graph/snapshot?include_private=${incPriv}`);
     const data = await res.json();
     document.getElementById("graphCountBadge").textContent = `Nodes: ${data.total_nodes} | Edges: ${data.total_edges}`;
-    document.getElementById("graphViewModeLabel").textContent = `[Mode: 🌐 Full DB Graph (${data.nodes.length} nodes)]`;
+    document.getElementById("graphViewModeLabel").textContent = `[Mode: Complete Database Graph (${data.nodes.length} nodes)]`;
     setGraphData(data.nodes || [], data.edges || [], new Set());
-    updateStoredTables(data.nodes || [], data.edges || [], `🌐 Full Database Graph Stored in Neo4j (${data.nodes.length} Nodes, ${data.edges.length} Edges):`);
+    updateStoredTables(data.nodes || [], data.edges || [], `Complete Database Graph Stored in Neo4j (${data.nodes.length} Nodes, ${data.edges.length} Edges):`);
     switchTab("tabStored", document.getElementById("tabBtnStored"));
   } catch (e) {
     console.error(e);
@@ -1202,7 +1296,7 @@ async function loadFullGraph() {
 }
 
 /* =====================================================================
-   Interactive 2D Force-Directed Graph Canvas (Zero External CDN Needed)
+   Interactive 2D Force-Directed Graph Canvas (Clean Light Theme)
    ===================================================================== */
 const canvas = document.getElementById("graphCanvas");
 const ctx = canvas.getContext("2d");
@@ -1213,16 +1307,16 @@ let hoverNode = null;
 let simAlpha = 0.0;
 
 const TYPE_COLORS = {
-  Person: "#38bdf8",
-  Task: "#22c55e",
-  Issue: "#ef4444",
-  Decision: "#a855f7",
-  Deadline: "#f97316",
-  Meeting: "#f97316",
-  Project: "#eab308",
-  Event: "#ec4899",
-  Location: "#14b8a6",
-  Concept: "#94a3b8"
+  Person: "#0284c7",    // sky blue
+  Task: "#16a34a",      // green
+  Issue: "#dc2626",     // crimson red
+  Decision: "#7c3aed",  // violet purple
+  Deadline: "#ea580c",  // warm orange
+  Meeting: "#d97706",   // amber
+  Project: "#2563eb",   // royal blue
+  Event: "#db2777",     // pink
+  Location: "#0d9488",  // teal
+  Concept: "#64748b"    // slate
 };
 
 function resizeCanvas() {
@@ -1240,7 +1334,6 @@ function setGraphData(nodes, edges, seedKeys) {
   const count = Math.max(1, nodes.length);
 
   gNodes = nodes.map((n, i) => {
-    // Golden-angle spiral initial placement for uniform distribution without corner clumping
     const goldenAngle = i * 2.399963229728653;
     const rRatio = Math.sqrt((i + 0.5) / count);
     const rx = (w * 0.38) * rRatio;
@@ -1260,49 +1353,37 @@ function setGraphData(nodes, edges, seedKeys) {
     return obj;
   });
 
-  gEdges = [];
-  edges.forEach(e => {
-    const src = nodeMap.get(e.from);
-    const dst = nodeMap.get(e.to);
-    if (src && dst && src !== dst) {
-      gEdges.push({
-        source: src,
-        target: dst,
-        type: e.type,
-        props: e.props || {}
-      });
-    }
-  });
+  gEdges = edges.map(e => ({
+    source: nodeMap.get(e.from) || { x: w / 2, y: h / 2, vx: 0, vy: 0 },
+    target: nodeMap.get(e.to) || { x: w / 2, y: h / 2, vx: 0, vy: 0 },
+    type: e.type,
+    props: e.props || {}
+  })).filter(e => e.source.key && e.target.key);
 
-  // Pre-compute 140 layout ticks synchronously so graph appears settled immediately
-  for (let tick = 0; tick < 140; tick++) {
-    const alpha = Math.max(0.05, 1.0 - tick / 140);
-    stepPhysics(alpha);
-  }
-  // Cool down gently over a few frames and then stop moving completely
-  simAlpha = 0.15;
+  simAlpha = 1.0;
 }
 
 function stepPhysics(alphaOverride) {
   const alpha = alphaOverride !== undefined ? alphaOverride : simAlpha;
-  if (alpha <= 0.002 && !dragNode) return;
+  if (alpha <= 0.0001) return;
 
-  const w = canvas.width || 800;
-  const h = canvas.height || 390;
-  const isLarge = gNodes.length > 30;
-  const repulseStrength = isLarge ? 650 : 2200;
-  const targetDist = isLarge ? 68 : 115;
-  const gravityStrength = isLarge ? 0.012 : 0.006;
+  const w = canvas.width;
+  const h = canvas.height;
+  const count = gNodes.length;
+  const isLarge = count > 30;
 
-  // Repulsion between nodes
-  for (let i = 0; i < gNodes.length; i++) {
-    for (let j = i + 1; j < gNodes.length; j++) {
+  const repulseStrength = isLarge ? 550 : 1200;
+  const targetDist = isLarge ? 48 : 85;
+  const gravityStrength = isLarge ? 0.045 : 0.035;
+
+  for (let i = 0; i < count; i++) {
+    for (let j = i + 1; j < count; j++) {
       const a = gNodes[i];
       const b = gNodes[j];
       let dx = b.x - a.x;
       let dy = b.y - a.y;
       let distSq = dx * dx + dy * dy + 1.0;
-      if (isLarge && distSq > 18000) continue; // Local cutoff for large graph clarity
+      if (isLarge && distSq > 18000) continue;
       let dist = Math.sqrt(distSq);
       let force = (repulseStrength / distSq) * alpha;
       let fx = (dx / dist) * force;
@@ -1311,7 +1392,7 @@ function stepPhysics(alphaOverride) {
       b.vx += fx; b.vy += fy;
     }
   }
-  // Spring attraction along edges
+
   for (const e of gEdges) {
     let dx = e.target.x - e.source.x;
     let dy = e.target.y - e.source.y;
@@ -1322,7 +1403,7 @@ function stepPhysics(alphaOverride) {
     e.source.vx += fx; e.source.vy += fy;
     e.target.vx -= fx; e.target.vy -= fy;
   }
-  // Center gravity & velocity damping
+
   const padX = 55;
   const padY = 38;
   for (const n of gNodes) {
@@ -1351,8 +1432,8 @@ function drawGraph() {
     const x1 = e.source.x, y1 = e.source.y;
     const x2 = e.target.x, y2 = e.target.y;
     const isHighlighted = hoverNode && (e.source === hoverNode || e.target === hoverNode);
-    ctx.strokeStyle = isHighlighted ? "#38bdf8" : (isLarge ? "rgba(71, 85, 105, 0.55)" : "#334155");
-    ctx.lineWidth = isHighlighted ? 2.2 : (isLarge ? 1.1 : 1.5);
+    ctx.strokeStyle = isHighlighted ? "#2563eb" : (isLarge ? "rgba(148, 163, 184, 0.6)" : "#cbd5e1");
+    ctx.lineWidth = isHighlighted ? 2.0 : (isLarge ? 1.0 : 1.3);
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
@@ -1363,7 +1444,7 @@ function drawGraph() {
     const arrowDist = isLarge ? 11 : 16;
     const ax = x2 - arrowDist * Math.cos(angle);
     const ay = y2 - arrowDist * Math.sin(angle);
-    ctx.fillStyle = isHighlighted ? "#38bdf8" : "#64748b";
+    ctx.fillStyle = isHighlighted ? "#2563eb" : "#94a3b8";
     ctx.beginPath();
     ctx.moveTo(ax, ay);
     ctx.lineTo(ax - 6 * Math.cos(angle - Math.PI / 6), ay - 6 * Math.sin(angle - Math.PI / 6));
@@ -1371,12 +1452,12 @@ function drawGraph() {
     ctx.closePath();
     ctx.fill();
 
-    // Edge label (show always on subgraphs, or on hover in Full DB mode to prevent clutter)
+    // Edge label
     if (!isLarge || isHighlighted) {
       const mx = (x1 + x2) / 2;
       const my = (y1 + y2) / 2;
-      ctx.fillStyle = isHighlighted ? "#bae6fd" : "#94a3b8";
-      ctx.font = isHighlighted ? "bold 10px -apple-system, sans-serif" : "10px -apple-system, sans-serif";
+      ctx.fillStyle = isHighlighted ? "#1e40af" : "#64748b";
+      ctx.font = isHighlighted ? "600 10px -apple-system, sans-serif" : "10px -apple-system, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(e.type, mx, my - 4);
     }
@@ -1384,17 +1465,15 @@ function drawGraph() {
 
   // Draw nodes
   for (const n of gNodes) {
-    const r = n.isSeed ? 15 : (isLarge ? 8 : 12);
-    const color = TYPE_COLORS[n.type] || "#94a3b8";
+    const r = n.isSeed ? 14 : (isLarge ? 8 : 11);
+    const color = TYPE_COLORS[n.type] || "#64748b";
 
     if (n.isSeed) {
       ctx.save();
       ctx.beginPath();
-      ctx.arc(n.x, n.y, r + 5, 0, 2 * Math.PI);
-      ctx.strokeStyle = "#facc15";
+      ctx.arc(n.x, n.y, r + 4, 0, 2 * Math.PI);
+      ctx.strokeStyle = "#d97706";
       ctx.lineWidth = 2.5;
-      ctx.shadowColor = "#facc15";
-      ctx.shadowBlur = 10;
       ctx.stroke();
       ctx.restore();
     }
@@ -1403,13 +1482,13 @@ function drawGraph() {
     ctx.arc(n.x, n.y, r, 0, 2 * Math.PI);
     ctx.fillStyle = color;
     ctx.fill();
-    ctx.strokeStyle = n === hoverNode ? "#ffffff" : "#0f172a";
-    ctx.lineWidth = n === hoverNode ? 2.5 : 1.8;
+    ctx.strokeStyle = n === hoverNode ? "#0f172a" : "#ffffff";
+    ctx.lineWidth = n === hoverNode ? 2.5 : 2.0;
     ctx.stroke();
 
     // Node name
-    ctx.fillStyle = n === hoverNode ? "#ffffff" : "#f8fafc";
-    ctx.font = (n.isSeed || n === hoverNode) ? "bold 11px -apple-system, sans-serif" : (isLarge ? "9.5px -apple-system, sans-serif" : "11px -apple-system, sans-serif");
+    ctx.fillStyle = n === hoverNode ? "#0f172a" : "#1e293b";
+    ctx.font = (n.isSeed || n === hoverNode) ? "600 11px -apple-system, sans-serif" : (isLarge ? "9.5px -apple-system, sans-serif" : "10.5px -apple-system, sans-serif");
     ctx.textAlign = "center";
     const maxLen = isLarge && n !== hoverNode ? 18 : 26;
     const label = n.name.length > maxLen ? n.name.slice(0, maxLen - 2) + "…" : n.name;
@@ -1465,7 +1544,7 @@ function showNodeInspector(n) {
     .map(([k, v]) => `<code>${k}</code>: ${JSON.stringify(v)}`)
     .join(" • ");
   document.getElementById("nodeInspector").innerHTML = `
-    <strong>[${n.type}] ${n.name}</strong> ${n.isSeed ? '<span style="color:#facc15;">★ Seed Anchor</span>' : ''}<br>
+    <strong>[${n.type}] ${n.name}</strong> ${n.isSeed ? '<span style="color:#d97706; font-weight:600;">(Seed Anchor)</span>' : ''}<br>
     <span style="color:var(--muted);">${propEntries || 'key: ' + n.key}</span>
   `;
 }
@@ -1485,7 +1564,6 @@ async function loadModelMetrics() {
     document.getElementById("mlDatasetInfo").textContent = `${m.dataset_size} / ${m.vocabulary_size}`;
     if (m.model_name) document.getElementById("mlModelName").textContent = m.model_name;
 
-    // Per-class metrics table
     const perClass = overall.per_class || {};
     const perClassBody = document.getElementById("mlPerClassBody");
     perClassBody.innerHTML = "";
@@ -1501,14 +1579,13 @@ async function loadModelMetrics() {
       perClassBody.appendChild(tr);
     });
 
-    // 6x6 Confusion Matrix
     const matrix = overall.confusion_matrix || [];
     const classes = overall.classes || [];
     const confBody = document.getElementById("mlConfusionBody");
     confBody.innerHTML = "";
     if (classes.length > 0 && matrix.length > 0) {
       const headerTr = document.createElement("tr");
-      headerTr.innerHTML = `<th>True \\ Pred</th>` + classes.map(c => `<th style="font-size:0.68rem;">${c.slice(0,4)}</th>`).join("");
+      headerTr.innerHTML = `<th>True \ Pred</th>` + classes.map(c => `<th style="font-size:0.68rem;">${c.slice(0,4)}</th>`).join("");
       confBody.appendChild(headerTr);
 
       matrix.forEach((row, rIdx) => {
@@ -1516,7 +1593,7 @@ async function loadModelMetrics() {
         let cells = `<td style="font-size:0.7rem; font-weight:700;">${classes[rIdx]}</td>`;
         row.forEach((cnt, cIdx) => {
           const isDiag = rIdx === cIdx;
-          const bg = isDiag ? "background:rgba(34,197,94,0.18); font-weight:700; color:#4ade80;" : (cnt > 0 ? "background:rgba(239,68,68,0.18); color:#f87171;" : "color:var(--muted);");
+          const bg = isDiag ? "background:#f0fdf4; font-weight:700; color:#15803d;" : (cnt > 0 ? "background:#fef2f2; color:#b91c1c;" : "color:var(--muted);");
           cells += `<td style="text-align:center; ${bg}">${cnt}</td>`;
         });
         rowTr.innerHTML = cells;
@@ -1531,14 +1608,14 @@ async function loadModelMetrics() {
 async function retrainModel() {
   const btn = document.getElementById("btnRetrainModel");
   const origText = btn.textContent;
-  btn.textContent = "⏳ Training 5 Folds...";
+  btn.textContent = "Training 5 Folds...";
   btn.disabled = true;
   try {
     const res = await fetch("/model/train", { method: "POST" });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Training failed");
     await loadModelMetrics();
-    alert("✅ Model trained successfully! 5-Fold CV Accuracy: " + ((data.cross_validation_5fold.mean_accuracy || 0) * 100).toFixed(1) + "%");
+    alert("Model trained successfully! 5-Fold CV Accuracy: " + ((data.cross_validation_5fold.mean_accuracy || 0) * 100).toFixed(1) + "%");
   } catch (e) {
     alert("Training error: " + e.message);
   } finally {
@@ -1547,11 +1624,9 @@ async function retrainModel() {
   }
 }
 
-// Initialize on load
 window.addEventListener("DOMContentLoaded", () => {
   loadPreset("whisperx");
   loadFullGraph();
-  loadPending();
   loadModelMetrics();
   requestAnimationFrame(drawGraph);
 });
