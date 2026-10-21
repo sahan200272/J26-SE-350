@@ -8,9 +8,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from agentic_core.tests.schema_compliance.frozen_setup import FROZEN_SETUP_HASHES
+from agentic_core.tests.schema_compliance.test_case_dataset import FROZEN_FINGERPRINT as SCHEMA_CASES_FINGERPRINT
 from scripts.panel_dashboard.status import Objective, Reading
 
 REQUIRED_VECTORS = 50
+REQUIRED_SCHEMA_CASES = 200
 
 
 def _date(text: Any) -> str:
@@ -124,13 +127,89 @@ def read_vram(data: dict[str, Any]) -> Reading:
     )
 
 
+def _pct(value: Any) -> str:
+    return f"{100.0 * float(value):.1f}%"
+
+
+def _schema_run_problem(data: dict[str, Any], mode: str) -> str | None:
+    """Why a schema-compliance result file does not count, or None if it does."""
+    total = data["summary"]["total"]
+    records = data["records"]
+    if not isinstance(records, list):
+        raise TypeError("records must be a list")
+    if data.get("mode") != mode:
+        return f"This file is the {data.get('mode')} run, not the {mode} run."
+    if data.get("official") is not True:
+        return "Not an official run (frozen cases or frozen setup not used)."
+    if data.get("dataset_fingerprint") != SCHEMA_CASES_FINGERPRINT:
+        return "Dataset fingerprint does not match the frozen 200 cases."
+    if data.get("setup_frozen") is not True or data.get("setup_hashes") != FROZEN_SETUP_HASHES:
+        return "Prompt, schema or LLM config differ from the frozen setup."
+    if (data.get("all_run") is not True or data["cases"] != REQUIRED_SCHEMA_CASES
+            or total["cases_run"] != REQUIRED_SCHEMA_CASES or len(records) != REQUIRED_SCHEMA_CASES):
+        return f"{total['cases_run']} of {data['cases']} cases ran; the target needs all {REQUIRED_SCHEMA_CASES}."
+    if total["infra_errors"] != 0:
+        return f"{total['infra_errors']} case(s) hit an Ollama error."
+    if total.get("extractor_disagrees", 0) != 0:
+        return "The extractor and the check disagree on some cases."
+    counted = sum(1 for r in records if r.get("status") == "ran" and r.get("compliant") is True)
+    if counted != total["compliant"] or abs(float(total["rate"]) - counted / REQUIRED_SCHEMA_CASES) > 1e-9:
+        return "Summary numbers and per-case records disagree."
+    return None
+
+
+def read_schema_compliance(data: dict[str, Any]) -> Reading:
+    total = data["summary"]["total"]
+    rate = float(total["rate"])
+    machine = data["machine"]
+    placement = data["model_placement_after_first_case"]["placement"]
+    fingerprint = str(data["dataset_fingerprint"])
+    errors = total.get("error_type_counts") or {}
+    limits = _note(data) + (
+        f"JSON syntax valid {total['json_valid']} of {total['cases_run']}; "
+        f"cut off at {data['llm_options']['num_predict']} tokens: {total['cut_off']}.",
+        "Failures by error type: " + (", ".join(f"{k} {v}" for k, v in sorted(errors.items())) or "none") + ".",
+        f"Dataset fingerprint {fingerprint[:8]}...{fingerprint[-6:]} (frozen before the runner).",
+    )
+    return Reading(
+        value=100.0 * rate,
+        shown=f"{_pct(rate)} ({total['compliant']} of {total['cases_run']} first answers valid; "
+              f"95% CI {_pct(total['ci95_low'])} to {_pct(total['ci95_high'])})",
+        machine=f"{machine['gpu']}; {data['model']} at {placement}; {machine['os']}",
+        date=_date(data["measured_at"]),
+        not_valid=_schema_run_problem(data, "grammar"),
+        file_limits=limits,
+    )
+
+
+def describe_schema_baseline(data: dict[str, Any]) -> str:
+    problem = _schema_run_problem(data, "baseline")
+    if problem is not None:
+        return f"Baseline file not shown: {problem}"
+    total = data["summary"]["total"]
+    return (f"Comparison only, no target: grammar OFF on the same 200 cases gave "
+            f"{_pct(total['rate'])} ({total['compliant']} of {total['cases_run']}; "
+            f"95% CI {_pct(total['ci95_low'])} to {_pct(total['ci95_high'])}; "
+            f"JSON syntax valid {total['json_valid']} of {total['cases_run']}).")
+
+
 OBJECTIVES: list[Objective] = [
     Objective(
         key="schema_compliance",
-        name="JSON schema compliance",
+        name="JSON schema compliance (NFR-04)",
         op=">=", target=98, unit="%",
-        evidence=None, extract=None,
-        limits=("Planned: 200 prompts on the GPU machine (another story).",),
+        evidence="schema_compliance_official.json", extract=read_schema_compliance,
+        limits=(
+            "Valid = the first answer parses as JSON and passes DraftPlan; prefilter off; no retry.",
+            "Measures valid structure only, not correct content (Intent F1 measures that).",
+            "The JSON-RPC 2.0 envelope is built by the FastMCP client, not the LLM; not part of this number.",
+            "The HH:MM time rule is checked in Python only, not by the grammar.",
+            "Synthetic cases prepared for this test and reviewed by the author; not real meetings.",
+            "200 cases is a small sample; see the 95% confidence interval.",
+            "RTX 2050 4 GB with the model split between CPU and GPU. Validity should not depend on "
+            "speed, but CPU and GPU maths can differ slightly, so another machine may give other answers.",
+        ),
+        comparisons=(("schema_compliance_baseline.json", describe_schema_baseline),),
     ),
     Objective(
         key="intent_f1",

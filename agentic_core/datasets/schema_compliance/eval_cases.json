@@ -1,0 +1,3449 @@
+{
+  "set": "eval",
+  "note": "200 synthetic cases for the NFR-04 schema-compliance test. Frozen before any evaluation run. Do not edit and do not tune on these cases; use dev_cases.json for that.",
+  "cases": [
+    {
+      "id": "SC-001",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-001\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we have the backlog grooming on Tuesday at 11 am?\n[00:00:10] Speaker 2: Tuesday 11 am is good.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Backlog grooming",
+            "day": "tuesday",
+            "time": "11:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-002",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-002\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's set the architecture review for Thursday at 2 pm.\n[00:00:09] Speaker 2: Okay, Thursday 2 pm.\n[00:00:13] Speaker 1: I will send the diagram before that.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Architecture review",
+            "day": "thursday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-003",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-003\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Shanika, are you free tomorrow at 10:45 for a quick sync?\n[00:00:10] Speaker 2: Yes, 10:45 tomorrow is fine.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Quick sync",
+            "day": "tomorrow",
+            "time": "10:45",
+            "attendees": [
+              "Shanika"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-004",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-004\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The release meeting is Friday at half past nine in the morning.\n[00:00:10] Speaker 2: Got it, Friday 9:30.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Release meeting",
+            "day": "friday",
+            "time": "09:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-005",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-005\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the one to one on Monday at 4 pm.\n[00:00:10] Speaker 2: Monday at four in the afternoon, sure.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "One to one",
+            "day": "monday",
+            "time": "16:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-006",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-006\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we meet with Tharindu today at 3 pm about the invoices?\n[00:00:10] Speaker 2: Today at 3 pm works.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Invoices meeting",
+            "day": "today",
+            "time": "15:00",
+            "attendees": [
+              "Tharindu"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-007",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-007\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The vendor call is on Wednesday at 8 am, sorry for the early start.\n[00:00:11] Speaker 2: No problem, Wednesday 8 am.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Vendor call",
+            "day": "wednesday",
+            "time": "08:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-008",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-008\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please put the security training on Friday at 1 pm.\n[00:00:09] Speaker 2: Friday 1 pm, done.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Security training",
+            "day": "friday",
+            "time": "13:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-009",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-009\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We agreed the code freeze check is Monday at 17:00.\n[00:00:09] Speaker 2: Yes, five in the evening on Monday.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Code freeze check",
+            "day": "monday",
+            "time": "17:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-010",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-010\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's have a call with Priya and Ahmed on Tuesday at 10 am.\n[00:00:11] Speaker 2: I will tell them. Tuesday 10 am.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Call with Priya and Ahmed",
+            "day": "tuesday",
+            "time": "10:00",
+            "attendees": [
+              "Priya",
+              "Ahmed"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-011",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-011\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we do the planning session on Monday at a quarter past ten in the morning?\n[00:00:12] Speaker 2: Monday 10:15, fine with me.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Planning session",
+            "day": "monday",
+            "time": "10:15",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-012",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-012\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The UX test with users is on Thursday at 11:30 am.\n[00:00:10] Speaker 2: Thursday 11:30, I will prepare the room.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "UX test with users",
+            "day": "thursday",
+            "time": "11:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-013",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-013\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Kamal wants a demo of the app tomorrow at 9 am.\n[00:00:10] Speaker 2: Tomorrow 9 am is fine. I will be ready.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "App demo",
+            "day": "tomorrow",
+            "time": "09:00",
+            "attendees": [
+              "Kamal"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-014",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-014\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's book the data migration dry run for Saturday at 7 am.\n[00:00:10] Speaker 2: Early, but fine. Saturday 7 am.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Data migration dry run",
+            "day": "saturday",
+            "time": "07:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-015",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-015\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Is the team lunch still on Friday at 12:30?\n[00:00:09] Speaker 2: Yes, Friday half past twelve.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Team lunch",
+            "day": "friday",
+            "time": "12:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-016",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-016\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The board update is on Wednesday at 3:45 pm.\n[00:00:09] Speaker 2: Okay, Wednesday quarter to four.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Board update",
+            "day": "wednesday",
+            "time": "15:45",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-017",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-017\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can you and Lahiru pair on the parser on Wednesday at 2:30 pm?\n[00:00:11] Speaker 2: Sure, Lahiru and I will do Wednesday 2:30 pm.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Pair on the parser",
+            "day": "wednesday",
+            "time": "14:30",
+            "attendees": [
+              "Lahiru"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-018",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-018\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We need a short call today at 6 pm to check the build.\n[00:00:11] Speaker 2: Today 6 pm, okay.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Build check call",
+            "day": "today",
+            "time": "18:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-019",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-019\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The interview with Maria is on Monday at 11 am.\n[00:00:09] Speaker 2: Monday 11 am, I will send her the link.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Interview with Maria",
+            "day": "monday",
+            "time": "11:00",
+            "attendees": [
+              "Maria"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-020",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-020\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we review the contract on Tuesday at 9:30 am?\n[00:00:09] Speaker 2: Tuesday 9:30 works.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Contract review",
+            "day": "tuesday",
+            "time": "09:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-021",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-021\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the server patching window on Sunday at 10 pm.\n[00:00:10] Speaker 2: Sunday 10 pm, I will be online.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Server patching window",
+            "day": "sunday",
+            "time": "22:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-022",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-022\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The parents meeting at school is tomorrow at 10 am.\n[00:00:09] Speaker 2: Tomorrow at 10, I will come with you.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Parents meeting at school",
+            "day": "tomorrow",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-023",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-023\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we meet Dinesh on Friday at 4:15 pm about the budget?\n[00:00:10] Speaker 2: Friday 4:15 pm is fine.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Budget meeting",
+            "day": "friday",
+            "time": "16:15",
+            "attendees": [
+              "Dinesh"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-024",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-024\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The workshop on testing starts Thursday at 1:30 pm.\n[00:00:09] Speaker 2: Thursday 1:30 pm, thanks.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Testing workshop",
+            "day": "thursday",
+            "time": "13:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-025",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-025\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's check in on the hiring plan today at 5 pm.\n[00:00:10] Speaker 2: Today at five in the evening, okay.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Hiring plan check-in",
+            "day": "today",
+            "time": "17:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-026",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-026\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The demo for the investors is Monday at 10:30 am.\n[00:00:09] Speaker 2: Monday 10:30 am. We should be ready.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Investor demo",
+            "day": "monday",
+            "time": "10:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-027",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-027\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we move the standup to Tuesday at 8:45 am?\n[00:00:09] Speaker 2: Yes, Tuesday 8:45 am.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Standup",
+            "day": "tuesday",
+            "time": "08:45",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-028",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-028\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Ishara asked for a design walkthrough on Wednesday at 3 pm.\n[00:00:10] Speaker 2: Wednesday 3 pm is free. Let's do it.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Design walkthrough",
+            "day": "wednesday",
+            "time": "15:00",
+            "attendees": [
+              "Ishara"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-029",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-029\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The doctor appointment is Saturday at 9:20 am.\n[00:00:09] Speaker 2: Okay, Saturday 9:20 in the morning.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Doctor appointment",
+            "day": "saturday",
+            "time": "09:20",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-030",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-030\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's run the load test tomorrow at 2 pm.\n[00:00:09] Speaker 2: Tomorrow 2 pm, I will reserve the test servers.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Load test",
+            "day": "tomorrow",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-031",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-031\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: One idea: we could let users export their notes as PDF.\n[00:00:10] Speaker 2: Good one, put it in the ideas folder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Export notes as PDF",
+            "body": "Let users export their notes as PDF.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-032",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-032\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to use PostgreSQL for the new service.\n[00:00:09] Speaker 2: Yes, write that in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Use PostgreSQL",
+            "body": "Decided to use PostgreSQL for the new service.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-033",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-033\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remind me to renew the SSL certificate.\n[00:00:08] Speaker 2: Okay, I will note it.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Renew SSL certificate",
+            "body": "Renew the SSL certificate.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-034",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-034\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if the app sent a weekly summary email?\n[00:00:09] Speaker 2: Nice idea. Save it for later.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Weekly summary email",
+            "body": "The app could send a weekly summary email.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-035",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-035\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The decision is final: no new features before the release.\n[00:00:09] Speaker 2: Agreed. Note that in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Feature freeze",
+            "body": "No new features before the release.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-036",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-036\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please note that the office wifi password changed.\n[00:00:09] Speaker 2: Okay, noted.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Wifi password changed",
+            "body": "The office wifi password changed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-037",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-037\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We could add voice search to the mobile app.\n[00:00:09] Speaker 2: Interesting. Write that down as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Voice search",
+            "body": "Add voice search to the mobile app.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-038",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-038\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We agreed to move the support hours to 8 till 5.\n[00:00:10] Speaker 2: Yes, keep that in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "New support hours",
+            "body": "Support hours move to 8 till 5.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-039",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-039\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Don't forget to order new name badges for the team.\n[00:00:09] Speaker 2: Right, I will save a reminder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Order name badges",
+            "body": "Order new name badges for the team.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-040",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-040\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Idea for the website: a short customer story on the home page.\n[00:00:10] Speaker 2: I like it. Keep it in ideas.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Customer story on home page",
+            "body": "Add a short customer story to the website home page.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-041",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-041\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided that code reviews need two approvals from now on.\n[00:00:10] Speaker 2: Okay, add it to the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Two approvals for reviews",
+            "body": "Code reviews need two approvals from now on.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-042",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-042\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remember that the parking pass expires next month.\n[00:00:09] Speaker 2: Thanks, I will write it down.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Parking pass expires",
+            "body": "The parking pass expires next month.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-043",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-043\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if we used a queue for the email sending?\n[00:00:09] Speaker 2: Could work. Let's note it as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Queue for email sending",
+            "body": "Use a queue for sending emails.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-044",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-044\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The team agreed to stop using the old chat tool.\n[00:00:09] Speaker 2: Yes, that goes in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Stop old chat tool",
+            "body": "The team agreed to stop using the old chat tool.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-045",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-045\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Make sure we back up the laptop before the update.\n[00:00:09] Speaker 2: Good point, I will keep a reminder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Back up laptop",
+            "body": "Back up the laptop before the update.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-046",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-046\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Idea: a family photo book for grandmother's birthday.\n[00:00:09] Speaker 2: Lovely. Save that idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Photo book for grandmother",
+            "body": "Make a family photo book for grandmother's birthday.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-047",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-047\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided the mobile app will support Sinhala and Tamil.\n[00:00:09] Speaker 2: Yes, write it in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Sinhala and Tamil support",
+            "body": "The mobile app will support Sinhala and Tamil.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-048",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-048\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Note this down: the API key for the maps service is in the vault.\n[00:00:11] Speaker 2: Okay, saved.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Maps API key location",
+            "body": "The API key for the maps service is in the vault.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-049",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-049\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We could reward the top bug finders each month.\n[00:00:09] Speaker 2: Nice, keep that as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Reward bug finders",
+            "body": "Reward the top bug finders each month.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-050",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: sc-050\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please remind the team to fill in the timesheets.\n[00:00:09] Speaker 2: Okay, I will note that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Timesheets reminder",
+            "body": "Remind the team to fill in the timesheets.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-051",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-051\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the API review on Wednesday at 10 am.\n[00:00:09] Speaker 2: Fine. And remember the staging database is full, we must clean it.\n[00:00:16] Speaker 1: Yes, save that as a reminder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Clean staging database",
+            "body": "The staging database is full and must be cleaned.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "API review",
+            "day": "wednesday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-052",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-052\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Chamari, can we meet tomorrow at 3 pm about the survey?\n[00:00:10] Speaker 2: Sure. Also, an idea: we could add a progress bar to the survey.\n[00:00:18] Speaker 1: Nice, put that in ideas.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Survey progress bar",
+            "body": "Add a progress bar to the survey.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Survey meeting",
+            "day": "tomorrow",
+            "time": "15:00",
+            "attendees": [
+              "Chamari"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-053",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-053\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to ship version two without the chat feature.\n[00:00:09] Speaker 2: Right. Write that in the meeting notes.\n[00:00:14] Speaker 1: And the release call is Friday at 11 am.\n[00:00:20] Speaker 2: Friday 11 am, okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Ship v2 without chat",
+            "body": "Version two ships without the chat feature.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Release call",
+            "day": "friday",
+            "time": "11:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-054",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-054\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we review the slides on Monday at 9 am?\n[00:00:09] Speaker 2: Yes. Also don't forget to print the handouts.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Print handouts",
+            "body": "Print the handouts.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Slides review",
+            "day": "monday",
+            "time": "09:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-055",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-055\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The supplier meeting with Ruwan is Tuesday at 2:30 pm.\n[00:00:09] Speaker 2: Okay. And note that the supplier raised prices by ten percent.\n[00:00:16] Speaker 1: Yes, put it in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Supplier price rise",
+            "body": "The supplier raised prices by ten percent.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Supplier meeting",
+            "day": "tuesday",
+            "time": "14:30",
+            "attendees": [
+              "Ruwan"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-056",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-056\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if we gave new users a guided tour?\n[00:00:09] Speaker 2: Good idea, save it.\n[00:00:13] Speaker 1: Let's discuss it properly on Thursday at 4 pm.\n[00:00:19] Speaker 2: Thursday 4 pm works.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Guided tour for new users",
+            "body": "Give new users a guided tour.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Guided tour discussion",
+            "day": "thursday",
+            "time": "16:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-057",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-057\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Today at 5 pm we need a quick call on the outage.\n[00:00:10] Speaker 2: Okay. And remind me to write the incident report.\n[00:00:16] Speaker 1: I will note it.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Write incident report",
+            "body": "Write the incident report for the outage.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Outage call",
+            "day": "today",
+            "time": "17:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-058",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-058\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Hiran and Malsha should join the retro on Friday at 3:30 pm.\n[00:00:10] Speaker 2: I will invite them. Also we decided retros will be every two weeks.\n[00:00:18] Speaker 1: Good, put that decision in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Retros every two weeks",
+            "body": "Retros will be held every two weeks.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Retro",
+            "day": "friday",
+            "time": "15:30",
+            "attendees": [
+              "Hiran",
+              "Malsha"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-059",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-059\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please book the training room for Tuesday at 10 am.\n[00:00:09] Speaker 2: Done. And idea: we could record the training for new staff.\n[00:00:16] Speaker 1: Yes, keep that as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Record the training",
+            "body": "Record the training for new staff.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Training",
+            "day": "tuesday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-060",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-060\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Note that the client wants weekly reports from now on.\n[00:00:09] Speaker 2: Okay. And the first report review is Monday at 2 pm.\n[00:00:16] Speaker 1: Monday 2 pm, fine.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Weekly reports for client",
+            "body": "The client wants weekly reports from now on.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Report review",
+            "day": "monday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-061",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-061\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The plumber is coming tomorrow at 8 am.\n[00:00:09] Speaker 2: Okay. Remember to move the boxes from under the sink.\n[00:00:15] Speaker 1: Yes, I will note that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Move boxes from under the sink",
+            "body": "Move the boxes from under the sink before the plumber comes.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Plumber visit",
+            "day": "tomorrow",
+            "time": "08:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-062",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-062\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's meet Sunil on Friday at 10:30 am about the contract.\n[00:00:10] Speaker 2: Okay. And we decided to ask for a two year contract, not one.\n[00:00:18] Speaker 1: Right, add that to the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Two year contract",
+            "body": "We will ask for a two year contract, not one.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Contract meeting",
+            "day": "friday",
+            "time": "10:30",
+            "attendees": [
+              "Sunil"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-063",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-063\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We could build a small bot that answers HR questions.\n[00:00:09] Speaker 2: Interesting, save that idea.\n[00:00:13] Speaker 1: And HR wants to meet us on Wednesday at 11 am.\n[00:00:20] Speaker 2: Wednesday 11 am, fine.",
+      "expected": {
+        "notes": [
+          {
+            "title": "HR question bot",
+            "body": "Build a small bot that answers HR questions.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "HR meeting",
+            "day": "wednesday",
+            "time": "11:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-064",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-064\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The penetration test results meeting is Thursday at 9:30 am.\n[00:00:09] Speaker 2: Okay. Please remember to rotate the admin passwords after it.\n[00:00:15] Speaker 1: Noted.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Rotate admin passwords",
+            "body": "Rotate the admin passwords after the penetration test.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Pen test results meeting",
+            "day": "thursday",
+            "time": "09:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-065",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-065\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Mother's checkup is on Saturday at 10 am.\n[00:00:09] Speaker 2: Okay, I will drive her. Don't forget to bring her old reports.\n[00:00:16] Speaker 1: I will keep a reminder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Bring old medical reports",
+            "body": "Bring mother's old reports to the checkup.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Mother's checkup",
+            "day": "saturday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-066",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-066\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We agreed the mobile team owns the push notifications.\n[00:00:09] Speaker 2: Yes, note that in the meeting notes.\n[00:00:14] Speaker 1: And let's hand it over on Tuesday at 3 pm with Asanka.\n[00:00:21] Speaker 2: Tuesday 3 pm with Asanka, okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Mobile team owns push",
+            "body": "The mobile team owns push notifications.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Push notifications handover",
+            "day": "tuesday",
+            "time": "15:00",
+            "attendees": [
+              "Asanka"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-067",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-067\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we do the sprint demo today at 4:30 pm?\n[00:00:09] Speaker 2: Yes. And remember to update the release notes before that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Update release notes",
+            "body": "Update the release notes before the sprint demo.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Sprint demo",
+            "day": "today",
+            "time": "16:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-068",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-068\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: An idea: let customers book support calls online.\n[00:00:09] Speaker 2: Good. Save that.\n[00:00:13] Speaker 1: Let's present it to Nadeesha tomorrow at 11:15 am.\n[00:00:19] Speaker 2: Tomorrow 11:15 am, I will tell her.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Online support booking",
+            "body": "Let customers book support calls online.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Present support booking idea",
+            "day": "tomorrow",
+            "time": "11:15",
+            "attendees": [
+              "Nadeesha"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-069",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-069\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The accessibility audit is on Monday at 1 pm.\n[00:00:09] Speaker 2: Okay. We decided all new screens must pass it first.\n[00:00:15] Speaker 1: Yes, put that in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "New screens must pass audit",
+            "body": "All new screens must pass the accessibility audit first.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Accessibility audit",
+            "day": "monday",
+            "time": "13:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-070",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-070\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please remind me to send the visa documents.\n[00:00:09] Speaker 2: Okay. And the embassy appointment is Wednesday at 9 am, right?\n[00:00:16] Speaker 1: Yes, Wednesday 9 am.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Send visa documents",
+            "body": "Send the visa documents.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Embassy appointment",
+            "day": "wednesday",
+            "time": "09:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-071",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-071\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's have a coffee chat with the new intern on Monday at 10 am.\n[00:00:11] Speaker 2: Sure. Idea: we could give interns a buddy for the first month.\n[00:00:18] Speaker 1: Nice, keep that idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Buddy for interns",
+            "body": "Give interns a buddy for the first month.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Coffee chat with new intern",
+            "day": "monday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-072",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-072\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The car service is Monday at 8:30 am.\n[00:00:09] Speaker 2: Okay. Also remember the insurance renewal is due this month.\n[00:00:15] Speaker 1: Thanks, I will note it.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Insurance renewal",
+            "body": "The car insurance renewal is due this month.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Car service",
+            "day": "monday",
+            "time": "08:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-073",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-073\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to drop support for the old Android versions.\n[00:00:09] Speaker 2: Yes, in the meeting notes please.\n[00:00:14] Speaker 1: And let's tell support on Thursday at 2 pm.\n[00:00:20] Speaker 2: Thursday 2 pm, fine.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Drop old Android versions",
+            "body": "Support for old Android versions will be dropped.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Tell support about Android change",
+            "day": "thursday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-074",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-074\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can Vihanga join a debugging session tomorrow at 1:30 pm?\n[00:00:09] Speaker 2: Yes, he is free. And note that the bug only happens on Windows.\n[00:00:17] Speaker 1: Good, save that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Bug only on Windows",
+            "body": "The bug only happens on Windows.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Debugging session",
+            "day": "tomorrow",
+            "time": "13:30",
+            "attendees": [
+              "Vihanga"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-075",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-075\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if the dashboard showed costs per team?\n[00:00:09] Speaker 2: That is a good idea, write it down.\n[00:00:15] Speaker 1: And finance review is Friday at 9 am.\n[00:00:21] Speaker 2: Friday 9 am, okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Costs per team on dashboard",
+            "body": "Show costs per team on the dashboard.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Finance review",
+            "day": "friday",
+            "time": "09:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-076",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-076\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The office move planning is Tuesday at 11:30 am.\n[00:00:09] Speaker 2: Okay. Remember to label all the monitors before the move.\n[00:00:15] Speaker 1: Yes, I will note that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Label monitors",
+            "body": "Label all the monitors before the office move.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Office move planning",
+            "day": "tuesday",
+            "time": "11:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-077",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-077\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Kavindi wants to meet on Wednesday at 4 pm about her promotion.\n[00:00:10] Speaker 2: Okay, Wednesday 4 pm. We agreed promotions are reviewed twice a year.\n[00:00:17] Speaker 1: Right, put that in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Promotions twice a year",
+            "body": "Promotions are reviewed twice a year.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Promotion meeting",
+            "day": "wednesday",
+            "time": "16:00",
+            "attendees": [
+              "Kavindi"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-078",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-078\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Don't forget to cancel the old hosting plan.\n[00:00:09] Speaker 2: Okay. And the migration check is today at 6 pm.\n[00:00:15] Speaker 1: Yes, today 6 pm.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Cancel old hosting plan",
+            "body": "Cancel the old hosting plan.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Migration check",
+            "day": "today",
+            "time": "18:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-079",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-079\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's run a hackathon planning call on Thursday at 3 pm.\n[00:00:10] Speaker 2: Okay. Idea: the theme could be tools for farmers.\n[00:00:16] Speaker 1: Good, save it as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Hackathon theme",
+            "body": "The hackathon theme could be tools for farmers.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Hackathon planning call",
+            "day": "thursday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-080",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-080\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided the team works from home on Fridays.\n[00:00:09] Speaker 2: Yes, meeting notes.\n[00:00:13] Speaker 1: And the all-hands to announce it is tomorrow at 10 am.\n[00:00:20] Speaker 2: Tomorrow 10 am.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Work from home Fridays",
+            "body": "The team works from home on Fridays.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "All-hands",
+            "day": "tomorrow",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-081",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-081\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Design sync is Monday at 10 am, and the dev sync is Monday at 11 am.\n[00:00:12] Speaker 2: Okay, both on Monday.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Design sync",
+            "day": "monday",
+            "time": "10:00",
+            "attendees": []
+          },
+          {
+            "title": "Dev sync",
+            "day": "monday",
+            "time": "11:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-082",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-082\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we meet Ayesha on Tuesday at 9 am?\n[00:00:09] Speaker 2: Yes. And Bandara on Tuesday at 2 pm.\n[00:00:15] Speaker 1: Good, both booked.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Meeting with Ayesha",
+            "day": "tuesday",
+            "time": "09:00",
+            "attendees": [
+              "Ayesha"
+            ]
+          },
+          {
+            "title": "Meeting with Bandara",
+            "day": "tuesday",
+            "time": "14:00",
+            "attendees": [
+              "Bandara"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-083",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-083\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The kickoff is Wednesday at 10 am.\n[00:00:08] Speaker 2: And the follow-up?\n[00:00:12] Speaker 1: Follow-up is Friday at 3 pm.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Kickoff",
+            "day": "wednesday",
+            "time": "10:00",
+            "attendees": []
+          },
+          {
+            "title": "Kickoff follow-up",
+            "day": "friday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-084",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-084\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the code review today at 4 pm.\n[00:00:09] Speaker 2: And the deployment tomorrow at 7 am?\n[00:00:14] Speaker 1: Yes, tomorrow 7 am.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Code review",
+            "day": "today",
+            "time": "16:00",
+            "attendees": []
+          },
+          {
+            "title": "Deployment",
+            "day": "tomorrow",
+            "time": "07:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-085",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-085\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Dentist on Saturday at 9 am for me.\n[00:00:09] Speaker 2: And the kids' swimming lesson is Saturday at 4 pm.\n[00:00:15] Speaker 1: Okay, both on Saturday.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Dentist",
+            "day": "saturday",
+            "time": "09:00",
+            "attendees": []
+          },
+          {
+            "title": "Kids' swimming lesson",
+            "day": "saturday",
+            "time": "16:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-086",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-086\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Pradeep, the customer workshop is Tuesday at 1 pm.\n[00:00:09] Speaker 2: Okay. Then the internal debrief on Wednesday at 10 am.\n[00:00:15] Speaker 1: Yes, with Pradeep too.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Customer workshop",
+            "day": "tuesday",
+            "time": "13:00",
+            "attendees": [
+              "Pradeep"
+            ]
+          },
+          {
+            "title": "Internal debrief",
+            "day": "wednesday",
+            "time": "10:00",
+            "attendees": [
+              "Pradeep"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-087",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-087\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Monday at 9:30 am is the budget kickoff.\n[00:00:09] Speaker 2: And Thursday at 3 pm the budget sign-off.\n[00:00:15] Speaker 1: Okay.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Budget kickoff",
+            "day": "monday",
+            "time": "09:30",
+            "attendees": []
+          },
+          {
+            "title": "Budget sign-off",
+            "day": "thursday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-088",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-088\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Test day one is tomorrow at 8 am.\n[00:00:09] Speaker 2: And test day two is Wednesday at 8 am.\n[00:00:15] Speaker 1: Right, same time both days.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Test day one",
+            "day": "tomorrow",
+            "time": "08:00",
+            "attendees": []
+          },
+          {
+            "title": "Test day two",
+            "day": "wednesday",
+            "time": "08:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-089",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-089\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we have the security review on Friday at 10 am?\n[00:00:10] Speaker 2: Yes. And the privacy review right after, at 11:30 am.\n[00:00:16] Speaker 1: Friday 11:30 am, okay.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Security review",
+            "day": "friday",
+            "time": "10:00",
+            "attendees": []
+          },
+          {
+            "title": "Privacy review",
+            "day": "friday",
+            "time": "11:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-090",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-090\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Interview with Tom on Thursday at 10 am.\n[00:00:09] Speaker 2: And with Leena on Thursday at 3 pm.\n[00:00:15] Speaker 1: Okay, Thursday is interview day.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Interview with Tom",
+            "day": "thursday",
+            "time": "10:00",
+            "attendees": [
+              "Tom"
+            ]
+          },
+          {
+            "title": "Interview with Leena",
+            "day": "thursday",
+            "time": "15:00",
+            "attendees": [
+              "Leena"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-091",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-091\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the press briefing on Monday at 11 am.\n[00:00:09] Speaker 2: And the rehearsal?\n[00:00:13] Speaker 1: Rehearsal on Saturday at 2 pm.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Press briefing",
+            "day": "monday",
+            "time": "11:00",
+            "attendees": []
+          },
+          {
+            "title": "Press briefing rehearsal",
+            "day": "saturday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-092",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-092\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The sales call is today at 2 pm, and the partner call today at 5 pm.\n[00:00:12] Speaker 2: Busy afternoon. Okay.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Sales call",
+            "day": "today",
+            "time": "14:00",
+            "attendees": []
+          },
+          {
+            "title": "Partner call",
+            "day": "today",
+            "time": "17:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-093",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-093\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Family lunch is Sunday at 12:30.\n[00:00:08] Speaker 2: And the movie with the kids on Sunday at 6 pm.\n[00:00:15] Speaker 1: Okay, Sunday is full.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Family lunch",
+            "day": "sunday",
+            "time": "12:30",
+            "attendees": []
+          },
+          {
+            "title": "Movie with the kids",
+            "day": "sunday",
+            "time": "18:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-094",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-094\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Roshan, can you run the backup test on Tuesday at 10 pm?\n[00:00:10] Speaker 2: Yes. And the restore test on Wednesday at 10 pm.\n[00:00:16] Speaker 1: Great, thanks Roshan.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Backup test",
+            "day": "tuesday",
+            "time": "22:00",
+            "attendees": [
+              "Roshan"
+            ]
+          },
+          {
+            "title": "Restore test",
+            "day": "wednesday",
+            "time": "22:00",
+            "attendees": [
+              "Roshan"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-095",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-095\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The quarterly review is Thursday at 9 am.\n[00:00:09] Speaker 2: And the planning offsite is Friday at 8:30 am.\n[00:00:15] Speaker 1: Okay, both noted in the calendar.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Quarterly review",
+            "day": "thursday",
+            "time": "09:00",
+            "attendees": []
+          },
+          {
+            "title": "Planning offsite",
+            "day": "friday",
+            "time": "08:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-096",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-096\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to switch to monthly releases.\n[00:00:08] Speaker 2: Yes. And an idea: release notes as a short video.\n[00:00:14] Speaker 1: Okay, the decision goes in meeting notes and the video in ideas.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Monthly releases",
+            "body": "We switch to monthly releases.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Release notes video",
+            "body": "Release notes as a short video.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-097",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-097\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remind me to buy printer ink.\n[00:00:08] Speaker 2: And remember to call the bank about the card.\n[00:00:14] Speaker 1: Okay, two reminders.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Buy printer ink",
+            "body": "Buy printer ink.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Call the bank",
+            "body": "Call the bank about the card.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-098",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-098\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Idea one: a dark theme for the admin panel.\n[00:00:09] Speaker 2: Idea two: keyboard shortcuts for the editor.\n[00:00:14] Speaker 1: Both good, save them as ideas.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Dark theme for admin panel",
+            "body": "A dark theme for the admin panel.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Editor keyboard shortcuts",
+            "body": "Keyboard shortcuts for the editor.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-099",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-099\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We agreed the QA team signs off every release.\n[00:00:09] Speaker 2: And we agreed hotfixes skip the full test cycle.\n[00:00:15] Speaker 1: Yes, both go in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "QA signs off releases",
+            "body": "The QA team signs off every release.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Hotfixes skip full tests",
+            "body": "Hotfixes skip the full test cycle.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-100",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-100\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Don't forget the team photo needs a new background.\n[00:00:09] Speaker 2: Also we could print the photo for the office wall.\n[00:00:15] Speaker 1: Okay, a reminder and an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "New background for team photo",
+            "body": "The team photo needs a new background.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Print team photo",
+            "body": "Print the team photo for the office wall.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-101",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-101\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Note that the client prefers email over calls.\n[00:00:09] Speaker 2: And note their office closes at 4 pm on Fridays.\n[00:00:15] Speaker 1: Got it, both saved.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Client prefers email",
+            "body": "The client prefers email over calls.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Client office hours",
+            "body": "The client's office closes at 4 pm on Fridays.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-102",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-102\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if we offered a student discount?\n[00:00:08] Speaker 2: And what if we had a free trial for teachers?\n[00:00:14] Speaker 1: Both nice ideas, save them.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Student discount",
+            "body": "Offer a student discount.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Free trial for teachers",
+            "body": "A free trial for teachers.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-103",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-103\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided the logo stays blue.\n[00:00:08] Speaker 2: Okay. Remember to send the logo files to the printer.\n[00:00:14] Speaker 1: Yes, decision in the meeting notes and the reminder in inbox.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Logo stays blue",
+            "body": "The logo stays blue.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Send logo files to printer",
+            "body": "Send the logo files to the printer.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-104",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-104\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remember to water the plants while we are away.\n[00:00:09] Speaker 2: And remember to lock the back gate.\n[00:00:14] Speaker 1: Okay, noting both.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Water the plants",
+            "body": "Water the plants while we are away.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Lock the back gate",
+            "body": "Lock the back gate.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-105",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-105\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided the new office will have quiet rooms.\n[00:00:09] Speaker 2: Idea: we could also add a small library corner.\n[00:00:15] Speaker 1: Good, save both.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Quiet rooms in new office",
+            "body": "The new office will have quiet rooms.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Library corner",
+            "body": "Add a small library corner to the new office.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-106",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-106\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Sprint review is Friday at 2 pm.\n[00:00:08] Speaker 2: And sprint planning Monday at 10 am.\n[00:00:13] Speaker 1: Also we decided to cut the sprint to one week.\n[00:00:19] Speaker 2: Right, that goes in the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "One week sprints",
+            "body": "Sprints are cut to one week.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Sprint review",
+            "day": "friday",
+            "time": "14:00",
+            "attendees": []
+          },
+          {
+            "title": "Sprint planning",
+            "day": "monday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-107",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-107\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we meet Janaka tomorrow at 9 am?\n[00:00:09] Speaker 2: Yes. Remind me to bring the signed forms.\n[00:00:15] Speaker 1: And idea: we could move these forms online.\n[00:00:21] Speaker 2: Good, save that as an idea.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Bring signed forms",
+            "body": "Bring the signed forms.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Move forms online",
+            "body": "Move these forms online.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Meeting with Janaka",
+            "day": "tomorrow",
+            "time": "09:00",
+            "attendees": [
+              "Janaka"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-108",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-108\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remember to renew the trademark.\n[00:00:07] Speaker 2: And the lawyer meeting is Tuesday at 11 am.\n[00:00:13] Speaker 1: Also the board call is Wednesday at 4 pm.\n[00:00:19] Speaker 2: Okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Renew trademark",
+            "body": "Renew the trademark.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Lawyer meeting",
+            "day": "tuesday",
+            "time": "11:00",
+            "attendees": []
+          },
+          {
+            "title": "Board call",
+            "day": "wednesday",
+            "time": "16:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-109",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-109\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to hire two more testers.\n[00:00:08] Speaker 2: Okay. Idea: a referral bonus for testers.\n[00:00:13] Speaker 1: And the hiring call with HR is Monday at 3 pm.\n[00:00:20] Speaker 2: Monday 3 pm.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Hire two testers",
+            "body": "We will hire two more testers.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Referral bonus for testers",
+            "body": "A referral bonus for testers.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Hiring call with HR",
+            "day": "monday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-110",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-110\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The demo for Nimesh is Wednesday at 10:30 am.\n[00:00:09] Speaker 2: And the demo for Fathima is Wednesday at 2 pm.\n[00:00:15] Speaker 1: Remind me to reset the demo data between them.\n[00:00:21] Speaker 2: Noted.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Reset demo data",
+            "body": "Reset the demo data between the two demos.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Demo for Nimesh",
+            "day": "wednesday",
+            "time": "10:30",
+            "attendees": [
+              "Nimesh"
+            ]
+          },
+          {
+            "title": "Demo for Fathima",
+            "day": "wednesday",
+            "time": "14:00",
+            "attendees": [
+              "Fathima"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-111",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-111\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Idea: a mobile widget for quick notes.\n[00:00:08] Speaker 2: Idea: sync notes with the smartwatch.\n[00:00:13] Speaker 1: Let's present both on Thursday at 11 am.\n[00:00:19] Speaker 2: Thursday 11 am.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Quick notes widget",
+            "body": "A mobile widget for quick notes.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Smartwatch sync",
+            "body": "Sync notes with the smartwatch.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Present widget and watch ideas",
+            "day": "thursday",
+            "time": "11:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-112",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-112\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: School sports day is Friday at 8 am.\n[00:00:09] Speaker 2: And the parents' tea is Friday at 3 pm.\n[00:00:15] Speaker 1: Remember to pack the white shoes.\n[00:00:20] Speaker 2: I will note it.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Pack white shoes",
+            "body": "Pack the white shoes for sports day.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "School sports day",
+            "day": "friday",
+            "time": "08:00",
+            "attendees": []
+          },
+          {
+            "title": "Parents' tea",
+            "day": "friday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-113",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-113\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided the beta goes to fifty users first.\n[00:00:09] Speaker 2: Okay. Remember to prepare the feedback form.\n[00:00:14] Speaker 1: And the beta launch call is Monday at 9 am.\n[00:00:20] Speaker 2: Monday 9 am.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Beta to fifty users",
+            "body": "The beta goes to fifty users first.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Prepare feedback form",
+            "body": "Prepare the feedback form for the beta.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Beta launch call",
+            "day": "monday",
+            "time": "09:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-114",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-114\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Upul, the network upgrade is Saturday at 6 am.\n[00:00:09] Speaker 2: Yes. And the rollback test Saturday at 9 am.\n[00:00:15] Speaker 1: Note that the guest wifi will be down all morning.\n[00:00:21] Speaker 2: Okay, saved.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Guest wifi down",
+            "body": "The guest wifi will be down all morning during the upgrade.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Network upgrade",
+            "day": "saturday",
+            "time": "06:00",
+            "attendees": [
+              "Upul"
+            ]
+          },
+          {
+            "title": "Rollback test",
+            "day": "saturday",
+            "time": "09:00",
+            "attendees": [
+              "Upul"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-115",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-115\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's meet the marketing team today at 2 pm.\n[00:00:09] Speaker 2: Okay. Idea: a podcast about our product.\n[00:00:14] Speaker 1: And decided: no paid ads this quarter.\n[00:00:19] Speaker 2: Right, meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Product podcast",
+            "body": "A podcast about our product.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "No paid ads this quarter",
+            "body": "No paid ads this quarter.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Marketing meeting",
+            "day": "today",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-116",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-116\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The tax meeting with the accountant is Thursday at 10 am.\n[00:00:10] Speaker 2: Remember to bring the bank statements.\n[00:00:15] Speaker 1: And the receipts too.\n[00:00:19] Speaker 2: Okay, two reminders.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Bring bank statements",
+            "body": "Bring the bank statements to the tax meeting.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Bring receipts",
+            "body": "Bring the receipts to the tax meeting.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Tax meeting with accountant",
+            "day": "thursday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-117",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-117\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The performance review with Sachini is Friday at 11 am.\n[00:00:09] Speaker 2: And with Gayan on Friday at 2 pm.\n[00:00:15] Speaker 1: We agreed reviews use the new form.\n[00:00:20] Speaker 2: Yes, put that in meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Reviews use new form",
+            "body": "Performance reviews use the new form.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Review with Sachini",
+            "day": "friday",
+            "time": "11:00",
+            "attendees": [
+              "Sachini"
+            ]
+          },
+          {
+            "title": "Review with Gayan",
+            "day": "friday",
+            "time": "14:00",
+            "attendees": [
+              "Gayan"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-118",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-118\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remind me to pay the electricity bill.\n[00:00:08] Speaker 2: And the water bill.\n[00:00:12] Speaker 1: Also the gas delivery is tomorrow at 9 am.\n[00:00:18] Speaker 2: Okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Pay electricity bill",
+            "body": "Pay the electricity bill.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Pay water bill",
+            "body": "Pay the water bill.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Gas delivery",
+            "day": "tomorrow",
+            "time": "09:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-119",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-119\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The open day is Saturday at 10 am.\n[00:00:09] Speaker 2: Idea: a small coding game for visitors.\n[00:00:14] Speaker 1: And remember to order the banners.\n[00:00:19] Speaker 2: Noted both.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Coding game for visitors",
+            "body": "A small coding game for open day visitors.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Order banners",
+            "body": "Order the banners for the open day.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Open day",
+            "day": "saturday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-120",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-120\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Design review Tuesday at 10 am.\n[00:00:08] Speaker 2: Content review Tuesday at 2 pm.\n[00:00:13] Speaker 1: We decided the launch date is fixed.\n[00:00:18] Speaker 2: And idea: a launch countdown on the site.\n[00:00:24] Speaker 1: Okay, save all of that.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Launch date fixed",
+            "body": "The launch date is fixed.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Launch countdown",
+            "body": "A launch countdown on the site.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Design review",
+            "day": "tuesday",
+            "time": "10:00",
+            "attendees": []
+          },
+          {
+            "title": "Content review",
+            "day": "tuesday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-121",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-121\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Thilini and Mark, team sync tomorrow at 9:30 am.\n[00:00:09] Speaker 2: Okay. And the client demo Friday at 3 pm.\n[00:00:15] Speaker 1: Remember to update the demo script.\n[00:00:20] Speaker 2: And remember to test the projector.\n[00:00:25] Speaker 1: Yes, both reminders.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Update demo script",
+            "body": "Update the demo script.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Test the projector",
+            "body": "Test the projector.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Team sync",
+            "day": "tomorrow",
+            "time": "09:30",
+            "attendees": [
+              "Thilini",
+              "Mark"
+            ]
+          },
+          {
+            "title": "Client demo",
+            "day": "friday",
+            "time": "15:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-122",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-122\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to move to the cloud by March.\n[00:00:09] Speaker 2: We also decided to keep backups on site.\n[00:00:15] Speaker 1: Cloud planning call is Monday at 11 am.\n[00:00:21] Speaker 2: And the cost review Thursday at 2 pm.\n[00:00:27] Speaker 1: Okay, all saved.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Move to cloud by March",
+            "body": "We move to the cloud by March.",
+            "folder": "Meetings"
+          },
+          {
+            "title": "Keep backups on site",
+            "body": "We keep backups on site.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Cloud planning call",
+            "day": "monday",
+            "time": "11:00",
+            "attendees": []
+          },
+          {
+            "title": "Cost review",
+            "day": "thursday",
+            "time": "14:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-123",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-123\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Idea: a loyalty card for the cafe.\n[00:00:08] Speaker 2: Idea: a weekend breakfast menu.\n[00:00:12] Speaker 1: Remind me to ask the bank about a card machine.\n[00:00:18] Speaker 2: And let's meet the owner on Monday at 8 am.\n[00:00:24] Speaker 1: Monday 8 am, okay.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Cafe loyalty card",
+            "body": "A loyalty card for the cafe.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Weekend breakfast menu",
+            "body": "A weekend breakfast menu.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Ask bank about card machine",
+            "body": "Ask the bank about a card machine.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Meeting with cafe owner",
+            "day": "monday",
+            "time": "08:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-124",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-124\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The wedding venue visit is Saturday at 11 am.\n[00:00:09] Speaker 2: And the cake tasting Saturday at 3 pm.\n[00:00:15] Speaker 1: The photographer call is Sunday at 10 am.\n[00:00:21] Speaker 2: Remember to send the guest list to the venue.\n[00:00:27] Speaker 1: Okay, all noted.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Send guest list",
+            "body": "Send the guest list to the venue.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Wedding venue visit",
+            "day": "saturday",
+            "time": "11:00",
+            "attendees": []
+          },
+          {
+            "title": "Cake tasting",
+            "day": "saturday",
+            "time": "15:00",
+            "attendees": []
+          },
+          {
+            "title": "Photographer call",
+            "day": "sunday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-125",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: sc-125\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remember to call grandfather tomorrow.\n[00:00:07] Speaker 2: And the family dinner is Sunday at 7 pm.\n[00:00:13] Speaker 1: Idea: we could make a video of old photos for him.\n[00:00:20] Speaker 2: Lovely. And remember to buy flowers.\n[00:00:25] Speaker 1: Okay, saving everything.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Call grandfather",
+            "body": "Call grandfather tomorrow.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Video of old photos",
+            "body": "Make a video of old photos for grandfather.",
+            "folder": "Ideas"
+          },
+          {
+            "title": "Buy flowers",
+            "body": "Buy flowers.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Family dinner",
+            "day": "sunday",
+            "time": "19:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "SC-126",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-126\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Did you have lunch already?\n[00:00:07] Speaker 2: Yes, rice and curry from the canteen.\n[00:00:12] Speaker 1: Was it good?\n[00:00:16] Speaker 2: Too spicy for me today.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-127",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-127\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The traffic was terrible this morning.\n[00:00:08] Speaker 2: Same here, almost an hour from Nugegoda.\n[00:00:13] Speaker 1: The rain makes it worse.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-128",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-128\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: How is your new puppy?\n[00:00:07] Speaker 2: Very naughty. He chewed my shoes.\n[00:00:12] Speaker 1: Ha, they all do that.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-129",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-129\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Nice shirt, is it new?\n[00:00:07] Speaker 2: Yes, a gift from my sister.\n[00:00:12] Speaker 1: The colour suits you.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-130",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-130\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: It's so hot in this room.\n[00:00:08] Speaker 2: The air conditioner is broken again.\n[00:00:13] Speaker 1: At least there is a fan.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-131",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-131\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Have you tried the new bakery near the station?\n[00:00:09] Speaker 2: Yes, their fish buns are great.\n[00:00:14] Speaker 1: I like the tea there too.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-132",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-132\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: My son started school this year.\n[00:00:08] Speaker 2: Oh nice, does he like it?\n[00:00:13] Speaker 1: He loves his teacher.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-133",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-133\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What music do you listen to while coding?\n[00:00:09] Speaker 2: Mostly lo-fi, sometimes old Sinhala songs.\n[00:00:14] Speaker 1: Same, lo-fi helps me focus.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-134",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-134\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The view from this floor is amazing.\n[00:00:08] Speaker 2: You can see the sea on a clear day.\n[00:00:14] Speaker 1: Lucky us.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-135",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-135\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I finally finished that book you gave me.\n[00:00:09] Speaker 2: What did you think?\n[00:00:13] Speaker 1: The ending surprised me.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-136",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-136\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Is your phone new?\n[00:00:07] Speaker 2: No, I just changed the cover.\n[00:00:12] Speaker 1: Looks like new.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-137",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-137\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: How was the wedding last weekend?\n[00:00:08] Speaker 2: Beautiful, but very long.\n[00:00:12] Speaker 1: They always are.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-138",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-138\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Do you play any sport?\n[00:00:07] Speaker 2: Badminton, but not much lately.\n[00:00:11] Speaker 1: I used to play too, years ago.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-139",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-139\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Your plant on the desk looks healthy.\n[00:00:08] Speaker 2: Thanks, it only needs water once a week.\n[00:00:14] Speaker 1: Mine died in a month.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-140",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-140\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The elevator was stuck again this morning.\n[00:00:08] Speaker 2: I took the stairs, eight floors.\n[00:00:13] Speaker 1: Good exercise at least.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-141",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-141\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: My mother made kiribath this morning.\n[00:00:08] Speaker 2: Lucky. Is there a special day?\n[00:00:13] Speaker 1: No, she just felt like it.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-142",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-142\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Did you see the moon last night?\n[00:00:08] Speaker 2: Yes, it was huge and orange.\n[00:00:13] Speaker 1: Really pretty.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-143",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-143\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: How long have you worked here?\n[00:00:08] Speaker 2: About three years now.\n[00:00:12] Speaker 1: Time goes fast.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-144",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-144\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Is that green tea?\n[00:00:07] Speaker 2: Yes, I stopped drinking coffee.\n[00:00:11] Speaker 1: How do you feel?\n[00:00:15] Speaker 2: Better, I sleep well.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-145",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-145\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The new chairs are really comfortable.\n[00:00:08] Speaker 2: Much better than the old ones.\n[00:00:13] Speaker 1: My back thanks them.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-146",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-146\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The meeting on Monday at 10 went well.\n[00:00:09] Speaker 2: Yes, the client signed in the end.\n[00:00:14] Speaker 1: Great result.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-147",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-147\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I already sent the report to the manager.\n[00:00:09] Speaker 2: Good, thanks.\n[00:00:12] Speaker 1: She replied that it looks fine.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-148",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-148\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Yesterday's demo at 3 pm was a success.\n[00:00:09] Speaker 2: Everyone liked the new design.\n[00:00:13] Speaker 1: The team worked hard for it.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-149",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-149\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Did the deployment go fine on Friday?\n[00:00:08] Speaker 2: Yes, no problems at all.\n[00:00:12] Speaker 1: Nice, first clean deploy in weeks.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-150",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-150\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I booked the hall last week and it is paid.\n[00:00:09] Speaker 2: Great, thanks for handling it.\n[00:00:13] Speaker 1: No problem, all done.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-151",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-151\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The interview this morning was good.\n[00:00:08] Speaker 2: Did you like the candidate?\n[00:00:12] Speaker 1: Yes, very sharp.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-152",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-152\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Remember the trip to Kandy last year?\n[00:00:08] Speaker 2: Of course, the elephant almost took my bag.\n[00:00:14] Speaker 1: Best trip ever.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-153",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-153\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The training on Tuesday at 2 pm was useful.\n[00:00:09] Speaker 2: I learned a lot about testing.\n[00:00:14] Speaker 1: Same here.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-154",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-154\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We fixed the login bug last night.\n[00:00:08] Speaker 2: Yes, it was a missing check.\n[00:00:13] Speaker 1: Glad it is done.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-155",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-155\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The party on Saturday was fun.\n[00:00:08] Speaker 2: The music was great.\n[00:00:12] Speaker 1: And the food.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-156",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-156\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I already renewed my passport.\n[00:00:07] Speaker 2: That was fast.\n[00:00:11] Speaker 1: It took only two weeks.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-157",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-157\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Sprint planning yesterday took three hours.\n[00:00:08] Speaker 2: Too long, but we finished.\n[00:00:12] Speaker 1: At least it is over.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-158",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-158\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: What if we added a chat feature?\n[00:00:08] Speaker 2: No, we tried that last year and nobody used it.\n[00:00:14] Speaker 1: True, forget it.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-159",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-159\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I think the new logo looks a bit dark.\n[00:00:09] Speaker 2: Maybe, but people like it.\n[00:00:13] Speaker 1: Fair enough.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-160",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-160\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Meetings on Friday afternoons are always slow.\n[00:00:08] Speaker 2: Everyone is tired by then.\n[00:00:12] Speaker 1: It is the same everywhere.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-161",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-161\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Should we use a new database?\n[00:00:08] Speaker 2: No, the current one is fine.\n[00:00:13] Speaker 1: Okay, no change then.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-162",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-162\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Python is easier to read than Java.\n[00:00:08] Speaker 2: For small scripts, yes.\n[00:00:12] Speaker 1: Big projects are another story.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-163",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-163\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The office opens at 8 every day.\n[00:00:08] Speaker 2: Yes, but most people come at 9.\n[00:00:13] Speaker 1: Traffic, probably.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-164",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-164\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Tomorrow is a public holiday, right?\n[00:00:08] Speaker 2: Yes, Poya day.\n[00:00:12] Speaker 1: Nice, a long weekend.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-165",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-165\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I heard the cafe downstairs closes at 6 pm.\n[00:00:09] Speaker 2: Yes, since last month.\n[00:00:13] Speaker 1: Too early for me.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-166",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-166\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We could move the meeting room, but it is too much work.\n[00:00:10] Speaker 2: Agreed, leave it as it is.\n[00:00:15] Speaker 1: Yes, not worth it.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-167",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-167\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Calendar apps are confusing sometimes.\n[00:00:07] Speaker 2: Time zones make it worse.\n[00:00:11] Speaker 1: Especially with daylight saving.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-168",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-168\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I need to sleep for a week after this project.\n[00:00:09] Speaker 2: Ha, me too.\n[00:00:13] Speaker 1: Just joking, I am fine.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-169",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-169\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Please, no more meetings today, I am tired.\n[00:00:09] Speaker 2: Ha, I feel the same.\n[00:00:13] Speaker 1: Coffee will save us.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-170",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-170\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Don't forget, you owe me a coffee from last time.\n[00:00:09] Speaker 2: Ha, I remember, I remember.\n[00:00:13] Speaker 1: Just teasing.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-171",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-171\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Thanks for your help today.\n[00:00:07] Speaker 2: You're welcome, any time.\n[00:00:11] Speaker 1: Have a good evening.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-172",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-172\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Good morning everyone.\n[00:00:07] Speaker 2: Morning. How are you?\n[00:00:11] Speaker 1: Fine, thanks. Busy week.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-173",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-173\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can you believe it is already October?\n[00:00:08] Speaker 2: This year went so fast.\n[00:00:12] Speaker 1: Soon it will be December.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-174",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-174\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Make sure you enjoy the weekend.\n[00:00:08] Speaker 2: Ha, I will try.\n[00:00:12] Speaker 1: You deserve the rest.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-175",
+      "category": "noise",
+      "transcript": "---\nrecording_id: sc-175\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I will never understand this printer.\n[00:00:08] Speaker 2: Nobody does.\n[00:00:11] Speaker 1: It has a mind of its own.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-176",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-176\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's catch up with the sales team on Wednesday.\n[00:00:09] Speaker 2: Okay, but I have no free slot yet.\n[00:00:15] Speaker 1: We will find a time later.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Catch up with sales team",
+            "body": "Catch up with the sales team on Wednesday. Time not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-177",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-177\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we look at the bug list on Monday?\n[00:00:09] Speaker 2: Sure, Monday sometime.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Look at bug list",
+            "body": "Look at the bug list on Monday. No time set.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-178",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-178\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The landlord wants to visit on Saturday.\n[00:00:08] Speaker 2: What time?\n[00:00:11] Speaker 1: He did not say.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Landlord visit",
+            "body": "The landlord wants to visit on Saturday. Time unknown.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-179",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-179\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the backup check tomorrow.\n[00:00:08] Speaker 2: Morning or afternoon?\n[00:00:12] Speaker 1: Whenever it is quiet.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Backup check",
+            "body": "Do the backup check tomorrow. Time not fixed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-180",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-180\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We should call Nuwan on Friday.\n[00:00:08] Speaker 2: Okay, I will find a good time.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Call Nuwan",
+            "body": "Call Nuwan on Friday. Time not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-181",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-181\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The team dinner could be on Thursday.\n[00:00:08] Speaker 2: Thursday sounds okay, time to be decided.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Team dinner",
+            "body": "Team dinner possibly on Thursday. Time to be decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-182",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-182\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we review the budget today?\n[00:00:08] Speaker 2: Maybe, if the numbers arrive.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Review budget",
+            "body": "Review the budget today if the numbers arrive. No time set.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-183",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-183\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's meet at 10 am to plan the release.\n[00:00:09] Speaker 2: Which day?\n[00:00:12] Speaker 1: I am not sure yet.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Release planning at 10 am",
+            "body": "Meet at 10 am to plan the release. Day not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-184",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-184\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The call with the vendor is at 4 pm.\n[00:00:09] Speaker 2: Today or another day?\n[00:00:13] Speaker 1: I need to check the email.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Vendor call at 4 pm",
+            "body": "Vendor call at 4 pm. Day unclear.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-185",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-185\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do a standup at 9:15 from now on.\n[00:00:09] Speaker 2: Starting when?\n[00:00:12] Speaker 1: We will decide later.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Standup at 9:15",
+            "body": "Standup at 9:15. Start day not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-186",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-186\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Lunch with the new team at 12:30?\n[00:00:08] Speaker 2: Good idea, but which day?\n[00:00:12] Speaker 1: Let me ask them.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Lunch with new team",
+            "body": "Lunch with the new team at 12:30. Day not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-187",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-187\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We could do the demo at 3 pm.\n[00:00:09] Speaker 2: Not this week, maybe next.\n[00:00:13] Speaker 1: Okay, we will see.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Demo at 3 pm",
+            "body": "Demo at 3 pm. Day not decided, maybe next week.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-188",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-188\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The cleaning service comes at 7 am.\n[00:00:08] Speaker 2: On which day?\n[00:00:12] Speaker 1: They will confirm.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Cleaning service at 7 am",
+            "body": "The cleaning service comes at 7 am. Day to be confirmed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-189",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-189\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's meet sometime next week about the roadmap.\n[00:00:09] Speaker 2: Sure, early next week maybe.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Roadmap meeting",
+            "body": "Meet about the roadmap sometime next week.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-190",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-190\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We should talk to the client soon.\n[00:00:08] Speaker 2: Yes, soon.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Talk to the client",
+            "body": "Talk to the client soon. No date set.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-191",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-191\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we do the review at the end of the month?\n[00:00:10] Speaker 2: End of the month is fine.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Review at end of month",
+            "body": "Do the review at the end of the month.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-192",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-192\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's have the party in the evening after the launch.\n[00:00:09] Speaker 2: Good, after the launch then.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Launch party",
+            "body": "Party in the evening after the launch. Date not fixed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-193",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-193\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We need to fix the printer one of these days.\n[00:00:09] Speaker 2: Yes, one day.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Fix the printer",
+            "body": "Fix the printer at some point.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-194",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-194\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's plan the trip in the morning sometime.\n[00:00:09] Speaker 2: Okay, a morning when we are free.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Plan the trip",
+            "body": "Plan the trip some morning. No day set.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-195",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-195\nstarted_at: 2026-10-20T10:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The workshop is either Tuesday or Wednesday at 10 am.\n[00:00:09] Speaker 2: We will know tomorrow which one.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Workshop Tuesday or Wednesday",
+            "body": "The workshop is Tuesday or Wednesday at 10 am. Day not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-196",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-196\nstarted_at: 2026-10-21T13:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Someone has to update the website.\n[00:00:08] Speaker 2: True, but who?\n[00:00:12] Speaker 1: We will decide later.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Update the website",
+            "body": "Someone has to update the website. Owner not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-197",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-197\nstarted_at: 2026-10-22T15:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Maybe we should change the meeting room booking system.\n[00:00:09] Speaker 2: Maybe. Let's think about it.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Change room booking system",
+            "body": "Maybe change the meeting room booking system. Not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-198",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-198\nstarted_at: 2026-10-23T09:45:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: If the client agrees, we can start on Monday.\n[00:00:09] Speaker 2: And if not, we wait.\n[00:00:13] Speaker 1: Right, it depends on them.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Start Monday if client agrees",
+            "body": "Start on Monday if the client agrees. Not confirmed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-199",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-199\nstarted_at: 2026-10-24T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We might need a new laptop for the intern.\n[00:00:09] Speaker 2: Let's check the budget first.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Laptop for intern",
+            "body": "Maybe a new laptop for the intern. Check the budget first.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "SC-200",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: sc-200\nstarted_at: 2026-10-19T09:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Should we move the deadline?\n[00:00:07] Speaker 2: Possibly, I need to ask the manager.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Maybe move deadline",
+            "body": "Possibly move the deadline. Ask the manager first.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    }
+  ]
+}

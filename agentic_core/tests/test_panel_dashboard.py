@@ -1,11 +1,16 @@
 """Tests for the PP1 panel dashboard status logic (scripts/panel_dashboard)."""
 
+import copy
 import json
 import threading
 import urllib.request
+from pathlib import Path
 
 import pytest
 
+from agentic_core.tests.schema_compliance.frozen_setup import FROZEN_SETUP_HASHES
+from agentic_core.tests.schema_compliance.harness import wilson_interval
+from agentic_core.tests.schema_compliance.test_case_dataset import FROZEN_FINGERPRINT
 from scripts.panel_dashboard.objectives import OBJECTIVES
 from scripts.panel_dashboard.server import build_status, make_server
 from scripts.panel_dashboard.status import MET, NOT_MEASURED, NOT_MET, evaluate
@@ -60,6 +65,34 @@ def llm_file(gpu=False, vram_mb=0, vram_check=None, tpot=229.36, mode="CPU-only 
     }
 
 
+def schema_file(compliant=193, mode="grammar", **changes):
+    low, high = wilson_interval(compliant, 200)
+    data = {
+        "measured_at": "2026-10-20T20:45:47",
+        "official": True,
+        "mode": mode,
+        "dataset_fingerprint": FROZEN_FINGERPRINT,
+        "cases": 200,
+        "all_run": True,
+        "setup_frozen": True,
+        "setup_hashes": dict(FROZEN_SETUP_HASHES),
+        "model": "llama3:8b",
+        "llm_options": {"num_ctx": 4096, "temperature": 0.0, "num_predict": 512},
+        "model_placement_after_first_case": {"placement": "56%/44% CPU/GPU"},
+        "machine": {"gpu": "NVIDIA GeForce RTX 2050, 4096 MiB", "os": "Windows-11"},
+        "summary": {"total": {
+            "cases_run": 200, "infra_errors": 0, "compliant": compliant, "json_valid": 200,
+            "schema_valid": compliant, "cut_off": 0, "extractor_disagrees": 0,
+            "rate": compliant / 200, "ci95_low": low, "ci95_high": high,
+            "error_type_counts": {"value_error": 200 - compliant} if compliant < 200 else {},
+        }},
+        "records": [{"status": "ran", "compliant": i < compliant} for i in range(200)],
+        "note": "prefilter off; first answer only",
+    }
+    data.update(changes)
+    return data
+
+
 def write(folder, objective_key, data):
     path = folder / BY_KEY[objective_key].evidence
     path.write_text(data if isinstance(data, str) else json.dumps(data), encoding="utf-8")
@@ -68,7 +101,7 @@ def write(folder, objective_key, data):
 # --- missing or broken evidence -------------------------------------------
 
 
-@pytest.mark.parametrize("key", ["tool_latency", "sandbox_escape", "tpot", "vram"])
+@pytest.mark.parametrize("key", ["schema_compliance", "tool_latency", "sandbox_escape", "tpot", "vram"])
 def test_missing_file_gives_not_measured(tmp_path, key):
     row = evaluate(BY_KEY[key], tmp_path)
     assert row["status"] == NOT_MEASURED
@@ -76,7 +109,7 @@ def test_missing_file_gives_not_measured(tmp_path, key):
     assert row["measured"] == "-"
 
 
-@pytest.mark.parametrize("key", ["schema_compliance", "intent_f1", "sus"])
+@pytest.mark.parametrize("key", ["intent_f1", "sus"])
 def test_objective_without_result_file_is_not_measured(tmp_path, key):
     row = evaluate(BY_KEY[key], tmp_path)
     assert row["status"] == NOT_MEASURED
@@ -154,6 +187,83 @@ def test_one_escape_is_not_met(tmp_path):
 def test_incomplete_or_unofficial_escape_run_is_not_measured(tmp_path, changes):
     write(tmp_path, "sandbox_escape", escape_file(**changes))
     assert evaluate(BY_KEY["sandbox_escape"], tmp_path)["status"] == NOT_MEASURED
+
+
+# --- schema compliance (NFR-04) --------------------------------------------
+
+
+def test_schema_compliance_below_98_is_not_met_with_interval(tmp_path):
+    write(tmp_path, "schema_compliance", schema_file(193))
+    row = evaluate(BY_KEY["schema_compliance"], tmp_path)
+    assert row["status"] == NOT_MET
+    assert row["measured"].startswith("96.5% (193 of 200")
+    assert "95% CI 93.0% to 98.3%" in row["measured"]
+    assert "RTX 2050" in row["machine"] and "56%/44% CPU/GPU" in row["machine"]
+    assert row["date"] == "2026-10-20 20:45:47"
+    assert any("Synthetic cases" in limit for limit in row["limits"])
+    assert any("value_error 7" in limit for limit in row["limits"])
+
+
+def test_schema_compliance_at_or_above_98_is_met(tmp_path):
+    write(tmp_path, "schema_compliance", schema_file(196))
+    assert evaluate(BY_KEY["schema_compliance"], tmp_path)["status"] == MET
+
+
+def _broken_records(data):
+    data["records"][0]["compliant"] = False  # summary still says 193
+    return data
+
+
+@pytest.mark.parametrize("change", [
+    lambda d: d.update(official=False),
+    lambda d: d.update(mode="baseline"),
+    lambda d: d.update(all_run=False),
+    lambda d: d.update(dataset_fingerprint="0" * 64),
+    lambda d: d.update(setup_frozen=False),
+    lambda d: d["setup_hashes"].update(system_prompt="0" * 64),
+    lambda d: d["summary"]["total"].update(cases_run=199),
+    lambda d: d.update(records=d["records"][:199]),
+    lambda d: d["summary"]["total"].update(infra_errors=1),
+    lambda d: d["summary"]["total"].update(extractor_disagrees=1),
+    _broken_records,
+], ids=["not_official", "baseline_file", "not_all_run", "fingerprint", "setup_not_frozen",
+        "setup_changed", "199_run", "199_records", "infra_error", "extractor_disagrees",
+        "records_disagree"])
+def test_invalid_schema_compliance_run_is_not_measured(tmp_path, change):
+    data = copy.deepcopy(schema_file(196))  # would be MET if it counted
+    change(data)
+    write(tmp_path, "schema_compliance", data)
+    assert evaluate(BY_KEY["schema_compliance"], tmp_path)["status"] == NOT_MEASURED
+
+
+def test_baseline_is_shown_as_comparison_and_never_changes_the_status(tmp_path):
+    write(tmp_path, "schema_compliance", schema_file(193))
+    (tmp_path / "schema_compliance_baseline.json").write_text(
+        json.dumps(schema_file(95, mode="baseline")), encoding="utf-8")
+    row = evaluate(BY_KEY["schema_compliance"], tmp_path)
+    assert row["status"] == NOT_MET
+    assert any(limit.startswith("Comparison only, no target") and "47.5%" in limit for limit in row["limits"])
+
+
+def test_missing_or_bad_baseline_only_adds_a_note(tmp_path):
+    write(tmp_path, "schema_compliance", schema_file(196))
+    row = evaluate(BY_KEY["schema_compliance"], tmp_path)
+    assert row["status"] == MET
+    assert "Comparison file not found: schema_compliance_baseline.json" in row["limits"]
+    (tmp_path / "schema_compliance_baseline.json").write_text(
+        json.dumps(schema_file(95, mode="baseline", official=False)), encoding="utf-8")
+    row = evaluate(BY_KEY["schema_compliance"], tmp_path)
+    assert row["status"] == MET
+    assert any(limit.startswith("Baseline file not shown") for limit in row["limits"])
+
+
+def test_committed_official_result_shows_on_the_panel():
+    """The real result file in docs/evaluation, as the panel will show it."""
+    eval_dir = Path(__file__).resolve().parents[2] / "docs" / "evaluation"
+    row = evaluate(BY_KEY["schema_compliance"], eval_dir)
+    assert row["status"] == NOT_MET
+    assert row["measured"].startswith("96.5% (193 of 200")
+    assert any("47.5%" in limit for limit in row["limits"])
 
 
 # --- TPOT and VRAM ---------------------------------------------------------

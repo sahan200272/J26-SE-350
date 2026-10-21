@@ -48,6 +48,9 @@ class Objective:
     evidence: str | None  # file name inside the evaluation folder; None = no file yet
     extract: Callable[[dict[str, Any]], Reading] | None
     limits: tuple[str, ...] = field(default=())
+    # Extra result files shown as limit lines only (for example a baseline).
+    # They never change the status.
+    comparisons: tuple[tuple[str, Callable[[dict[str, Any]], str]], ...] = field(default=())
 
     @property
     def target_text(self) -> str:
@@ -77,8 +80,25 @@ def _is_number(value: Any) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
 
 
+def _comparison_line(file_name: str, describe: Callable[[dict[str, Any]], str], eval_dir: Path) -> str:
+    path = eval_dir / file_name
+    if not path.is_file():
+        return f"Comparison file not found: {file_name}"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return describe(data)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError, ValueError, AttributeError):
+        return f"Comparison file could not be read: {file_name}"
+
+
 def evaluate(objective: Objective, eval_dir: Path) -> dict[str, Any]:
     """Read the evidence file for one objective and decide its status."""
+    row = _evaluate_target(objective, eval_dir)
+    row["limits"] += [_comparison_line(name, describe, eval_dir) for name, describe in objective.comparisons]
+    return row
+
+
+def _evaluate_target(objective: Objective, eval_dir: Path) -> dict[str, Any]:
     if objective.evidence is None or objective.extract is None:
         return _row(objective, NOT_MEASURED, "No result file for this objective yet.", None)
 
