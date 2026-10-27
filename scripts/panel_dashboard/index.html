@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Component 2 Objectives</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e2e2dc;
+    --met-bg: #e3f4e8; --met-fg: #1f6b3a;
+    --notmet-bg: #fbe5e3; --notmet-fg: #9b2a1f;
+    --none-bg: #ececea; --none-fg: #55554f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161615; --card: #1f1f1d; --text: #ecece8; --muted: #a0a09a; --line: #34342f;
+      --met-bg: #1d3a26; --met-fg: #8fdca6;
+      --notmet-bg: #42201c; --notmet-fg: #f1a197;
+      --none-bg: #2c2c29; --none-fg: #bdbdb6;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+  .count { padding: 4px 10px; border-radius: 999px; font-weight: 600; font-size: 13px; }
+  button { margin-left: auto; padding: 6px 14px; border: 1px solid var(--line); border-radius: 6px;
+           background: var(--card); color: var(--text); cursor: pointer; font: inherit; }
+  table { width: 100%; border-collapse: collapse; background: var(--card);
+          border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+  td.target { white-space: nowrap; }
+  .badge { display: inline-block; white-space: nowrap; padding: 3px 9px; border-radius: 4px;
+           font-weight: 700; font-size: 12px; }
+  .MET { background: var(--met-bg); color: var(--met-fg); }
+  .NOT-MET { background: var(--notmet-bg); color: var(--notmet-fg); }
+  .NOT-MEASURED { background: var(--none-bg); color: var(--none-fg); }
+  .reason, .where { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  code { font-size: 13px; overflow-wrap: anywhere; }
+  ul { margin: 0; padding-left: 18px; font-size: 13px; }
+  .error { color: var(--notmet-fg); }
+
+  /* Run the pipeline */
+  h1.second { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+  h3 { font-size: 15px; margin: 22px 0 8px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  textarea { width: 100%; min-height: 190px; resize: vertical; padding: 10px; border: 1px solid var(--line);
+             border-radius: 6px; background: var(--bg); color: var(--text);
+             font: 13px/1.45 ui-monospace, Consolas, monospace; }
+  .controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 10px; }
+  .controls button { margin-left: 0; }
+  .controls label { font-size: 14px; display: inline-flex; gap: 6px; align-items: center; }
+  .controls input[type=date] { padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px;
+                               background: var(--card); color: var(--text); font: inherit; }
+  button.primary { background: var(--met-fg); color: var(--card); border-color: var(--met-fg); font-weight: 600; }
+  button:disabled { opacity: .55; cursor: wait; }
+  #runState { font-size: 14px; color: var(--muted); }
+  .meta { font-size: 13px; color: var(--muted); margin: 14px 0 10px; overflow-wrap: anywhere; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-width: 104px; }
+  .chip b { display: block; font-size: 20px; line-height: 1.2; }
+  .chip span { font-size: 12px; color: var(--muted); }
+  .seg { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+  .seg-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+  .seg-head strong { font-size: 15px; }
+  .lines { margin: 8px 0; padding: 8px 10px; background: var(--bg); border-radius: 6px;
+           font: 12.5px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .plan { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 6px; }
+  .plan h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .plan ul { font-size: 14px; }
+  .stat { font-size: 13px; color: var(--muted); }
+  .SKIPPED { background: var(--none-bg); color: var(--none-fg); }
+  .VALID, .WRITTEN, .CREATED, .BLOCKED, .OK { background: var(--met-bg); color: var(--met-fg); }
+  .INVALID, .FAILED, .NOT-BLOCKED { background: var(--notmet-bg); color: var(--notmet-fg); }
+  .EXISTS { background: var(--none-bg); color: var(--none-fg); }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+  pre.term { margin: 8px 0 0; padding: 12px; border-radius: 6px; background: #121212; color: #e6e6e6;
+             font: 12.5px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap; overflow-x: auto; }
+  @media (max-width: 760px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 1px solid var(--line); padding: 8px 0; }
+    td { border: none; padding: 4px 12px; }
+    td::before { content: attr(data-label); display: block; font-size: 11px;
+                 text-transform: uppercase; color: var(--muted); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Run the pipeline: Stage 1 → Stage 2</h1>
+  <p class="sub">Paste a diarized Markdown transcript and press Run. It goes to the local LLM and the local MCP
+    servers on this computer only. A demo, not an evaluation result: it never changes the targets below.</p>
+  <div class="panel">
+    <textarea id="transcript" spellcheck="false" placeholder="---&#10;started_at: 2026-10-12T09:30:00+05:30&#10;---&#10;[00:00:04] Speaker 1: I will book the meeting room for Friday at ten o'clock."></textarea>
+    <div class="controls">
+      <button id="sample" type="button">Load sample</button>
+      <label>Recording date <input type="date" id="recDate"></label>
+      <label><input type="checkbox" id="attack" checked> Also try 4 path-traversal attacks</label>
+      <button id="run" type="button" class="primary">Run</button>
+      <span id="runState"></span>
+    </div>
+  </div>
+  <div id="result"></div>
+
+  <h1 class="second">Component 2: Agentic Reasoning Core</h1>
+  <p class="sub">PP1 objectives: target against measured value. Read from the result files when the page loads.</p>
+  <div class="bar" id="bar"><button id="reload" type="button">Reload</button></div>
+  <table>
+    <thead><tr>
+      <th>Objective</th><th>Target</th><th>Status</th><th>Measured</th>
+      <th>Where / when</th><th>Evidence</th><th>Limits</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="sub" id="footer"></p>
+</main>
+<script>
+  const STATUSES = ["MET", "NOT MET", "NOT MEASURED"];
+
+  function el(tag, attrs, children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) node.setAttribute(k, v);
+    for (const child of [].concat(children || [])) {
+      node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+    }
+    return node;
+  }
+
+  function badge(status) {
+    return el("span", { class: "badge " + status.replace(/ /g, "-") }, status);
+  }
+
+  function render(data) {
+    const body = document.getElementById("rows");
+    body.replaceChildren();
+    for (const r of data.rows) {
+      body.append(el("tr", {}, [
+        el("td", { "data-label": "Objective" }, [el("strong", {}, r.name)]),
+        el("td", { "data-label": "Target", class: "target" }, r.target),
+        el("td", { "data-label": "Status" }, [badge(r.status), el("div", { class: "reason" }, r.reason)]),
+        el("td", { "data-label": "Measured" }, r.measured),
+        el("td", { "data-label": "Where / when" }, [r.machine, el("div", { class: "where" }, r.date)]),
+        el("td", { "data-label": "Evidence" }, [el("code", {}, r.evidence)]),
+        el("td", { "data-label": "Limits" }, [el("ul", {}, r.limits.map(t => el("li", {}, t)))]),
+      ]));
+    }
+    const bar = document.getElementById("bar");
+    bar.querySelectorAll(".count").forEach(n => n.remove());
+    for (const s of STATUSES) {
+      const n = data.rows.filter(r => r.status === s).length;
+      bar.insertBefore(el("span", { class: "count " + s.replace(/ /g, "-") }, `${s}: ${n}`),
+                       document.getElementById("reload"));
+    }
+    document.getElementById("footer").textContent =
+      `Read from ${data.eval_dir} at ${data.generated_at}. Grey means no valid measurement exists yet.`;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("/api/status", { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      render(await res.json());
+    } catch (err) {
+      const footer = document.getElementById("footer");
+      footer.className = "sub error";
+      footer.textContent = "Could not load /api/status: " + err.message;
+    }
+  }
+
+  document.getElementById("reload").addEventListener("click", load);
+  load();
+
+  // ---------- Run the pipeline ----------
+  const $ = id => document.getElementById(id);
+  const txt = v => (v === null || v === undefined ? "-" : String(v));  // keeps 0 visible
+
+  function chip(value, label) {
+    return el("div", { class: "chip" }, [el("b", {}, txt(value)), el("span", {}, label)]);
+  }
+
+  function planBlock(plan) {
+    const notes = plan.notes.map(n => el("li", {}, [el("strong", {}, n.title), ` (${n.folder}): ${n.body}`]));
+    const events = plan.events.map(e => el("li", {}, [
+      el("strong", {}, e.title), ` ${e.start.replace("T", " ").slice(0, 16)}`,
+      e.attendees.length ? `, with ${e.attendees.join(", ")}` : ""]));
+    return el("div", { class: "plan" }, [
+      el("div", {}, [el("h4", {}, `Notes (${notes.length})`), notes.length ? el("ul", {}, notes) : el("div", { class: "stat" }, "none")]),
+      el("div", {}, [el("h4", {}, `Events (${events.length})`), events.length ? el("ul", {}, events) : el("div", { class: "stat" }, "none")]),
+    ]);
+  }
+
+  function segmentCard(s) {
+    const label = { skipped: "SKIPPED", valid: "VALID", invalid: "INVALID" }[s.status];
+    const why = { skipped: "Prefilter: no task, time or idea words. No LLM call.",
+                  valid: "Valid JSON, passed the Pydantic schema on the first try.",
+                  invalid: `Invalid first-try answer (reported, not repaired): ${s.error}` }[s.status];
+    const parts = [
+      el("div", { class: "seg-head" }, [
+        el("strong", {}, `Segment ${s.index} · ${s.lines.length} turns · started_because=${s.started_because}`),
+        badge(label === "VALID" ? "VALID" : label)]),
+      el("div", { class: "lines" }, s.lines.join("\n")),
+      el("div", { class: "stat" }, s.status === "skipped" ? why
+        : `${why}  LLM: ${s.tokens} tokens, ${txt(s.ms_per_token)} ms/token, ${txt(s.seconds)} s.`),
+    ];
+    if (s.plan) {
+      parts.push(planBlock(s.plan));
+      parts.push(el("details", {}, [el("summary", {}, "Raw JSON plan"),
+        el("pre", { class: "term" }, JSON.stringify(s.plan, null, 2))]));
+    }
+    return el("div", { class: "seg" }, parts);
+  }
+
+  function table(head, rows) {
+    return el("table", {}, [
+      el("thead", {}, [el("tr", {}, head.map(h => el("th", {}, h)))]),
+      el("tbody", {}, rows.map(r => el("tr", {}, r.map(c => el("td", {}, c instanceof Node ? c : txt(c)))))),
+    ]);
+  }
+
+  function renderRun(r) {
+    const s = r.summary;
+    const box = $("result");
+    box.replaceChildren(
+      el("p", { class: "meta" }, `${r.machine} | model ${r.model} (${r.placement}) | ` +
+        `${r.turns} turns | recording date ${r.recording_date} | notes written to ${r.vault}`),
+      el("div", { class: "chips" }, [
+        chip(s.segments, "segments"), chip(s.skipped, "skipped by prefilter"),
+        chip(s.llm_calls, "LLM calls"), chip(`${s.valid_first_try} / ${s.llm_calls}`, "valid JSON, first try"),
+        chip(s.mean_ms_per_token === null ? "-" : `${Math.round(s.mean_ms_per_token)} ms`, "per token (this machine)"),
+        chip(s.notes_written, "notes written"), chip(s.events_created + s.events_existing, "events"),
+        chip(s.tool_failures, "failed tool calls"),
+        chip(r.attacks.length ? `${s.attacks_blocked} / ${s.attacks_tried}` : "off", "attacks blocked"),
+        el("div", { class: "chip" }, [badge(r.ok ? "OK" : "FAILED"), el("span", {}, r.ok ? " all steps OK" : " see below")]),
+      ]),
+      el("h3", {}, "Stage 1 · Constrained decoding (local LLM + Pydantic schema)"),
+      ...r.segments.map(segmentCard),
+      el("h3", {}, `Stage 2 · Sandboxed MCP tools (servers started in ${r.connect_ms} ms, one time)`),
+      r.calls.length
+        ? table(["Tool", "#", "Result", "Path in vault / event id", "Time"],
+            r.calls.map(c => [c.tool, c.index, badge(c.status.toUpperCase()),
+              c.status === "failed" ? c.code : c.reference, `${c.ms} ms`]))
+        : el("p", { class: "stat" }, "The plan was empty: nothing to write."),
+      el("p", { class: "stat" }, "Calendar: in-memory fake (Google backend not built). No invitation is sent."),
+      ...(r.attacks.length ? [
+        el("h3", {}, "Security · Path-traversal attempts sent straight to write_note"),
+        table(["Folder the attacker asked for", "Result", "Reason code"],
+          r.attacks.map(a => [el("code", {}, a.folder), badge(a.blocked ? "BLOCKED" : "NOT BLOCKED"), a.code])),
+      ] : []),
+      el("details", {}, [el("summary", {}, "Terminal view (same text as the command line)"),
+        el("pre", { class: "term" }, r.log)]),
+    );
+  }
+
+  $("sample").addEventListener("click", async () => {
+    try {
+      const res = await fetch("/api/sample", { cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+      $("transcript").value = data.text;
+    } catch (err) { $("runState").textContent = "Could not load the sample: " + err.message; }
+  });
+
+  $("run").addEventListener("click", async () => {
+    const button = $("run");
+    button.disabled = true;
+    $("runState").className = "";
+    $("runState").textContent = "Running on this computer... the local LLM can take 10 to 60 s.";
+    const started = performance.now();
+    try {
+      const res = await fetch("/api/run", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: $("transcript").value, date: $("recDate").value || null,
+                               attack: $("attack").checked }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+      renderRun(data);
+      $("runState").textContent = `Finished in ${((performance.now() - started) / 1000).toFixed(1)} s.`;
+    } catch (err) {
+      $("runState").className = "error";
+      $("runState").textContent = err.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

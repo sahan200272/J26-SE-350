@@ -20,10 +20,8 @@ This app is the **Edge Capture Layer** and the start of the **Local Transmission
    When proposing a package, report: version, last publish date, license, Android support,
    maintenance status. Verify on pub.dev – do not rely on memory.
 4. Android only. Do not add or generate iOS, web, desktop or macOS support.
-5. Privacy (FR5, NFR4): no cloud services, Firebase, analytics, crash reporting, telemetry or
-   remote logging. Audio never leaves the device except via the Syncthing-shared folder.
-   Design decision: the **main** `AndroidManifest.xml` must not declare `INTERNET`
-   (the debug/profile manifests created by Flutter may keep it for tooling).
+5. Privacy (FR5, NFR4): The only network component is the embedded Syncthing, configured
+   LAN-only by the app; no other network use, no cloud, analytics or telemetry.
 6. Never fabricate results. Report only output of commands that were actually run.
    If a test fails or a step is incomplete, say so plainly.
 7. Work in the step order below. After each step: stop, write the step report, and wait

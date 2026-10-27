@@ -1,0 +1,72 @@
+{
+  "recorded_at": "2026-10-18T12:46:22+05:30",
+  "packages": {
+    "whisperx": "3.8.6",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.3",
+    "torch": "2.8.0",
+    "torchaudio": "2.8.0",
+    "pyannote.audio": "4.0.7",
+    "transformers": "4.57.6",
+    "huggingface-hub": "0.36.2"
+  },
+  "whisper_models": {
+    "base": {
+      "repo_id": "Systran/faster-whisper-base",
+      "revision": "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66",
+      "license": "MIT",
+      "files": {
+        "config.json": {
+          "bytes": 2309,
+          "sha256": "56a6d8110d311f19c8f0471e562832c7527f146b567275bfca59fcf7c184da9a"
+        },
+        "model.bin": {
+          "bytes": 145217532,
+          "sha256": "d01c3014881c9c6f3133c182f3d2887eb6ca1c789a7538c5c007196857a0a6a9"
+        },
+        "tokenizer.json": {
+          "bytes": 2203239,
+          "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab"
+        },
+        "vocabulary.txt": {
+          "bytes": 459861,
+          "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+        }
+      }
+    },
+    "small": {
+      "repo_id": "Systran/faster-whisper-small",
+      "revision": "536b0662742c02347bc0e980a01041f333bce120",
+      "license": "MIT",
+      "files": {
+        "config.json": {
+          "bytes": 2370,
+          "sha256": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828"
+        },
+        "model.bin": {
+          "bytes": 483546902,
+          "sha256": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671"
+        },
+        "tokenizer.json": {
+          "bytes": 2203239,
+          "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab"
+        },
+        "vocabulary.txt": {
+          "bytes": 459861,
+          "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913"
+        }
+      }
+    }
+  },
+  "alignment_models": {
+    "en": {
+      "torchaudio_bundle": "WAV2VEC2_ASR_BASE_960H",
+      "file": "wav2vec2_fairseq_base_ls960_asr_ls960.pth",
+      "url": "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth",
+      "bytes": 377664473,
+      "sha256": "488fd4f16de84438ffc945334278c1b9fb9b7159a806c1080b16111a958c945d"
+    }
+  },
+  "vad": "whisperx bundled pyannote segmentation (whisperx/assets/pytorch_model.bin)",
+  "vad_sha256": "0b5b3216d60a2d32fc086b47ea8c67589aaeb26b7e07fcbe620d6d0b83e209ea"
+}

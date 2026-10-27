@@ -1,0 +1,336 @@
+{
+  "set": "dev",
+  "note": "Development set. The only cases allowed for prompt or schema fixes.",
+  "cases": [
+    {
+      "id": "DEV-01",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: dev-01\nstarted_at: 2026-10-12T09:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we do the sprint planning on Wednesday at 10 am?\n[00:00:10] Speaker 2: Yes, Wednesday at 10 works for me.\n[00:00:15] Speaker 1: Great, that is settled then.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Sprint planning",
+            "day": "wednesday",
+            "time": "10:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-02",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: dev-02\nstarted_at: 2026-10-13T14:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I had a thought about the onboarding screen.\n[00:00:09] Speaker 2: Go on.\n[00:00:12] Speaker 1: We could show a short video instead of three pages of text.\n[00:00:19] Speaker 2: Nice, please write that down in the ideas folder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Onboarding video",
+            "body": "Show a short video instead of three pages of text on the onboarding screen.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-03",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: dev-03\nstarted_at: 2026-10-14T10:15:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Ravi, can you join a call with the client tomorrow at half past two?\n[00:00:11] Speaker 2: Sure, tomorrow two thirty is fine.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Client call",
+            "day": "tomorrow",
+            "time": "14:30",
+            "attendees": [
+              "Ravi"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-04",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: dev-04\nstarted_at: 2026-10-15T16:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We decided to keep the old logo for the release.\n[00:00:09] Speaker 2: Right, let's note that decision for the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Keep old logo",
+            "body": "Decided to keep the old logo for the release.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-05",
+      "category": "single_intent",
+      "transcript": "---\nrecording_id: dev-05\nstarted_at: 2026-10-16T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The budget review is on Monday at 9:15.\n[00:00:09] Speaker 2: Okay, Monday 9:15, I will be there.\n[00:00:14] Speaker 1: Bring the sales numbers.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Budget review",
+            "day": "monday",
+            "time": "09:15",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-06",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: dev-06\nstarted_at: 2026-10-12T09:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's meet with Amal on Thursday at 3 pm to go over the test plan.\n[00:00:11] Speaker 2: Fine. Also remember that the test server password expires this month.\n[00:00:18] Speaker 1: Good point, save that as a reminder.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Test server password",
+            "body": "The test server password expires this month.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": [
+          {
+            "title": "Test plan meeting",
+            "day": "thursday",
+            "time": "15:00",
+            "attendees": [
+              "Amal"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-07",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: dev-07\nstarted_at: 2026-10-13T14:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Two things. The demo is Friday at 11.\n[00:00:09] Speaker 2: And the retro?\n[00:00:13] Speaker 1: Retro is Friday at 4 pm, right after lunch is too early.\n[00:00:20] Speaker 2: Okay, and put an idea in: a dark mode for the dashboard.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Dark mode",
+            "body": "Add a dark mode to the dashboard.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Demo",
+            "day": "friday",
+            "time": "11:00",
+            "attendees": []
+          },
+          {
+            "title": "Retro",
+            "day": "friday",
+            "time": "16:00",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-08",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: dev-08\nstarted_at: 2026-10-14T10:15:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Nimali and Kasun, design review tomorrow at nine?\n[00:00:09] Speaker 2: Works for me. Kasun said yes too.\n[00:00:14] Speaker 1: Then also note that we drop the old API by end of year.\n[00:00:22] Speaker 2: Yes, that was decided last week. Put it with the meeting notes.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Drop old API",
+            "body": "The old API will be dropped by the end of the year.",
+            "folder": "Meetings"
+          }
+        ],
+        "events": [
+          {
+            "title": "Design review",
+            "day": "tomorrow",
+            "time": "09:00",
+            "attendees": [
+              "Nimali",
+              "Kasun"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-09",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: dev-09\nstarted_at: 2026-10-15T16:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: I need to remember to renew the domain name.\n[00:00:09] Speaker 2: And we should try caching the search results, that is an idea for later.\n[00:00:17] Speaker 1: Okay, and the hiring sync is Tuesday at 13:30.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Renew domain",
+            "body": "Renew the domain name.",
+            "folder": "Inbox"
+          },
+          {
+            "title": "Cache search results",
+            "body": "Try caching the search results.",
+            "folder": "Ideas"
+          }
+        ],
+        "events": [
+          {
+            "title": "Hiring sync",
+            "day": "tuesday",
+            "time": "13:30",
+            "attendees": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-10",
+      "category": "multi_intent",
+      "transcript": "---\nrecording_id: dev-10\nstarted_at: 2026-10-16T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's book the interview with Dilan on Wednesday at 10:30.\n[00:00:09] Speaker 2: And the one with Sara on Wednesday at 2 pm.\n[00:00:15] Speaker 1: Good. Both in the small room.",
+      "expected": {
+        "notes": [],
+        "events": [
+          {
+            "title": "Interview with Dilan",
+            "day": "wednesday",
+            "time": "10:30",
+            "attendees": [
+              "Dilan"
+            ]
+          },
+          {
+            "title": "Interview with Sara",
+            "day": "wednesday",
+            "time": "14:00",
+            "attendees": [
+              "Sara"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "DEV-11",
+      "category": "noise",
+      "transcript": "---\nrecording_id: dev-11\nstarted_at: 2026-10-12T09:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: How was your weekend?\n[00:00:07] Speaker 2: Good, we went to the beach in Galle.\n[00:00:13] Speaker 1: Nice, was it crowded?\n[00:00:17] Speaker 2: Not too bad in the morning.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-12",
+      "category": "noise",
+      "transcript": "---\nrecording_id: dev-12\nstarted_at: 2026-10-13T14:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: The meeting yesterday went really well.\n[00:00:08] Speaker 2: Yes, the client seemed happy with the demo.\n[00:00:14] Speaker 1: I think the new slides helped a lot.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-13",
+      "category": "noise",
+      "transcript": "---\nrecording_id: dev-13\nstarted_at: 2026-10-14T10:15:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Is it raining outside?\n[00:00:07] Speaker 2: A little. I forgot my umbrella again.\n[00:00:12] Speaker 1: Classic.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-14",
+      "category": "noise",
+      "transcript": "---\nrecording_id: dev-14\nstarted_at: 2026-10-15T16:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Did you watch the cricket match on Sunday?\n[00:00:09] Speaker 2: Only the last ten overs. What a finish.\n[00:00:15] Speaker 1: I could not believe that last six.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-15",
+      "category": "noise",
+      "transcript": "---\nrecording_id: dev-15\nstarted_at: 2026-10-16T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: This coffee machine is so slow.\n[00:00:08] Speaker 2: It has always been like that.\n[00:00:13] Speaker 1: At least the coffee is good.",
+      "expected": {
+        "notes": [],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-16",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: dev-16\nstarted_at: 2026-10-12T09:30:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: We should meet with the design team sometime next week.\n[00:00:09] Speaker 2: Yes, maybe. Let's see how busy they are.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Meet design team",
+            "body": "Meet with the design team sometime next week. No day or time agreed.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-17",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: dev-17\nstarted_at: 2026-10-13T14:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Can we have a call on Thursday?\n[00:00:08] Speaker 2: Thursday is fine, but I do not know what time yet.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Call on Thursday",
+            "body": "Call on Thursday. Time not decided yet.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-18",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: dev-18\nstarted_at: 2026-10-14T10:15:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Let's do the review at 3 pm.\n[00:00:08] Speaker 2: Which day though?\n[00:00:12] Speaker 1: Not sure, I will check the calendar.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Review at 3 pm",
+            "body": "Review at 3 pm. Day not decided yet.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-19",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: dev-19\nstarted_at: 2026-10-15T16:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Maybe we should look into the login bug at some point.\n[00:00:10] Speaker 2: Maybe. It is not urgent.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Login bug",
+            "body": "Look into the login bug at some point. Not urgent.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    },
+    {
+      "id": "DEV-20",
+      "category": "ambiguous",
+      "transcript": "---\nrecording_id: dev-20\nstarted_at: 2026-10-16T11:00:00+05:30\nspeakers: 2\n---\n\n[00:00:03] Speaker 1: Someone should probably tell the client about the delay.\n[00:00:09] Speaker 2: Probably, yes.\n[00:00:12] Speaker 1: Let's think about who.",
+      "expected": {
+        "notes": [
+          {
+            "title": "Tell client about delay",
+            "body": "Someone should tell the client about the delay. Owner not decided.",
+            "folder": "Inbox"
+          }
+        ],
+        "events": []
+      }
+    }
+  ]
+}

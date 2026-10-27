@@ -31,6 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
   record: 7.1.2
+  # Home screen background video (muted, looping, from a local asset; no
+  # network). flutter.dev, BSD-3-Clause; approved by the developer 2026-10-19.
+  video_player: 2.14.1
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +56,15 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Syncthing's MPL-2.0 licence text, shown on the About screen (A5).
+  assets:
+    - assets/licenses/syncthing_LICENSE.txt
+    # Echo Vault logo, "Keyhole Wave" (symbol for dark UI, horizontal logo for dark backgrounds).
+    - assets/brand/
+    # Home / Recording background photo and the optional Home video
+    # (home_background.jpg, home_background.mp4).
+    - assets/backgrounds/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

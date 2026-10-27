@@ -4,6 +4,7 @@ import 'package:echo_vault/capture/audio_capture.dart';
 import 'package:echo_vault/permissions/microphone_permission.dart';
 import 'package:echo_vault/ui/input_level_meter.dart';
 import 'package:echo_vault/ui/lifecycle_source.dart';
+import 'package:echo_vault/ui/live_waveform.dart';
 import 'package:echo_vault/ui/recording_controller.dart';
 import 'package:echo_vault/ui/recording_screen.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +28,15 @@ final pausedIndicator = find.byType(PausedIndicator);
 final redDot = find.byKey(RecordingIndicator.dotKey);
 final permissionMessage = find.byKey(const Key('permission-message'));
 final levelMeter = find.byType(InputLevelMeter);
-final levelValue = find.byKey(InputLevelMeter.valueKey);
+final waveform = find.byType(LiveWaveform);
 final autoPauseNotice = find.byKey(const Key('auto-pause-notice'));
 
-bool isEnabled(WidgetTester tester, Finder button) =>
-    tester.widget<ButtonStyleButton>(button).onPressed != null;
+/// A control that is not shown cannot be pressed: the redesigned screen
+/// shows Start only while no session is open, and Pause/Resume and Stop only
+/// while one is.
+bool isEnabled(WidgetTester tester, Finder button) => tester
+    .widgetList<ButtonStyleButton>(button)
+    .any((b) => b.onPressed != null);
 
 /// Expected (start, pause/resume, stop) enabled states.
 void expectButtons(
@@ -85,6 +90,9 @@ void main() {
         clock: clock,
         wallClock: () => DateTime(2026, 10, 15, 14, 23, 0),
         random: FakeRandom(0xa1b2),
+        // Tests tap Start and Stop in quick succession; the guard has its
+        // own tests below.
+        doubleTapGuard: Duration.zero,
       ),
     ),
   );
@@ -105,7 +113,9 @@ void main() {
     expectRecordingIndicatorVisible(false);
     expect(pausedIndicator, findsNothing);
     expect(find.text('Ready to record'), findsOneWidget);
-    expect(find.text('Pause'), findsOneWidget);
+    expect(find.text('Start'), findsOneWidget);
+    expect(pauseResumeButton, findsNothing, reason: 'no session open');
+    expect(stopButton, findsNothing, reason: 'no session open');
     expectButtons(tester, start: true, pauseResume: false, stop: false);
     expect(permission.requestCount, 0, reason: 'no request before Start');
   });
@@ -232,6 +242,52 @@ void main() {
     expect(find.text('00:00'), findsOneWidget);
   });
 
+  group('double-tap guard (Start and Stop share a place)', () {
+    Future<void> pumpGuarded(WidgetTester tester) => tester.pumpWidget(
+      MaterialApp(
+        home: RecordingScreen(
+          permission: permission,
+          capture: capture,
+          screenAwake: screen,
+          lifecycle: lifecycle,
+          clock: clock,
+          wallClock: () => DateTime(2026, 10, 15, 14, 23, 0),
+          random: FakeRandom(0xa1b2),
+        ),
+      ),
+    );
+
+    testWidgets('a second tap right after Start does not stop', (
+      tester,
+    ) async {
+      await pumpGuarded(tester);
+      await tap(tester, startButton);
+      await tap(tester, stopButton);
+      expect(find.text('Stopped'), findsNothing, reason: 'still recording');
+      expect(capture.calls, ['start']);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, stopButton);
+      expect(find.text('Stopped'), findsOneWidget);
+    });
+
+    testWidgets('a second tap right after Stop does not record again', (
+      tester,
+    ) async {
+      await pumpGuarded(tester);
+      await tap(tester, startButton);
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, stopButton);
+      await tap(tester, startButton);
+      expect(find.text('Stopped'), findsOneWidget);
+      expect(permission.requestCount, 1);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tap(tester, startButton);
+      expect(permission.requestCount, 2);
+    });
+  });
+
   group('permission not granted', () {
     testWidgets('denied: message shown, stays idle, no indicator', (
       tester,
@@ -261,6 +317,72 @@ void main() {
       );
       expectRecordingIndicatorVisible(false);
       expectButtons(tester, start: true, pauseResume: false, stop: false);
+    });
+
+    testWidgets('permanently denied: "Open app settings" opens Settings', (
+      tester,
+    ) async {
+      permission.status = MicPermissionStatus.permanentlyDenied;
+      var opened = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RecordingScreen(
+            permission: permission,
+            capture: capture,
+            screenAwake: screen,
+            lifecycle: lifecycle,
+            clock: clock,
+            doubleTapGuard: Duration.zero,
+            openSettings: () async {
+              opened++;
+              return true;
+            },
+          ),
+        ),
+      );
+      await tap(tester, startButton);
+      final button = find.byKey(RecordingScreen.openSettingsKey);
+      expect(button, findsOneWidget);
+      await tester.ensureVisible(button);
+      await tap(tester, button);
+      await tester.pump();
+      expect(opened, 1);
+      expect(find.text(RecordingScreen.openSettingsFailedMessage), findsNothing);
+      expect(capture.calls, isEmpty, reason: 'nothing recorded');
+    });
+
+    testWidgets('permanently denied: says where to go when Settings cannot '
+        'be opened', (tester) async {
+      permission.status = MicPermissionStatus.permanentlyDenied;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RecordingScreen(
+            permission: permission,
+            capture: capture,
+            screenAwake: screen,
+            lifecycle: lifecycle,
+            clock: clock,
+            doubleTapGuard: Duration.zero,
+            openSettings: () async => false,
+          ),
+        ),
+      );
+      await tap(tester, startButton);
+      final button = find.byKey(RecordingScreen.openSettingsKey);
+      await tester.ensureVisible(button);
+      await tap(tester, button);
+      await tester.pump();
+      expect(
+        find.text(RecordingScreen.openSettingsFailedMessage),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('denied (can ask again): no settings button', (tester) async {
+      permission.status = MicPermissionStatus.denied;
+      await pumpScreen(tester);
+      await tap(tester, startButton);
+      expect(find.byKey(RecordingScreen.openSettingsKey), findsNothing);
     });
 
     testWidgets('platform error is treated as denied', (tester) async {
@@ -320,11 +442,15 @@ void main() {
       expect(screen.calls, [true, false]);
     });
 
-    testWidgets('Stop shows the session ID', (tester) async {
+    testWidgets('Stop shows a plain summary, no technical identifiers', (
+      tester,
+    ) async {
       await pumpScreen(tester);
       await tap(tester, startButton);
       await tap(tester, stopButton);
-      expect(find.text('Session 20261015T142300_a1b2'), findsOneWidget);
+      expect(find.text('Stopped'), findsOneWidget);
+      expect(find.text('Session 20261015T142300_a1b2'), findsNothing);
+      expect(find.textContaining('20261015T142300_a1b2'), findsNothing);
     });
 
     testWidgets('capture failure: stopped, message shown', (tester) async {
@@ -345,44 +471,30 @@ void main() {
     });
   });
 
-  group('input level meter', () {
-    testWidgets('shown only while recording, with the RMS level in dBFS', (
+  group('live waveform', () {
+    testWidgets('follows the real input level while recording', (
       tester,
     ) async {
       await pumpScreen(tester);
-      expect(levelMeter, findsNothing);
+      expect(waveform, findsNothing, reason: 'idle');
 
       await tap(tester, startButton);
-      expect(levelMeter, findsNothing, reason: 'starting microphone');
+      List<double> levels() => tester.widget<LiveWaveform>(waveform).levels;
+      expect(levels(), isEmpty, reason: 'starting microphone');
 
       capture.emit(constantPcm(1536, 3277)); // 3 frames, ≈ −20 dBFS
       await tester.pump();
-      expect(levelMeter, findsOneWidget);
-      expect(tester.widget<Text>(levelValue).data, '– dBFS');
       await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.widget<Text>(levelValue).data, '-20.0 dBFS');
-      final bar = tester.widget<LinearProgressIndicator>(
-        find.byKey(InputLevelMeter.barKey),
-      );
-      expect(bar.value, closeTo(40 / 60, 1e-3));
+      expect(levels().last, closeTo(40 / 60, 1e-3));
 
       capture.emit(constantPcm(1536, 0)); // digital silence
       await tester.pump(const Duration(milliseconds: 100));
-      expect(tester.widget<Text>(levelValue).data, '-96.0 dBFS');
+      expect(levels().last, 0);
 
       await tap(tester, pauseResumeButton);
-      expect(levelMeter, findsNothing);
-      await tap(tester, pauseResumeButton);
-      expect(levelMeter, findsNothing, reason: 'starting microphone');
-      await feedAudio(tester);
-      expect(levelMeter, findsOneWidget);
-      expect(
-        tester.widget<Text>(levelValue).data,
-        '– dBFS',
-        reason: 'no stale level after resume',
-      );
+      expect(waveform, findsOneWidget, reason: 'flat while paused');
       await tap(tester, stopButton);
-      expect(levelMeter, findsNothing);
+      expect(waveform, findsNothing);
     });
 
     test('bar fraction and text formatting', () {
@@ -394,13 +506,12 @@ void main() {
     });
   });
 
-  group('speech indicator and segment count', () {
+  group('speech indicator', () {
     final listening = find.byKey(SpeechStatus.listeningKey);
     final speech = find.byKey(SpeechStatus.speechKey);
-    final count = find.byKey(SpeechStatus.countKey);
 
-    testWidgets('"Speech detected" during speech; count rises when the '
-        'segment ends; summary after Stop', (tester) async {
+    testWidgets('"Speech detected" during speech, "Listening" otherwise; '
+        'summary after Stop', (tester) async {
       await pumpScreen(tester);
       await tap(tester, startButton);
       expect(listening, findsNothing, reason: 'starting microphone');
@@ -409,21 +520,20 @@ void main() {
       await tester.pump();
       expect(listening, findsOneWidget);
       expect(speech, findsNothing);
-      expect(tester.widget<Text>(count).data, 'Segments: 0');
 
       capture.emit(constantPcm(512 * 31, 3277)); // ≈ 1 s at −20 dBFS
       await tester.pump();
       expect(speech, findsOneWidget);
       expect(find.text('Speech detected'), findsOneWidget);
-      expect(tester.widget<Text>(count).data, 'Segments: 0');
 
       capture.emit(constantPcm(512 * 25, 0)); // hangover ends the segment
       await tester.pump();
       expect(listening, findsOneWidget);
-      expect(tester.widget<Text>(count).data, 'Segments: 1');
 
       await tap(tester, stopButton);
-      expect(find.text('1 speech segment'), findsOneWidget);
+      expect(find.byKey(const Key('stopped-summary')), findsOneWidget);
+      expect(speech, findsNothing);
+      expect(listening, findsNothing);
     });
 
     testWidgets('not shown while starting or paused', (tester) async {
@@ -558,37 +668,31 @@ void main() {
     }
 
     for (final (name, size, dpr, textScale, widthDp) in screens) {
-      testWidgets('$name, idle: Start / Pause / Stop', (tester) async {
+      testWidgets('$name, idle: Start', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
 
-        expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
-          'Pause': pauseResumeButton,
-          'Stop': stopButton,
-        });
+        expectSingleLineLabels(tester, widthDp, {'Start': startButton});
       });
 
-      testWidgets('$name, recording: Start / Pause / Stop', (tester) async {
+      testWidgets('$name, recording: Pause / Stop', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
         await tap(tester, startButton);
 
         expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
           'Pause': pauseResumeButton,
           'Stop': stopButton,
         });
       });
 
-      testWidgets('$name, paused: Start / Resume / Stop', (tester) async {
+      testWidgets('$name, paused: Resume / Stop', (tester) async {
         useScreen(tester, size, dpr, textScale);
         await pumpScreen(tester);
         await tap(tester, startButton);
         await tap(tester, pauseResumeButton);
 
         expectSingleLineLabels(tester, widthDp, {
-          'Start': startButton,
           'Resume': pauseResumeButton,
           'Stop': stopButton,
         });

@@ -146,11 +146,12 @@ Uint8List wavHeader(
 Uint8List encodeWav(Int16List samples, {int sampleRate = kSampleRate}) {
   final out = BytesBuilder(copy: false)
     ..add(wavHeader(samples.length * 2, sampleRate: sampleRate))
-    ..add(_pcm16le(samples));
+    ..add(pcm16le(samples));
   return out.takeBytes();
 }
 
-Uint8List _pcm16le(Int16List samples) {
+/// [samples] as 16-bit little-endian bytes (whatever the host byte order).
+Uint8List pcm16le(Int16List samples) {
   final bytes = Uint8List(samples.length * 2);
   final data = ByteData.sublistView(bytes);
   for (var i = 0; i < samples.length; i++) {

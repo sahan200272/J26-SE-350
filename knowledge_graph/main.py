@@ -11,17 +11,23 @@ Run command:
 
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from graph_schema.adapters import triples_to_payload
 from graph_schema.ingest import IngestResult, ingest_payload
 from graph_schema.models import Payload
 from graph_schema.schema import get_driver
+from graphrag.baseline_keyword import compare_retrieval
+from graphrag.context_builder import get_pending_items_context
+from graphrag.demo_ui import DEMO_HTML, get_graph_snapshot
+from graphrag.models import RetrievalRequest, RetrievalResult
+from graphrag.retriever import retrieve_subgraph
 
 app = FastAPI(
-    title="Knowledge Graph Ingestion API",
-    description="Automated graph construction and entity ingestion service bound strictly to 127.0.0.1.",
-    version="1.0.0",
+    title="Knowledge Graph & GraphRAG API",
+    description="Automated graph construction, entity ingestion, and multi-hop GraphRAG retrieval service bound strictly to 127.0.0.1.",
+    version="1.1.0",
 )
 
 
@@ -29,6 +35,27 @@ class TriplesRequest(BaseModel):
     source: str
     timestamp: Optional[str] = None
     triples: List[Any] = Field(default_factory=list)
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@app.get("/demo", response_class=HTMLResponse, tags=["Demo UI"])
+def demo_dashboard() -> HTMLResponse:
+    """Serve the interactive Knowledge Graph & Multi-Hop GraphRAG Demo Dashboard."""
+    return HTMLResponse(content=DEMO_HTML)
+
+
+@app.get("/graph/snapshot", tags=["Demo UI"])
+def graph_snapshot_endpoint(
+    limit: int = Query(default=120, ge=1, le=500),
+    include_private: bool = Query(default=False, description="Include private nodes in snapshot"),
+    keys: Optional[str] = Query(default=None, description="Comma-separated node keys to filter snapshot"),
+) -> Dict[str, Any]:
+    """Return a live snapshot of Neo4j nodes, edges, and label counts for 2D visualization."""
+    try:
+        key_list = [k.strip() for k in keys.split(",") if k.strip()] if keys else None
+        return get_graph_snapshot(limit=limit, include_private=include_private, keys=key_list)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 @app.get("/health")
@@ -66,6 +93,61 @@ def ingest_triples_endpoint(
         payload = triples_to_payload(req.triples, source=req.source, timestamp=req.timestamp)
         result: IngestResult = ingest_payload(payload, dry_run=dry_run)
         return result.to_dict()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/retrieve", response_model=RetrievalResult)
+def retrieve_endpoint(request: RetrievalRequest) -> RetrievalResult:
+    """Execute constrained multi-hop GraphRAG traversal with mathematical scoring."""
+    try:
+        return retrieve_subgraph(request)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/retrieve/compare")
+def retrieve_compare_endpoint(request: RetrievalRequest) -> Dict[str, Any]:
+    """Compare GraphRAG retrieval against flat keyword baseline to evaluate multi-hop gain."""
+    try:
+        return compare_retrieval(request)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/retrieve/pending")
+def retrieve_pending_endpoint(
+    include_private: bool = Query(default=False, description="Include private task/issue items"),
+) -> Dict[str, Any]:
+    """Retrieve actionable pending tasks, blockers, deadlines, and assignees for Component 4."""
+    try:
+        return get_pending_items_context(include_private=include_private)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/model/metrics", tags=["Trained ML Model"])
+def model_metrics_endpoint() -> Dict[str, Any]:
+    """Return evaluation metrics, per-class F1 scores, and 6x6 confusion matrix of the trained ML Intent Classifier."""
+    try:
+        from graphrag.intent_classifier import get_intent_classifier
+
+        clf = get_intent_classifier()
+        if not clf.metrics:
+            clf.train_and_evaluate()
+        return clf.metrics
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.post("/model/train", tags=["Trained ML Model"])
+def model_train_endpoint() -> Dict[str, Any]:
+    """Re-train the supervised ML Intent Classifier and run 80/20 split + 5-Fold Stratified Cross-Validation."""
+    try:
+        from graphrag.intent_classifier import get_intent_classifier
+
+        clf = get_intent_classifier()
+        return clf.train_and_evaluate()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 

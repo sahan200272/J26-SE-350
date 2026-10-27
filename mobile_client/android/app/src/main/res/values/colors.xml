@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Echo Vault "Ember" look: near-black (#070304); the launcher icon sits on a
+         deep red-black (#160606) behind the coral Keyhole Wave mark. -->
+    <color name="ic_launcher_background">#160606</color>
+    <color name="ev_black">#070304</color>
+</resources>

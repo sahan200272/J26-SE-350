@@ -19,7 +19,9 @@ android {
         applicationId = "lk.sliit.j26se350.echo_vault"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // API 29 (Android 10): MediaMuxer OGG output and the platform Opus encoder
+        // (c2.android.opus.encoder) used for chunk encoding (A4, approved).
+        minSdk = 29
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
@@ -27,6 +29,18 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    packaging {
+        jniLibs {
+            // A5 (approved): jniLibs/arm64-v8a/libsyncthing.so is the Syncthing executable
+            // (fetched by tool/fetch_syncthing.ps1), not a library. Legacy packaging stores it
+            // so the installer extracts it into nativeLibraryDir (extractNativeLibs=true): the
+            // only app location Android 10+ allows executing files from.
+            useLegacyPackaging = true
+            // Package the verified binary unchanged (never stripped).
+            keepDebugSymbols += "**/libsyncthing.so"
+        }
     }
 
     buildTypes {
