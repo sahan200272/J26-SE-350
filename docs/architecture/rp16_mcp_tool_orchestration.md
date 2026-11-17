@@ -31,7 +31,7 @@ RP-14 ActionPlan (notes, events)
 |---|---|
 | `mcp_servers/filesystem_server/sandbox.py` | The guard: text checks, then `resolve()` and `is_relative_to()` |
 | `mcp_servers/filesystem_server/notes.py` | Builds a safe file name, writes a note, never overwrites |
-| `mcp_servers/filesystem_server/server.py` | FastMCP server, one tool `write_note` |
+| `mcp_servers/filesystem_server/server.py` | FastMCP server, tool `write_note` (and `write_digest`, added in RP-18) |
 | `mcp_servers/calendar_server/config.py`, `config.yaml` | Settings: time zone `Asia/Colombo`, default duration, default reminder |
 | `mcp_servers/calendar_server/core.py` | Checks input, builds the event, no duplicates, backend plug |
 | `mcp_servers/calendar_server/server.py` | FastMCP server, one tool `create_event` |
@@ -44,7 +44,7 @@ RP-14 ActionPlan (notes, events)
 ## 4. Rules
 
 **Filesystem server**
-- Only `write_note`. No read, list, delete or overwrite tool.
+- Only `write_note` (plus `write_digest` since RP-18: it can replace only `todo.md` and `daily_brief.md` in the vault root, see `rp18_nightly_compaction.md`). No read, list or delete tool.
 - The folder must be exactly `Inbox`, `Meetings` or `Ideas`. Only `.md` files.
 - The server builds the file name (`date_slug.md`) from the title. The AI never picks a path.
 - An existing note is never overwritten (`-2`, `-3`, ...).

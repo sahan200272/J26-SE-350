@@ -48,3 +48,5 @@ test_output/
 **/data/notifications.db
 
 agentic_core/datasets/segmentation/ami/
+# Nightly compaction logs (RP-18)
+logs/

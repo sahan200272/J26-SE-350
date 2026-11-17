@@ -1,0 +1,5 @@
+# Nightly compaction (RP-18) for the Linux hub. Install with:  crontab -e  and paste the two lines.
+# Replace /opt/J26-SE-350 and /srv/vault with the real repo and vault paths.
+# CRON_TZ makes 20:00 mean Sri Lanka time even if the hub clock is UTC (cronie supports it).
+CRON_TZ=Asia/Colombo
+0 20 * * * /opt/J26-SE-350/scripts/scheduler/run_compaction.sh /srv/vault
