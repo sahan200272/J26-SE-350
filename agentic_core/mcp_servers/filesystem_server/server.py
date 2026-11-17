@@ -1,7 +1,11 @@
-"""FastMCP filesystem server (RP-16, section 2b).
+"""FastMCP filesystem server (RP-16, section 2b; write_digest added in RP-18).
 
-One tool only: write_note. There is no read, list, delete or overwrite tool,
-so the AI cannot do more than the sandbox rules allow.
+Two tools:
+  write_note   - a new note in Inbox, Meetings or Ideas. Never overwrites.
+  write_digest - replaces todo.md or daily_brief.md in the vault root. Those
+                 two exact names only.
+There is no read, list or delete tool, so the AI cannot do more than the
+sandbox rules allow.
 
 Run from the repo root:
     python -m agentic_core.mcp_servers.filesystem_server.server --vault <folder>
@@ -20,6 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 
 from ..safe_errors import HideValidationDetails
+from .digest import write_digest as _write_digest
 from .notes import NoteError
 from .notes import write_note as _write_note
 from .sandbox import SandboxConfig, SandboxViolation
@@ -28,7 +33,8 @@ logger = logging.getLogger("agentic_core.filesystem_server")
 
 INSTRUCTIONS = (
     "Writes new Markdown notes into a sandboxed vault. "
-    "Allowed folders: Inbox, Meetings, Ideas. Existing notes are never changed."
+    "Allowed folders: Inbox, Meetings, Ideas. Existing notes are never changed. "
+    "write_digest replaces only todo.md or daily_brief.md in the vault root."
 )
 
 
@@ -62,6 +68,25 @@ def create_server(config: SandboxConfig) -> FastMCP:
             logger.exception("write failed")  # details go to the log, not the client
             raise ToolError("IO_ERROR") from None
         return {"path": relative}
+
+    @mcp.tool(name="write_digest")
+    def write_digest(name: str, content: str) -> dict:
+        """Create or replace one nightly digest file in the vault root.
+
+        name: exactly "todo.md" or "daily_brief.md". Nothing else is allowed.
+        content: the full Markdown text. The old file is replaced in one step.
+        Returns the name of the file written.
+        """
+        try:
+            written = _write_digest(config, name, content)
+        except SandboxViolation as violation:
+            raise ToolError(f"BLOCKED:{violation.reason}") from None
+        except NoteError as error:
+            raise ToolError(f"REJECTED:{error.reason}") from None
+        except OSError:
+            logger.exception("digest write failed")
+            raise ToolError("IO_ERROR") from None
+        return {"path": written}
 
     return mcp
 
