@@ -41,13 +41,13 @@ def call(target, tool, arguments):
     return asyncio.run(run())
 
 
-def test_only_one_tool_is_offered(server):
+def test_only_the_two_write_tools_are_offered(server):
     async def run():
         async with Client(server) as client:
             return await client.list_tools()
 
-    names = [tool.name for tool in asyncio.run(run())]
-    assert names == ["write_note"]
+    names = sorted(tool.name for tool in asyncio.run(run()))
+    assert names == ["write_digest", "write_note"]  # no read, list or delete
 
 
 def test_write_note_creates_the_file(server, vault):

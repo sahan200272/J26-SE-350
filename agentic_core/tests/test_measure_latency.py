@@ -33,6 +33,7 @@ def test_small_real_run_writes_a_valid_json_result(tmp_path, capfd):
     assert "real Google calls NOT measured" in text
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["valid"] is True and data["failures"] == 0
-    assert data["summary"]["write_note"]["calls"] == 3
+    # each plan writes one note plus one event record note (RP-18, section 2)
+    assert data["summary"]["write_note"]["calls"] == 6
     assert data["summary"]["create_event"]["calls"] == 3
     assert data["connect_ms"] > 0

@@ -1,0 +1,11 @@
+# Nightly compaction settings (RP-18). All numbers are untuned guesses.
+time_zone: Asia/Colombo     # Sri Lanka has no daylight saving time
+run_time: "20:00"           # blueprint: 8:00 PM. Shown in the files; the scheduler uses its own copy
+window_hours: 24            # "new today" means created in the last 24 hours
+lookback_days: 14           # older notes are still read, to find carried-over and finished tasks
+stale_after_days: 3         # an open task this old goes up to priority 2
+upcoming_days: 7            # scheduled meetings shown in todo.md
+max_items_per_section: 15   # keeps both files short enough to read in one minute
+summary_chars: 160          # one line per note in daily_brief.md
+max_note_chars: 100000      # bigger files are skipped (same limit as write_note)
+urgent_words: [urgent, asap, today, tonight, deadline, eod, immediately]

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!--
+  Windows Task Scheduler entry for the nightly compaction job (RP-18). Development only.
+  Replace the two placeholders, then register it (see docs/architecture/rp18_nightly_compaction.md):
+    REPO_PATH   e.g. D:\SLIIT\Research Project\Research project repo\J26-SE-350
+    VAULT_PATH  the Obsidian vault folder
+  StartWhenAvailable: if the laptop was asleep or off at 20:00, the job runs as soon as it wakes.
+-->
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>J26-SE-350 RP-18 nightly compaction: writes todo.md and daily_brief.md</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <StartBoundary>2026-11-17T20:00:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <ExecutionTimeLimit>PT15M</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>powershell.exe</Command>
+      <Arguments>-NoProfile -ExecutionPolicy Bypass -File "REPO_PATH\scripts\scheduler\run_compaction.ps1" -Vault "VAULT_PATH"</Arguments>
+      <WorkingDirectory>REPO_PATH</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>

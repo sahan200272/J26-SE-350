@@ -1,0 +1,806 @@
+{
+  "measured_at": "2026-11-17T10:49:51",
+  "official": true,
+  "dataset_fingerprint": "f32ddcd869d4a14b380724a7f3fccc65aa8ef48cf3ab47e9708422c4d3a449f5",
+  "vectors": 50,
+  "vectors_run": 50,
+  "escaped_vector_ids": [],
+  "escape_rate": 0.0,
+  "totals": {
+    "blocked": 49,
+    "harmless": 49
+  },
+  "outcomes": [
+    {
+      "id": "PT-01",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-01",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-02",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-02",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-03",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-03",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-04",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:EMPTY_COMPONENT",
+      "evidence": []
+    },
+    {
+      "id": "PT-04",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-05",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-05",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-06",
+      "category": "dot_dot_slash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-06",
+      "category": "dot_dot_slash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-07",
+      "category": "windows_backslash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-07",
+      "category": "windows_backslash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-08",
+      "category": "windows_backslash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-08",
+      "category": "windows_backslash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-09",
+      "category": "windows_backslash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:EMPTY_COMPONENT",
+      "evidence": []
+    },
+    {
+      "id": "PT-09",
+      "category": "windows_backslash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-10",
+      "category": "windows_backslash",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TRAVERSAL",
+      "evidence": []
+    },
+    {
+      "id": "PT-10",
+      "category": "windows_backslash",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-11",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-11",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-12",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-12",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-13",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:DRIVE_OR_STREAM",
+      "evidence": []
+    },
+    {
+      "id": "PT-13",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-14",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:DRIVE_OR_STREAM",
+      "evidence": []
+    },
+    {
+      "id": "PT-14",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-15",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-15",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-16",
+      "category": "absolute_path",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-16",
+      "category": "absolute_path",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-17",
+      "category": "root_override",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-17",
+      "category": "root_override",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-18",
+      "category": "root_override",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-18",
+      "category": "root_override",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-19",
+      "category": "root_override",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-19",
+      "category": "root_override",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-20",
+      "category": "root_override",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-20",
+      "category": "root_override",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-21",
+      "category": "null_byte",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NULL_BYTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-21",
+      "category": "null_byte",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-22",
+      "category": "null_byte",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NULL_BYTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-22",
+      "category": "null_byte",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-23",
+      "category": "null_byte",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NULL_BYTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-23",
+      "category": "null_byte",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-24",
+      "category": "null_byte",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NULL_BYTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-24",
+      "category": "null_byte",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-25",
+      "category": "url_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-25",
+      "category": "url_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-26",
+      "category": "url_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-26",
+      "category": "url_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-27",
+      "category": "url_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-27",
+      "category": "url_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-28",
+      "category": "url_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-28",
+      "category": "url_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-29",
+      "category": "double_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-29",
+      "category": "double_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-30",
+      "category": "double_encoding",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-30",
+      "category": "double_encoding",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-31",
+      "category": "overlong_unicode",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-31",
+      "category": "overlong_unicode",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-32",
+      "category": "overlong_unicode",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-32",
+      "category": "overlong_unicode",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-33",
+      "category": "overlong_unicode",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-33",
+      "category": "overlong_unicode",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-34",
+      "category": "unicode_lookalike",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-34",
+      "category": "unicode_lookalike",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-35",
+      "category": "unicode_lookalike",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-35",
+      "category": "unicode_lookalike",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-36",
+      "category": "unicode_lookalike",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-36",
+      "category": "unicode_lookalike",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-37",
+      "category": "unicode_lookalike",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-37",
+      "category": "unicode_lookalike",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-38",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:RESERVED_NAME",
+      "evidence": []
+    },
+    {
+      "id": "PT-38",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-39",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:RESERVED_NAME",
+      "evidence": []
+    },
+    {
+      "id": "PT-39",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-40",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:DRIVE_OR_STREAM",
+      "evidence": []
+    },
+    {
+      "id": "PT-40",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-41",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-41",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-42",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:ABSOLUTE",
+      "evidence": []
+    },
+    {
+      "id": "PT-42",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-43",
+      "category": "windows_special",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:BAD_COMPONENT",
+      "evidence": []
+    },
+    {
+      "id": "PT-43",
+      "category": "windows_special",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-44",
+      "category": "name_and_case",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-44",
+      "category": "name_and_case",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-45",
+      "category": "name_and_case",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:NOT_ALLOWED_DIR",
+      "evidence": []
+    },
+    {
+      "id": "PT-45",
+      "category": "name_and_case",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-46",
+      "category": "name_and_case",
+      "position": "folder",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-46",
+      "category": "name_and_case",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-47",
+      "category": "control_chars",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:CONTROL_CHAR",
+      "evidence": []
+    },
+    {
+      "id": "PT-47",
+      "category": "control_chars",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-48",
+      "category": "length",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:TOO_LONG",
+      "evidence": []
+    },
+    {
+      "id": "PT-48",
+      "category": "length",
+      "position": "title",
+      "verdict": "harmless",
+      "detail": "WRITTEN_INSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-49",
+      "category": "symlink",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:OUTSIDE_ZONE",
+      "evidence": []
+    },
+    {
+      "id": "PT-50",
+      "category": "symlink",
+      "position": "folder",
+      "verdict": "blocked",
+      "detail": "BLOCKED:OUTSIDE_VAULT",
+      "evidence": []
+    }
+  ],
+  "environment": {
+    "python": "3.12.4",
+    "os": "Windows-11-10.0.26200-SP0",
+    "fastmcp": "4.1.1",
+    "cpu_threads": 16
+  },
+  "note": "in-process MCP transport; first full run is the official result"
+}

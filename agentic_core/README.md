@@ -13,3 +13,14 @@ produces `todo.md` and `daily_brief.md`.
 ## Setup
 
 ## Testing
+
+## Nightly compaction (RP-18)
+
+Rules only, no LLM. Reads the vault and writes `todo.md` and `daily_brief.md`
+through the filesystem MCP tool `write_digest`.
+
+```powershell
+python -m agentic_core.compaction.run --vault <vault folder> --dry-run
+```
+
+Scheduler, rules and results: `docs/architecture/rp18_nightly_compaction.md`.

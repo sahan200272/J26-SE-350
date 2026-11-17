@@ -82,7 +82,7 @@ async def measure(vault: Path, plans: int, warmup: int) -> dict:
                 continue  # warm-up plans are not counted
             for item in report.items:
                 if item.status != "failed":
-                    tool = "write_note" if item.kind == "note" else "create_event"
+                    tool = "create_event" if item.kind == "event" else "write_note"
                     samples[tool].append(item.latency_ms)
     return {"connect_ms": connect_ms, "failures": failures, "samples": samples}
 
