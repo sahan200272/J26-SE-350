@@ -1,0 +1,29 @@
+{
+  "measured_at": "2026-11-17T12:43:14",
+  "plans": 50,
+  "warmup": 3,
+  "valid": true,
+  "connect_ms": 3975.890800007619,
+  "failures": 0,
+  "summary": {
+    "write_note": {
+      "calls": 100,
+      "median_ms": 5.755400023190305,
+      "p95_ms": 7.32960004825145,
+      "max_ms": 7.984600029885769
+    },
+    "create_event": {
+      "calls": 50,
+      "median_ms": 4.0860500012058765,
+      "p95_ms": 4.915400000754744,
+      "max_ms": 5.654899985529482
+    }
+  },
+  "environment": {
+    "python": "3.12.4",
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu_threads": 16,
+    "fastmcp": "4.1.1"
+  },
+  "note": "synthetic data, no LLM, in-memory calendar; Google calls not measured"
+}

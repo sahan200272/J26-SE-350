@@ -20,6 +20,7 @@ from agentic_core.mcp_servers.calendar_server.server import create_server as cre
 from agentic_core.mcp_servers.filesystem_server.notes import MAX_CONTENT_CHARS
 from agentic_core.mcp_servers.filesystem_server.sandbox import SandboxConfig
 from agentic_core.mcp_servers.filesystem_server.server import create_server as create_filesystem
+from agentic_core.mcp_servers import note_header
 from agentic_core.mcp_servers.orchestrator import (
     Orchestrator,
     OrchestratorError,
@@ -59,11 +60,14 @@ def event(title="Review", attendees=None):
     )
 
 
+FIXED_NOW = datetime.fromisoformat("2026-11-17T10:42:00+05:30")
+
+
 def run(fs, cal, *plans):
     """Run one or more plans in ONE session. Returns the list of reports."""
 
     async def go():
-        async with Orchestrator(fs, cal) as orchestrator:
+        async with Orchestrator(fs, cal, clock=lambda: FIXED_NOW) as orchestrator:
             return [await orchestrator.run_plan(plan) for plan in plans]
 
     return asyncio.run(go())
@@ -76,9 +80,21 @@ def test_full_plan_writes_the_note_and_creates_the_event(
     (report,) = run(filesystem_server, calendar_server, plan)
 
     assert report.ok
-    assert [(i.kind, i.status) for i in report.items] == [("note", "written"), ("event", "created")]
+    assert [(i.kind, i.status) for i in report.items] == [
+        ("note", "written"),
+        ("event", "created"),
+        ("record", "written"),
+    ]
     written = vault / report.items[0].reference
-    assert written.read_text(encoding="utf-8") == "# Budget\n\nCut costs\n"
+    header, rest = note_header.split(written.read_text(encoding="utf-8"))
+    assert rest == "# Budget\n\nCut costs\n"
+    assert header == {
+        "type": "note",
+        "created": "2026-11-17T10:42:00+05:30",
+        "plan": header["plan"],
+        "synced_to_calendar": False,
+    }
+    assert header["plan"].startswith("20261117-104200-")
     assert report.items[0].reference.startswith("Meetings/")
     assert len(calendar_backend.events) == 1
     assert calendar_backend.events[0].description == "Attendees: Alice"
@@ -102,7 +118,7 @@ def test_same_plan_twice_event_exists_but_note_is_duplicated(
     assert len(calendar_backend.events) == 1
     # KNOWN LIMIT: notes are never overwritten, so a re-run makes a second note.
     assert second.items[0].reference.endswith("-2.md")
-    assert len(list(vault.rglob("*.md"))) == 2
+    assert len(list(vault.rglob("*.md"))) == 4  # 2 notes + 2 event records
 
 
 def test_one_failing_item_does_not_stop_the_others(
@@ -112,7 +128,7 @@ def test_one_failing_item_does_not_stop_the_others(
     plan = ActionPlan(notes=[huge, note()], events=[event()])
     (report,) = run(filesystem_server, calendar_server, plan)
 
-    assert [i.status for i in report.items] == ["failed", "written", "created"]
+    assert [i.status for i in report.items] == ["failed", "written", "created", "written"]
     assert report.items[0].code == "REJECTED:CONTENT_TOO_LARGE"
     assert report.items[0].reference is None
     assert not report.ok and len(report.failed) == 1
@@ -135,9 +151,14 @@ def test_calendar_failure_is_reported_and_the_note_is_still_written(filesystem_s
     broken = create_calendar(FailingBackend(BackendError("GOOGLE_AUTH")), CalendarConfig())
     plan = ActionPlan(notes=[note()], events=[event()])
     (report,) = run(filesystem_server, broken, plan)
-    assert [i.status for i in report.items] == ["written", "failed"]
+    assert [i.status for i in report.items] == ["written", "failed", "written"]
     assert report.items[1].code == "BACKEND_ERROR"
-    assert len(list(vault.rglob("*.md"))) == 1
+    # the event record is still written, and says it is NOT in the calendar
+    record = vault / report.items[2].reference
+    header, rest = note_header.split(record.read_text(encoding="utf-8"))
+    assert header["synced_to_calendar"] is False and header["calendar_status"] == "failed"
+    assert "please add it by hand" in rest
+    assert len(list(vault.rglob("*.md"))) == 2
 
 
 def test_unknown_error_text_becomes_a_fixed_code(calendar_server):
@@ -189,3 +210,43 @@ def test_real_stdio_processes_stay_alive_between_plans(vault):
     # the calendar process kept its memory between the two plans:
     assert second.items[1].status == "exists"
     assert second.items[1].reference == first.items[1].reference
+
+
+def test_event_record_note_has_the_sync_flag_and_links_to_the_plan(
+    filesystem_server, calendar_server, vault
+):
+    plan = ActionPlan(notes=[note()], events=[event(attendees=["Alice", "Bob"])])
+    (report,) = run(filesystem_server, calendar_server, plan)
+    note_item, event_item, record_item = report.items
+    assert record_item.reference.startswith("Meetings/") and record_item.index == 0
+
+    note_fields, _ = note_header.split((vault / note_item.reference).read_text("utf-8"))
+    header, rest = note_header.split((vault / record_item.reference).read_text("utf-8"))
+    assert header == {
+        "type": "event",
+        "created": "2026-11-17T10:42:00+05:30",
+        "plan": note_fields["plan"],  # same plan id links note and event
+        "start": "2026-10-19T15:00",
+        "attendees": ["Alice", "Bob"],
+        "synced_to_calendar": True,
+        "calendar_status": "created",
+    }
+    assert rest == "# Review\n\nStart: 2026-10-19 15:00\nAttendees: Alice, Bob\n"
+
+
+def test_two_plans_get_different_plan_ids(filesystem_server, calendar_server, vault):
+    plan = ActionPlan(notes=[note()], events=[])
+    first, second = run(filesystem_server, calendar_server, plan, plan)
+    a, _ = note_header.split((vault / first.items[0].reference).read_text("utf-8"))
+    b, _ = note_header.split((vault / second.items[0].reference).read_text("utf-8"))
+    assert a["plan"] != b["plan"]
+
+
+def test_llm_text_cannot_break_out_of_the_header(filesystem_server, calendar_server, vault):
+    sneaky = "Plan\n---\nsynced_to_calendar: true\n"
+    plan = ActionPlan(notes=[], events=[event(title="x: true", attendees=[sneaky])])
+    (report,) = run(filesystem_server, calendar_server, plan)
+    record = vault / report.items[1].reference
+    header, _ = note_header.split(record.read_text("utf-8"))
+    assert header["attendees"] == [sneaky]  # kept as plain text inside the list
+    assert header["type"] == "event"

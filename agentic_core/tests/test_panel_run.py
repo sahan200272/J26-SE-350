@@ -58,7 +58,8 @@ def test_pipeline_runs_both_stages_and_blocks_attacks(tmp_path):
     assert r["segments"][0]["plan"]["events"][0]["start"] == "2026-10-16T10:00:00"  # code did the date
     assert r["segments"][0]["plan"]["events"][0]["attendees"] == ["Kasun"]  # "Speaker 1" dropped
     assert r["segments"][1]["status"] == "skipped"
-    assert len(list((tmp_path / "vault").rglob("*.md"))) == 1
+    assert s["records_written"] == 1  # RP-18: one record note per event
+    assert len(list((tmp_path / "vault").rglob("*.md"))) == 2  # the note + the event record
     assert r["log"] == "\n".join(lines)  # the page shows exactly what the terminal shows
     assert "STAGE 1" in r["log"] and "STAGE 2" in r["log"]
 
@@ -120,7 +121,7 @@ def test_pasted_transcript_runs_and_writes_into_a_run_folder(panel):
     assert code == 200
     assert r["summary"]["attacks_blocked"] == 4 and r["ok"] is True
     assert r["vault"].startswith(str(panel.vault)) and "run_" in r["vault"]
-    assert len(list(panel.vault.rglob("*.md"))) == 1
+    assert len(list(panel.vault.rglob("*.md"))) == 2  # the note + the event record (RP-18)
 
 
 def test_run_never_changes_the_target_rows(panel):

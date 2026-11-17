@@ -111,8 +111,8 @@ async def _run_tools(vault: Path, plan: ActionPlan, attack: bool, say: Callable[
     if not report.items:
         say("The plan was empty: nothing to write.")
     for item in report.items:
-        tool = "write_note" if item.kind == "note" else "create_event"
-        calls.append({"tool": tool, "index": item.index, "status": item.status,
+        tool = "create_event" if item.kind == "event" else "write_note"
+        calls.append({"tool": tool, "kind": item.kind, "index": item.index, "status": item.status,
                       "code": item.code, "reference": item.reference,
                       "ms": round(item.latency_ms, 1)})
         if item.status == "failed":
@@ -245,7 +245,8 @@ def run_pipeline(
             "llm_calls": llm_calls,
             "valid_first_try": valid,
             "mean_ms_per_token": round(statistics.mean(tpots), 1) if tpots else None,
-            "notes_written": sum(1 for c in calls if c["status"] == "written"),
+            "notes_written": sum(1 for c in calls if c["kind"] == "note" and c["status"] == "written"),
+            "records_written": sum(1 for c in calls if c["kind"] == "record" and c["status"] == "written"),
             "events_created": sum(1 for c in calls if c["status"] == "created"),
             "events_existing": sum(1 for c in calls if c["status"] == "exists"),
             "tool_failures": failed,
