@@ -1,0 +1,2647 @@
+{
+  "scored_at": "2026-11-18T21:48:33",
+  "official": true,
+  "target": ">= 90% micro F1",
+  "definition": "docs/evaluation/intent_f1_definition.md",
+  "dataset": "D:/SLIIT/Research Project/Research project repo/J26-SE-350/agentic_core/datasets/schema_compliance/eval_cases.json",
+  "dataset_fingerprint": "a03126ad762e34c735b0d0b4eacf3aa5e5282eafc9c6683ca37aef0713a8551d",
+  "source_run": {
+    "path": "docs/evaluation/schema_compliance_official.json",
+    "measured_at": "2026-10-20T20:45:47",
+    "mode": "grammar",
+    "model": "llama3:8b",
+    "llm_options": {
+      "num_ctx": 4096,
+      "temperature": 0.0,
+      "num_predict": 512
+    },
+    "setup_hashes": {
+      "system_prompt": "c02aa2d5ae6ce204dcbd4cecf7ca31a0510f940135f35c795b2e61a7b6313a15",
+      "draft_schema": "e492b95a17549ba12810e558de6ab700a44ae0d41bc1ade25ea4e242af50524a",
+      "llm_config": "53386c8ac861e93064b7e48b97b81c99ad90be117d18b157acbb89818510bcb2"
+    },
+    "machine_gpu": "NVIDIA GeForce RTX 2050, 4096 MiB, 610.78"
+  },
+  "scorer": {
+    "threshold": 0.5,
+    "stop_words": [
+      "a",
+      "about",
+      "an",
+      "and",
+      "at",
+      "be",
+      "by",
+      "for",
+      "from",
+      "i",
+      "in",
+      "is",
+      "it",
+      "my",
+      "of",
+      "on",
+      "or",
+      "our",
+      "that",
+      "the",
+      "this",
+      "to",
+      "us",
+      "we",
+      "will",
+      "with",
+      "you",
+      "your"
+    ],
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 17,
+    "llm_calls": 0
+  },
+  "compliance_disagreements": 0,
+  "summary": {
+    "total": {
+      "cases": 200,
+      "tp": 152,
+      "fp": 181,
+      "fn": 99,
+      "precision": 0.45645645645645644,
+      "recall": 0.6055776892430279,
+      "f1": 0.5205479452054794,
+      "exact_cases": 52,
+      "ci95_low": 0.46238532110091746,
+      "ci95_high": 0.5774647887323944
+    },
+    "result": "NOT MET",
+    "notes_only": {
+      "cases": 200,
+      "tp": 58,
+      "fp": 155,
+      "fn": 72,
+      "precision": 0.27230046948356806,
+      "recall": 0.4461538461538462,
+      "f1": 0.33819241982507287
+    },
+    "events_only": {
+      "cases": 200,
+      "tp": 94,
+      "fp": 26,
+      "fn": 27,
+      "precision": 0.7833333333333333,
+      "recall": 0.7768595041322314,
+      "f1": 0.7800829875518672
+    },
+    "by_category": {
+      "single_intent": {
+        "cases": 50,
+        "tp": 36,
+        "fp": 34,
+        "fn": 14,
+        "precision": 0.5142857142857142,
+        "recall": 0.72,
+        "f1": 0.6,
+        "exact_cases": 21
+      },
+      "multi_intent": {
+        "cases": 75,
+        "tp": 105,
+        "fp": 86,
+        "fn": 71,
+        "precision": 0.5497382198952879,
+        "recall": 0.5965909090909091,
+        "f1": 0.5722070844686649,
+        "exact_cases": 17
+      },
+      "ambiguous": {
+        "cases": 25,
+        "tp": 11,
+        "fp": 9,
+        "fn": 14,
+        "precision": 0.55,
+        "recall": 0.44,
+        "f1": 0.4888888888888889,
+        "exact_cases": 11
+      },
+      "noise": {
+        "cases": 50,
+        "fp": 52,
+        "clean_cases": 3,
+        "clean_case_rate": 0.06
+      }
+    },
+    "exact_case_rate": 0.26,
+    "non_compliant": {
+      "cases": 7,
+      "fn_from_them": 8
+    },
+    "folder_accuracy": {
+      "checked": 58,
+      "correct": 42,
+      "rate": 0.7241379310344828
+    },
+    "attendees_accuracy": {
+      "checked": 94,
+      "correct": 87,
+      "rate": 0.925531914893617
+    }
+  },
+  "records": [
+    {
+      "id": "SC-001",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-002",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Architecture Review' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-003",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "event 'Meeting' 2026-10-22T10:45"
+      ]
+    },
+    {
+      "id": "SC-004",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-005",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-006",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Invoices meeting' 2026-10-19T15:00"
+      ],
+      "extras": [
+        "note 'Meeting with Tharindu' (Meetings)",
+        "event 'Meeting with Tharindu' 2026-10-19T15:00"
+      ]
+    },
+    {
+      "id": "SC-007",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-008",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Security Training' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-009",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Code Freeze Check' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-010",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Call with Priya and Ahmed' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-011",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-012",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'UX test preparation' (Inbox)",
+        "event 'Prepare the room' 2026-10-22T11:30"
+      ]
+    },
+    {
+      "id": "SC-013",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'App Demo' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-014",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-015",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Team Lunch' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-016",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Board Update' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-017",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Pair on the parser' 2026-10-21T14:30"
+      ],
+      "extras": [
+        "note 'Parser Pairing' (Inbox)",
+        "event 'Parser Pairing Meeting' 2026-10-21T14:30"
+      ]
+    },
+    {
+      "id": "SC-018",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Build check call' 2026-10-20T18:00"
+      ],
+      "extras": [
+        "note 'Meeting' (Inbox)",
+        "event 'Meeting' 2026-10-20T18:00"
+      ]
+    },
+    {
+      "id": "SC-019",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Send interview link to Maria' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-020",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-021",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-022",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Parents Meeting' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-023",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Budget meeting' 2026-10-23T16:15"
+      ],
+      "extras": [
+        "event 'Meeting with Dinesh' 2026-10-23T16:15"
+      ]
+    },
+    {
+      "id": "SC-024",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-025",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Hiring Plan Check-in' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-026",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Investor demo' 2026-10-26T10:30"
+      ],
+      "extras": [
+        "note 'Demo Preparation' (Inbox)",
+        "event 'Demo for Investors' 2026-10-26T10:30"
+      ]
+    },
+    {
+      "id": "SC-027",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-028",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Design Walkthrough' (Meetings)"
+      ]
+    },
+    {
+      "id": "SC-029",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Doctor Appointment' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-030",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Load Test' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-031",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Export notes as PDF' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-032",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Use PostgreSQL' (Meetings)"
+      ],
+      "extras": [
+        "note 'Database Choice' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-033",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-034",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-035",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Feature freeze' (Meetings)"
+      ],
+      "extras": [
+        "note 'No new features before release' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-036",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Wifi password changed' (Inbox)"
+      ],
+      "extras": [
+        "note 'Office WiFi Password Change' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-037",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-038",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-039",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-040",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Customer story on home page' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea for the website' (Ideas)"
+      ]
+    },
+    {
+      "id": "SC-041",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Two approvals for reviews' (Meetings)"
+      ],
+      "extras": [
+        "note 'Code Reviews' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-042",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-043",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-044",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-045",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Back up laptop' (Inbox)"
+      ],
+      "extras": [
+        "note 'Backup Laptop' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-046",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-047",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Sinhala and Tamil support' (Meetings)"
+      ],
+      "extras": [
+        "note 'Mobile App Language Support' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-048",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-049",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-050",
+      "category": "single_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Timesheets reminder' (Inbox)"
+      ],
+      "extras": [
+        "note 'Remind team to fill in timesheets' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-051",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'API Review' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-052",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Survey progress bar' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-053",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Ship v2 without chat' (Meetings)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-054",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-055",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Supplier price rise' (Meetings)"
+      ],
+      "extras": [
+        "note 'Supplier Meeting Notes' (Inbox)",
+        "note 'Supplier Meeting' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-056",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Guided tour discussion' 2026-10-22T16:00"
+      ],
+      "extras": [
+        "event 'Meeting' 2026-10-22T16:00"
+      ]
+    },
+    {
+      "id": "SC-057",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-058",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Retros every two weeks' (Meetings)"
+      ],
+      "extras": [
+        "note 'Invite Hiran and Malsha' (Inbox)",
+        "note 'Retro frequency' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-059",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "misses": [
+        "note 'Record the training' (Ideas)",
+        "event 'Training' 2026-10-27T10:00"
+      ],
+      "extras": [
+        "note 'Idea: Record Training for New Staff' (Inbox)",
+        "note 'Book Training Room' (Inbox)",
+        "event 'Meeting' 2026-10-27T10:00"
+      ]
+    },
+    {
+      "id": "SC-060",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Weekly reports for client' (Meetings)"
+      ],
+      "extras": [
+        "note 'Client Requirements' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-061",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-062",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Two year contract' (Meetings)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-063",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-064",
+      "category": "multi_intent",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "misses": [
+        "note 'Rotate admin passwords' (Inbox)",
+        "event 'Pen test results meeting' 2026-10-22T09:30"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-065",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Bring old medical reports' (Inbox)"
+      ],
+      "extras": [
+        "note 'Reminder' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-066",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "misses": [
+        "note 'Mobile team owns push' (Meetings)",
+        "event 'Push notifications handover' 2026-10-27T15:00"
+      ],
+      "extras": [
+        "note 'Mobile Team Ownership' (Inbox)",
+        "note 'Meeting Notes' (Inbox)",
+        "event 'Handover' 2026-10-27T15:00"
+      ]
+    },
+    {
+      "id": "SC-067",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-068",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Present support booking idea' 2026-10-21T11:15"
+      ],
+      "extras": [
+        "note 'Present to Nadeesha' (Inbox)",
+        "event 'Meeting with Nadeesha' 2026-10-21T11:15"
+      ]
+    },
+    {
+      "id": "SC-069",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'New screens must pass audit' (Meetings)"
+      ],
+      "extras": [
+        "note 'Accessibility Audit' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-070",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-071",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Buddy for interns' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea: Intern Buddy Program' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-072",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-073",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Tell support about Android change' 2026-10-22T14:00"
+      ],
+      "extras": [
+        "event 'Notify support' 2026-10-22T14:00"
+      ]
+    },
+    {
+      "id": "SC-074",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Bug only on Windows' (Inbox)"
+      ],
+      "extras": [
+        "note 'Vihanga debugging session' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-075",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Costs per team on dashboard' (Ideas)"
+      ],
+      "extras": [
+        "note 'Dashboard Idea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-076",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-077",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Promotions twice a year' (Meetings)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-078",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-079",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Hackathon theme' (Ideas)"
+      ],
+      "extras": [
+        "note 'Hackathon Planning' (Inbox)",
+        "note 'Idea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-080",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-081",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-082",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Meeting with Ayesha and Bandara' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-083",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "event 'Kickoff' 2026-10-21T10:00",
+        "event 'Kickoff follow-up' 2026-10-23T15:00"
+      ],
+      "extras": [
+        "event 'Meeting' 2026-10-21T10:00",
+        "event 'Meeting' 2026-10-23T15:00"
+      ]
+    },
+    {
+      "id": "SC-084",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Code review' 2026-10-20T16:00"
+      ],
+      "extras": [
+        "note 'Code Review' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-085",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "misses": [
+        "event 'Dentist' 2026-10-24T09:00",
+        "event 'Kids' swimming lesson' 2026-10-24T16:00"
+      ],
+      "extras": [
+        "note 'Dentist appointment' (Inbox)",
+        "event 'Saturday' 2026-10-24T09:00",
+        "event 'Saturday' 2026-10-24T16:00"
+      ]
+    },
+    {
+      "id": "SC-086",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Customer Workshop' (Meetings)",
+        "note 'Internal Debrief' (Meetings)"
+      ]
+    },
+    {
+      "id": "SC-087",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-088",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Test Schedule' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-089",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 4,
+      "fn": 2,
+      "misses": [
+        "event 'Security review' 2026-10-23T10:00",
+        "event 'Privacy review' 2026-10-23T11:30"
+      ],
+      "extras": [
+        "note 'Security Review' (Inbox)",
+        "note 'Privacy Review' (Inbox)",
+        "event 'Meeting' 2026-10-23T10:00",
+        "event 'Meeting' 2026-10-23T11:30"
+      ]
+    },
+    {
+      "id": "SC-090",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "misses": [
+        "event 'Interview with Tom' 2026-10-22T10:00",
+        "event 'Interview with Leena' 2026-10-22T15:00"
+      ],
+      "extras": [
+        "note 'Interviews' (Inbox)",
+        "event 'Interviews' 2026-10-22T10:00",
+        "event 'Interviews' 2026-10-22T15:00"
+      ]
+    },
+    {
+      "id": "SC-091",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Press briefing rehearsal' 2026-10-24T14:00"
+      ],
+      "extras": [
+        "note 'Press Briefing' (Inbox)",
+        "event 'Rehearsal' 2026-10-24T14:00"
+      ]
+    },
+    {
+      "id": "SC-092",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Sales Call' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-093",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "misses": [
+        "event 'Family lunch' 2026-10-25T12:30",
+        "event 'Movie with the kids' 2026-10-25T18:00"
+      ],
+      "extras": [
+        "note 'Sunday Plans' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-094",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Backup test' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-095",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-096",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'Monthly releases' (Meetings)",
+        "note 'Release notes video' (Ideas)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)",
+        "note 'Ideas' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-097",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "misses": [
+        "note 'Buy printer ink' (Inbox)",
+        "note 'Call the bank' (Inbox)"
+      ],
+      "extras": [
+        "note 'Reminders' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-098",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Editor keyboard shortcuts' (Ideas)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-099",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'QA signs off releases' (Meetings)",
+        "note 'Hotfixes skip full tests' (Meetings)"
+      ],
+      "extras": [
+        "note 'QA Team Sign Off' (Inbox)",
+        "note 'Hotfixes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-100",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'New background for team photo' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-101",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Client prefers email' (Inbox)"
+      ],
+      "extras": [
+        "note 'Client Preference' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-102",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Free trial for teachers' (Ideas)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-103",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Logo stays blue' (Meetings)"
+      ],
+      "extras": [
+        "note 'Logo Decision' (Inbox)",
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-104",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "misses": [
+        "note 'Water the plants' (Inbox)",
+        "note 'Lock the back gate' (Inbox)"
+      ],
+      "extras": [
+        "note 'Household' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-105",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "misses": [
+        "note 'Quiet rooms in new office' (Meetings)",
+        "note 'Library corner' (Ideas)"
+      ],
+      "extras": [
+        "note 'Office Design' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-106",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'One week sprints' (Meetings)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-107",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'Bring signed forms' (Inbox)",
+        "note 'Move forms online' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)",
+        "note 'Reminder' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-108",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Renew trademark' (Inbox)"
+      ],
+      "extras": [
+        "note 'Trademark Renewal' (Inbox)",
+        "note 'Lawyer Meeting' (Meetings)"
+      ]
+    },
+    {
+      "id": "SC-109",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-110",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-111",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "event 'Present widget and watch ideas' 2026-10-22T11:00"
+      ],
+      "extras": [
+        "note 'Present Ideas' (Inbox)",
+        "event 'Meeting' 2026-10-22T11:00"
+      ]
+    },
+    {
+      "id": "SC-112",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Parents' tea' 2026-10-23T15:00"
+      ],
+      "extras": [
+        "note 'Parents' tea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-113",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Beta to fifty users' (Meetings)"
+      ],
+      "extras": [
+        "note 'Beta launch' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-114",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Network Upgrade' (Inbox)",
+        "note 'Rollback Test' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-115",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'Product podcast' (Ideas)",
+        "note 'No paid ads this quarter' (Meetings)"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)",
+        "note 'Decisions' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-116",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'Bring bank statements' (Inbox)",
+        "note 'Bring receipts' (Inbox)"
+      ],
+      "extras": [
+        "note 'Tax Meeting' (Inbox)",
+        "note 'Reminders' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-117",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Reviews use new form' (Meetings)"
+      ],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)",
+        "note 'Ideas' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-118",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "misses": [
+        "note 'Pay electricity bill' (Inbox)",
+        "note 'Pay water bill' (Inbox)"
+      ],
+      "extras": [
+        "note 'Bills' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-119",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-120",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Launch countdown' (Ideas)"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-121",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-122",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 2,
+      "fp": 2,
+      "fn": 2,
+      "misses": [
+        "note 'Move to cloud by March' (Meetings)",
+        "note 'Keep backups on site' (Meetings)"
+      ],
+      "extras": [
+        "note 'Cloud Migration' (Inbox)",
+        "note 'Backup Strategy' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-123",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 0,
+      "fp": 4,
+      "fn": 4,
+      "misses": [
+        "note 'Cafe loyalty card' (Ideas)",
+        "note 'Weekend breakfast menu' (Ideas)",
+        "note 'Ask bank about card machine' (Inbox)",
+        "event 'Meeting with cafe owner' 2026-10-26T08:00"
+      ],
+      "extras": [
+        "note 'Idea' (Inbox)",
+        "note 'Idea' (Inbox)",
+        "note 'Reminder' (Inbox)",
+        "event 'Meeting' 2026-10-26T08:00"
+      ]
+    },
+    {
+      "id": "SC-124",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "event 'Photographer call' 2026-10-25T10:00"
+      ],
+      "extras": [
+        "note 'Photographer call' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-125",
+      "category": "multi_intent",
+      "compliant": true,
+      "tp": 4,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Family Dinner' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-126",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Lunch' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-127",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Traffic' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-128",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Puppy Antics' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-129",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Gift' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-130",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Air Conditioner' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-131",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Bakery' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-132",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Son's School Experience' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-133",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Music preferences' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-134",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'View' (Inbox)",
+        "note 'Sea' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-135",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Book Review' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-136",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Phone Cover' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-137",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Wedding' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-138",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Sports' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-139",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Plant Care' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-140",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Elevator issues' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-141",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Kiribath' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-142",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Moon' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-143",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Time flies' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-144",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Health' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-145",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-146",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Meeting outcome' (Inbox)",
+        "event 'Meeting' 2026-10-26T10:00"
+      ]
+    },
+    {
+      "id": "SC-147",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Report sent' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-148",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'New Design' (Inbox)",
+        "note 'Recognition' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-149",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Deployment Success' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-150",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Hall booking' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-151",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Interview' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-152",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Trip to Kandy' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-153",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Training' (Inbox)",
+        "note 'Idea' (Inbox)",
+        "event 'Meeting' 2026-10-27T14:00"
+      ]
+    },
+    {
+      "id": "SC-154",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Login Bug Fix' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-155",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Party' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-156",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Passport Renewal' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-157",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Sprint planning' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-158",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Chat feature' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-159",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Logo Discussion' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-160",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Meeting pace' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-161",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Database' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-162",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Programming languages' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-163",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Office Hours' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-164",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Poya day' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-165",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Cafe Hours' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-166",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Meeting Room' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-167",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Meeting Notes' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-168",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'No specific action agreed upon' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-169",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'No more meetings today' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-170",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Owe a coffee' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-171",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-172",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-173",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Reflection on time passing' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-174",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Weekend Relaxation' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-175",
+      "category": "noise",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "misses": [],
+      "extras": [
+        "note 'Printer issues' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-176",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-177",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Look at bug list' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-178",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-179",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Backup check' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-180",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Call Nuwan' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-181",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Team dinner' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-182",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-183",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Release planning at 10 am' (Inbox)"
+      ],
+      "extras": [
+        "note 'Meeting to plan release' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-184",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "misses": [
+        "note 'Vendor call at 4 pm' (Inbox)"
+      ],
+      "extras": [
+        "note 'Check email' (Inbox)",
+        "event 'Call with vendor' 2026-10-21T16:00"
+      ]
+    },
+    {
+      "id": "SC-185",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Standup at 9:15' (Inbox)"
+      ],
+      "extras": [
+        "note 'Standup' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-186",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-187",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Demo at 3 pm' (Inbox)"
+      ],
+      "extras": [
+        "note 'Demo' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-188",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-189",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Roadmap meeting' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-190",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-191",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Review at end of month' (Inbox)"
+      ],
+      "extras": [
+        "note 'Review' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-192",
+      "category": "ambiguous",
+      "compliant": false,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "misses": [
+        "note 'Launch party' (Inbox)"
+      ],
+      "extras": []
+    },
+    {
+      "id": "SC-193",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-194",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-195",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Workshop Tuesday or Wednesday' (Inbox)"
+      ],
+      "extras": [
+        "note 'Workshop Date' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-196",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-197",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-198",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Start Monday if client agrees' (Inbox)"
+      ],
+      "extras": [
+        "note 'Client Agreement' (Inbox)"
+      ]
+    },
+    {
+      "id": "SC-199",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "misses": [],
+      "extras": []
+    },
+    {
+      "id": "SC-200",
+      "category": "ambiguous",
+      "compliant": true,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "misses": [
+        "note 'Maybe move deadline' (Inbox)"
+      ],
+      "extras": [
+        "note 'Deadline' (Inbox)"
+      ]
+    }
+  ],
+  "note": "offline scoring of the frozen run; no new LLM calls; no tuning on eval cases"
+}

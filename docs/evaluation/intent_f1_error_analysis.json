@@ -1,0 +1,26 @@
+{
+  "note": "error analysis of the official run; NOT the result",
+  "run": "docs/evaluation/schema_compliance_official.json",
+  "extras": {
+    "note_title_differs": 55,
+    "noise_case": 52,
+    "copy_of_event": 39,
+    "right_slot_title_differs": 21,
+    "other": 14
+  },
+  "misses": {
+    "note_title_differs": 61,
+    "right_slot_title_differs": 21,
+    "non_compliant": 8,
+    "not_found": 5,
+    "type_swap": 4
+  },
+  "lenient_upper_bound": {
+    "tp": 231,
+    "fp": 102,
+    "fn": 20,
+    "precision": 0.6936936936936937,
+    "recall": 0.9203187250996016,
+    "f1": 0.791095890410959
+  }
+}
